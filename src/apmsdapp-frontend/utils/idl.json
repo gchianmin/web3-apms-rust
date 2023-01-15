@@ -1,0 +1,146 @@
+{
+  "version": "0.1.0",
+  "name": "apmsdapp",
+  "instructions": [
+    {
+      "name": "create",
+      "accounts": [
+        {
+          "name": "conference",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "name": "date",
+          "type": "string"
+        },
+        {
+          "name": "venue",
+          "type": "string"
+        },
+        {
+          "name": "submissionDeadline",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "modify",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "conference",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newName",
+          "type": "string"
+        },
+        {
+          "name": "newDescription",
+          "type": "string"
+        },
+        {
+          "name": "newDate",
+          "type": "string"
+        },
+        {
+          "name": "newVenue",
+          "type": "string"
+        },
+        {
+          "name": "newSubmissionDeadline",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "cancel",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "conference",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Conference",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "type": "string"
+          },
+          {
+            "name": "venue",
+            "type": "string"
+          },
+          {
+            "name": "submissionDeadline",
+            "type": "string"
+          },
+          {
+            "name": "paperSubmitted",
+            "type": "u64"
+          },
+          {
+            "name": "feeReceived",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "51QHpF5dYpwRfRfLAiBShGHEKZ3hT5K1FTyoo9omKfoz"
+  }
+}
