@@ -20,7 +20,7 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
         >
           <FormGroup row>
             <Label className="text-monospace" for="email" sm={2}>
-              Email address
+              Email Address
             </Label>
             <Col sm={10}>
               <Input
@@ -28,6 +28,21 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
                 name="email"
                 placeholder="email address of the organiser"
                 type="email"
+                required
+              />
+            </Col>
+          </FormGroup>
+
+          <FormGroup row>
+            <Label className="text-monospace" for="createdby" sm={2}>
+              Created By
+            </Label>
+            <Col sm={10}>
+              <Input
+                id="createdby"
+                name="createdby"
+                placeholder="display name of the organiser"
+                type="text"
                 required
               />
             </Col>
@@ -56,7 +71,7 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
               <Input
                 id="description"
                 name="description"
-                placeholder="A brief description of what the conference does"
+                placeholder="a brief description of what the conference does"
                 type="textarea"
                 required
               />

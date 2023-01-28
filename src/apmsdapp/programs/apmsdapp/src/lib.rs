@@ -8,7 +8,7 @@ mod account_data;
 mod errors;
 mod instructions;
 
-declare_id!("51QHpF5dYpwRfRfLAiBShGHEKZ3hT5K1FTyoo9omKfoz");
+declare_id!("4oTVMeFwQwkUpFBwdNk2kF2Ryxv5ZQdPkdhqyH2iy8H4");
 
 #[program]
 pub mod apmsdapp {
@@ -18,8 +18,8 @@ pub mod apmsdapp {
         instructions::initialize(ctx)
     }
 
-    pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String) -> Result<()> {
-        instructions::create_conference(ctx, name, description, date, venue, submission_deadline)
+    pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String, created_by: String, organiser_email: String) -> Result<()> {
+        instructions::create_conference(ctx, name, description, date, venue, submission_deadline, created_by, organiser_email)
     }
 
     pub fn update_conference(ctx: Context<UpdateConference>, conference: Conference) -> Result<()> {

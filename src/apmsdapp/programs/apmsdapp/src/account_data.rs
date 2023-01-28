@@ -37,4 +37,6 @@ pub struct Conference {
   pub submission_deadline: String,
   pub paper_submitted: u64,
   pub fee_received: u64,
+  pub created_by: String,
+  pub organiser_email: String,
 }

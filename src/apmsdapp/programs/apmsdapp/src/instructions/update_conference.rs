@@ -10,6 +10,7 @@ pub struct UpdateConference<'info> {
 }
 
 pub fn update_conference(ctx: Context<UpdateConference>, conference: Conference) -> Result<()> {
+  print!("enter");
   let account = &mut ctx.accounts.conference_list;
   let index = account.get_conference_index(conference.id)?;
   *(account.conferences.get_mut(index).expect("")) = conference;

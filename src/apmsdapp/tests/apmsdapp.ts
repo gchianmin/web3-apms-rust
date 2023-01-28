@@ -4,34 +4,34 @@ const { SystemProgram } = anchor.web3
 const { PublicKey } = require('@solana/web3.js')
 
 
-interface ConferenceListAccountData {
-  count: number;
-  deletedIndexes: number[];
-  conferences: Conference[];
-}
+// interface ConferenceListAccountData {
+//   count: number;
+//   deletedIndexes: number[];
+//   conferences: Conference[];
+// }
 
-interface Conference {
-  id: anchor.web3.PublicKey;
-  name: String;
-  description: String;
-  date: String;
-  venue: String;
-  submission_deadline: String;
-  paper_submitted: anchor.BN;
-  fee_received: anchor.BN;
-}
-
-
-// Configure the client to use the local cluster.
-const provider = anchor.getProvider();
-anchor.setProvider(provider);
-const program = anchor.workspace.Apmsdapp;
-// let creatorKey = provider.wallet.publicKey
-// let stateSigner
-const user = program.provider.wallet;
-const conferenceListKeypair = anchor.web3.Keypair.generate();
+// interface Conference {
+//   id: anchor.web3.PublicKey;
+//   name: String;
+//   description: String;
+//   date: String;
+//   venue: String;
+//   submission_deadline: String;
+//   paper_submitted: anchor.BN;
+//   fee_received: anchor.BN;
+//   created_by: String;
+// }
 
 describe("apmsdapp", () => {
+  // Configure the client to use the local cluster.
+  const provider = anchor.getProvider();
+  anchor.setProvider(provider);
+  const program = anchor.workspace.Apmsdapp;
+  // let creatorKey = provider.wallet.publicKey
+  // let stateSigner
+  const user = program.provider.wallet;
+  const conferenceListKeypair = anchor.web3.Keypair.generate();
+
   it("initialize account data", async () => {
     await program.rpc.initialize({
         accounts: {
@@ -51,7 +51,7 @@ describe("apmsdapp", () => {
 
   it("create first conference", async () => {
 
-    await program.rpc.createConference("IEEE Conference", "A yearly conference for authors globally.", "2023-04-05 00:00:00", "Marina Bay Sand", "2023-02-05 00:00:00", {
+    await program.rpc.createConference("IEEE Conference", "A yearly conference for authors globally.", "2023-04-05 00:00:00", "Marina Bay Sand", "2023-02-05 00:00:00", "May", {
       accounts: {
         conferenceList: conferenceListKeypair.publicKey,
         user: user.publicKey,
@@ -70,11 +70,12 @@ describe("apmsdapp", () => {
     assert.equal(firstConference.date, "2023-04-05 00:00:00");
     assert.equal(firstConference.venue, "Marina Bay Sand");
     assert.equal(firstConference.submissionDeadline, "2023-02-05 00:00:00");
+    assert.equal(firstConference.createdBy, "May");
   });
 
   it("create second conference", async () => {
 
-    await program.rpc.createConference("ACM Conference", "ACM Conference description", "2023-05-05 00:00:00", "Suntec Convention Centre", "2023-04-05 00:00:00", {
+    await program.rpc.createConference("ACM Conference", "ACM Conference description", "2023-05-05 00:00:00", "Suntec Convention Centre", "2023-04-05 00:00:00", "May",{
       accounts: {
         conferenceList: conferenceListKeypair.publicKey,
         user: user.publicKey,
@@ -93,12 +94,14 @@ describe("apmsdapp", () => {
     assert.equal(secondConference.date, "2023-05-05 00:00:00");
     assert.equal(secondConference.venue, "Suntec Convention Centre");
     assert.equal(secondConference.submissionDeadline, "2023-04-05 00:00:00");
+    assert.equal(secondConference.createdBy, "May");
   });
 
   it("Fetch All Conferences",async () => {
       try{
         const conferenceInfo = await program.account.conferenceListAccountData.all()
         console.log("Conferences List", conferenceInfo)
+      
       }
       catch (e) {
         console.log(e)
@@ -107,13 +110,19 @@ describe("apmsdapp", () => {
   
   it("Updating IEEE Conference", async() => {
     const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair.publicKey);
-    // const conferenceInfo = await program.account.conferenceListAccountData.all()
-    // const conf_id = conferenceInfo[0].account.conferences[0].id
-  
-    let updatedContent = {id: data.conferences[0].id, name:"IEEE Conference Updated", description: "IEEE Conference description", date: "2023-08-05 00:00:00", venue: "KLCC Convention Centre", submission_deadline:"2023-04-05 00:00:00", paper_submitted: new anchor.BN(0), fee_received:new anchor.BN(0)}
-    console.log(updatedContent)
-
-    await program.rpc.updateConference(updatedContent.web3.serialize(), 
+    console.log(data.conferences[0].id)
+    let id = data.conferences[0].id
+    let name = "IEEE Conference Updated"
+    let description = "IEEE Conference description"
+    let date = "2023-08-05 00:00:00"
+    let venue = "KLCC Convention Centre"
+    let submissionDeadline = "2023-04-05 00:00:00"
+    let paperSubmitted = new anchor.BN(0)
+    let feeReceived = new anchor.BN(0)
+    let createdBy = "May"
+ 
+    await program.rpc.updateConference( 
+      {id, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy},
       {
         accounts: {
           conferenceList: conferenceListKeypair.publicKey,
@@ -122,26 +131,226 @@ describe("apmsdapp", () => {
       }
     );
 
-    // const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair.publicKey);
-    // console.log(data)
-    // assert.equal(data.count, 2);
-    // assert.equal(data.conferences.length, 2);
-    // assert.equal(data.deletedIndexes.length, 0);
-    // const firstConference = data.conferences[0];
-    // assert.equal(firstConference.id.toBytes().length, 32);
-    // assert.equal(firstConference.name, "IEEE Conference Updated");
-    // assert.equal(firstConference.description, "IEEE Conference description");
-    // assert.equal(firstConference.date, "2023-08-05 00:00:00");
-    // assert.equal(firstConference.venue, "KLCC Convention Centre");
-    // assert.equal(firstConference.submissionDeadline, "2023-04-05 00:00:00");
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferenceListKeypair.publicKey);
+    console.log(updatedData)
+    assert.equal(updatedData.count, 2);
+    assert.equal(updatedData.conferences.length, 2);
+    assert.equal(updatedData.deletedIndexes.length, 0);
+    const firstConference = updatedData.conferences[0];
+    assert.equal(firstConference.id.toBytes().length, 32);
+    assert.equal(firstConference.name, "IEEE Conference Updated");
+    assert.equal(firstConference.description, "IEEE Conference description");
+    assert.equal(firstConference.date, "2023-08-05 00:00:00");
+    assert.equal(firstConference.venue, "KLCC Convention Centre");
+    assert.equal(firstConference.submissionDeadline, "2023-04-05 00:00:00");
+    assert.equal(firstConference.createdBy, "May");
+  })
+
+  it("Fetch All Conferences after Updating",async () => {
+    try{
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo[0].account.conferences)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  });
+
+  it("Deleting IEEE Conference", async() => {
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair.publicKey);
+    console.log(data.conferences[0].id)
+    let id = data.conferences[0].id
+ 
+    await program.rpc.deleteConference( 
+      id,
+      {
+        accounts: {
+          conferenceList: conferenceListKeypair.publicKey,
+          user: user.publicKey,
+        },
+      }
+    );
+
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferenceListKeypair.publicKey);
+    console.log(updatedData)
+    assert.equal(updatedData.count, 1);
+    assert.equal(updatedData.conferences.length, 1);
+    assert.equal(updatedData.deletedIndexes.length, 1);
+  })
+
+  it("Fetch All Conferences after deleting",async () => {
+    try{
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo[0].account.conferences)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  });
+
+  //create another user
+  const user2 = program.provider.wallet;
+  const conferenceListKeypair2 = anchor.web3.Keypair.generate();
+
+  it("initialize account data for the second user", async () => {
+    await program.rpc.initialize({
+        accounts: {
+          systemProgram: SystemProgram.programId,
+          conferenceList: conferenceListKeypair2.publicKey,
+          user: user2.publicKey,
+        },
+        signers: [conferenceListKeypair2],
+      });
+
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(data)
+    assert.equal(data.count, 0);
+    assert.equal(data.conferences.length, 0);
+    assert.equal(data.deletedIndexes.length, 0);
+  });
+  
+
+  it("create first conference for the second user", async () => {
+
+    await program.rpc.createConference("IEEE Conference 2", "A yearly conference for authors globally 2.", "2023-04-05 00:00:00", "Marina Bay Sand 2", "2023-02-05 00:00:00", "Ariel",{
+      accounts: {
+        conferenceList: conferenceListKeypair2.publicKey,
+        user: user2.publicKey,
+      },
+    });
+
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(data)
+    assert.equal(data.count, 1);
+    assert.equal(data.conferences.length, 1);
+    assert.equal(data.deletedIndexes.length, 0);
+    const firstConference = data.conferences[0];
+    assert.equal(firstConference.id.toBytes().length, 32);
+    assert.equal(firstConference.name, "IEEE Conference 2");
+    assert.equal(firstConference.description, "A yearly conference for authors globally 2.");
+    assert.equal(firstConference.date, "2023-04-05 00:00:00");
+    assert.equal(firstConference.venue, "Marina Bay Sand 2");
+    assert.equal(firstConference.submissionDeadline, "2023-02-05 00:00:00");
+    assert.equal(firstConference.createdBy, "Ariel");
+  });
+
+  it("create second conference for second user", async () => {
+
+    await program.rpc.createConference("ACM Conference", "ACM Conference description", "2023-05-05 00:00:00", "Suntec Convention Centre", "2023-04-05 00:00:00", "Ariel",{
+      accounts: {
+        conferenceList: conferenceListKeypair2.publicKey,
+        user: user2.publicKey,
+      },
+    });
+
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(data)
+    assert.equal(data.count, 2);
+    assert.equal(data.conferences.length, 2);
+    assert.equal(data.deletedIndexes.length, 0);
+    const secondConference = data.conferences[1];
+    assert.equal(secondConference.id.toBytes().length, 32);
+    assert.equal(secondConference.name, "ACM Conference");
+    assert.equal(secondConference.description, "ACM Conference description");
+    assert.equal(secondConference.date, "2023-05-05 00:00:00");
+    assert.equal(secondConference.venue, "Suntec Convention Centre");
+    assert.equal(secondConference.submissionDeadline, "2023-04-05 00:00:00");
+    assert.equal(secondConference.createdBy, "Ariel");
+  });
+
+  it("Fetch All Conferences",async () => {
+    try{
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo[0].account.conferences)
+      console.log("Conferences List", conferenceInfo[1].account.conferences)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  });
+  
+  it("Updating IEEE Conference for the second user", async() => {
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(data.conferences[0].id)
+    let id = data.conferences[0].id
+    let name = "Updated"
+    let description = "IEEE Conference description"
+    let date = "2023-08-05 00:00:00"
+    let venue = "KLCC Convention Centre"
+    let submissionDeadline = "2023-04-05 00:00:00"
+    let paperSubmitted = new anchor.BN(0)
+    let feeReceived = new anchor.BN(0)
+    let createdBy = "Ariel"
+ 
+    await program.rpc.updateConference( 
+      {id, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy},
+      {
+        accounts: {
+          conferenceList: conferenceListKeypair2.publicKey,
+          user: user2.publicKey,
+        },
+      }
+    );
+
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(updatedData)
+    assert.equal(updatedData.count, 2);
+    assert.equal(updatedData.conferences.length, 2);
+    assert.equal(updatedData.deletedIndexes.length, 0);
+    const firstConference = updatedData.conferences[0];
+    assert.equal(firstConference.id.toBytes().length, 32);
+    assert.equal(firstConference.name, "Updated");
+    assert.equal(firstConference.description, "IEEE Conference description");
+    assert.equal(firstConference.date, "2023-08-05 00:00:00");
+    assert.equal(firstConference.venue, "KLCC Convention Centre");
+    assert.equal(firstConference.submissionDeadline, "2023-04-05 00:00:00");
+    assert.equal(firstConference.createdBy, "Ariel");
     
   })
 
+  it("Fetch All Conferences after Updating",async () => {
+    try{
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo[0].account.conferences)
+      console.log("Conferences List", conferenceInfo[1].account.conferences)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  });
 
+  it("Deleting ACM Conference for second user", async() => {
+    const data = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(data.conferences[1].id)
+    let id = data.conferences[1].id
+ 
+    await program.rpc.deleteConference( 
+      id,
+      {
+        accounts: {
+          conferenceList: conferenceListKeypair2.publicKey,
+          user: user2.publicKey,
+        },
+      }
+    );
 
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferenceListKeypair2.publicKey);
+    console.log(updatedData)
+    assert.equal(updatedData.count, 1);
+    assert.equal(updatedData.conferences.length, 1);
+    assert.equal(updatedData.deletedIndexes.length, 1);
+  })
 
-
-
+  it("Fetch All Conferences after deleting",async () => {
+    try{
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo[0].account.conferences)
+      console.log("Conferences List", conferenceInfo[1].account.conferences)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  });
 });
 
   // it('Create State', async () => {

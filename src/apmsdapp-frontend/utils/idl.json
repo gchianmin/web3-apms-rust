@@ -3,12 +3,12 @@
   "name": "apmsdapp",
   "instructions": [
     {
-      "name": "create",
+      "name": "initialize",
       "accounts": [
         {
-          "name": "conference",
+          "name": "conferenceList",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "user",
@@ -19,6 +19,22 @@
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -41,71 +57,96 @@
         {
           "name": "submissionDeadline",
           "type": "string"
+        },
+        {
+          "name": "createdBy",
+          "type": "string"
+        },
+        {
+          "name": "organiserEmail",
+          "type": "string"
         }
       ]
     },
     {
-      "name": "modify",
+      "name": "updateConference",
       "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "user",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "conference",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "newName",
-          "type": "string"
-        },
-        {
-          "name": "newDescription",
-          "type": "string"
-        },
-        {
-          "name": "newDate",
-          "type": "string"
-        },
-        {
-          "name": "newVenue",
-          "type": "string"
-        },
-        {
-          "name": "newSubmissionDeadline",
-          "type": "string"
+          "name": "conference",
+          "type": {
+            "defined": "Conference"
+          }
         }
       ]
     },
     {
-      "name": "cancel",
+      "name": "deleteConference",
       "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "user",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "conference",
-          "isMut": true,
-          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "id",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "ConferenceListAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u8"
+          },
+          {
+            "name": "deletedIndexes",
+            "type": "bytes"
+          },
+          {
+            "name": "conferences",
+            "type": {
+              "vec": {
+                "defined": "Conference"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
     {
       "name": "Conference",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "admin",
+            "name": "id",
             "type": "publicKey"
           },
           {
@@ -135,12 +176,27 @@
           {
             "name": "feeReceived",
             "type": "u64"
+          },
+          {
+            "name": "createdBy",
+            "type": "string"
+          },
+          {
+            "name": "organiserEmail",
+            "type": "string"
           }
         ]
       }
     }
   ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ConferenceNotFound",
+      "msg": "The conference with the given id is not found"
+    }
+  ],
   "metadata": {
-    "address": "51QHpF5dYpwRfRfLAiBShGHEKZ3hT5K1FTyoo9omKfoz"
+    "address": "4oTVMeFwQwkUpFBwdNk2kF2Ryxv5ZQdPkdhqyH2iy8H4"
   }
 }
