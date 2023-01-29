@@ -8,7 +8,7 @@
         {
           "name": "conferenceList",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "user",
@@ -150,6 +150,10 @@
             "type": "publicKey"
           },
           {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
             "name": "name",
             "type": "string"
           },
@@ -197,6 +201,6 @@
     }
   ],
   "metadata": {
-    "address": "4oTVMeFwQwkUpFBwdNk2kF2Ryxv5ZQdPkdhqyH2iy8H4"
+    "address": "FwYZN1BjDu3Szoc1rUMbMyuAQFPHNxFJMo7ijWCUcPRM"
   }
 }

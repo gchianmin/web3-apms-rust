@@ -7,13 +7,15 @@ import {
   CardText,
 } from "reactstrap";
 
-export default function CardComponent({ props }) {
-  
+export default function CardComponent({ props, pk }) {
+  console.log(props)
+  console.log(pk)
+
   return (
     
     <div className="grid">
       <a
-        href={"/conferences/" + props.pubkey.toString()}
+        href={"/conferences/" + pk.toString() + "-"+ props.id.toString()}
         className="text-decoration-none"
         props={props}
       >

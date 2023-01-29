@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
 import React from "react";
-import {IDL} from "../../utils/const"
-// import idl from "../../idl.json";
+import { IDL } from "../../utils/const";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import {
   Program,
@@ -12,7 +11,6 @@ import {
   BN,
 } from "@project-serum/anchor";
 import { useEffect, useState } from "react";
-import { Buffer } from "buffer";
 import {
   Button,
   Card,
@@ -39,10 +37,12 @@ const opts = {
 const { SystemProgram } = web3;
 
 export default function ViewIndividualConferencePage() {
+  console.log("enter individual page");
+  const [conferences, setConferences] = useState([]);
+  const [query, setQuery] = useState(null);
+  const [walletAddress, setWalletAddress] = useState(null);
   const router = useRouter();
   const { conferenceid } = router.query;
-  const [conferences, setConferences] = useState([]);
-  const [walletAddress, setWalletAddress] = useState(null);
 
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
@@ -70,7 +70,7 @@ export default function ViewIndividualConferencePage() {
           setWalletAddress(response.publicKey.toString());
         }
       } else {
-        alert("Solana objject not found! Get a Phantom wallet");
+        alert("Solana object not found! Get a Phantom wallet");
       }
     } catch (error) {
       console.log(error);
@@ -87,51 +87,74 @@ export default function ViewIndividualConferencePage() {
   };
 
   const getConferences = async () => {
-    const connection = new Connection(network, opts.preflightCommitment);
     const provider = getProvider();
     const program = new Program(IDL, programID, provider);
-    // each program-derived account is wrapped in the promise
-    Promise.all(
-      (await connection.getProgramAccounts(programID)).map(
-        async (conference) => ({
-          ...(await program.account.conference.fetch(conference.pubkey)),
-          pubkey: conference.pubkey,
-        })
-      )
-    ).then((conferences) => setConferences(conferences));
+    const conferenceInfo =
+      await program.account.conferenceListAccountData.all();
+    setConferences(conferenceInfo);
+  };
+
+  const getConferenceFromLists = () => {
+    try {
+      const conf = conferences.find(
+        (element) => element.publicKey.toString() == query[0]
+      );
+
+      let confid;
+
+      for (let i in conf.account.conferences) {
+        console.log(conf.account.conferences[i]);
+        if (conf.account.conferences[i].id == query[1]) {
+          confid = conf.account.conferences[i];
+        }
+      }
+      return confid;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getDetails = () => {
-    const conf = conferences.find(
-      (element) => element.pubkey.toString() == conferenceid
-    );
-    if (conf) {
-      return (
-        <>
-          <Card className="my-2">
-            <CardImg
-              alt="sample image"
-              src="https://picsum.photos/900/180"
-              top
-              width="100%"
-            />
-            <CardBody>
-              <CardTitle tag="h4">{conf.name}</CardTitle>
-              <CardText>
-                <small className="text-muted font-italic">
-                  Conference ID: {conferenceid}
-                </small>
-              </CardText>
-              <CardText className="lead">{conf.description}</CardText>
-              <CardText>Date: {conf.date}</CardText>
-              <CardText>Venue: {conf.venue}</CardText>
-              <CardText>
-                Paper Submission Deadline: {conf.submissionDeadline}
-              </CardText>
-            </CardBody>
-            <CardFooter>
-              <Popup cancelConference={cancelConference} modifyConference={modifyConference} walletAddress={walletAddress} connectWallet={connectWallet} existingDetails={conf} handleSubmit={handleSubmit}/>
-              {/* <div className="d-flex justify-content-center d-grid col-5 mx-auto">
+    try {
+      const confid = getConferenceFromLists();
+      if (confid) {
+        return (
+          <>
+            <Card className="my-2">
+              <CardImg
+                alt="sample image"
+                src="https://picsum.photos/900/180"
+                top
+                width="100%"
+              />
+              <CardBody>
+                <CardTitle tag="h4">{confid.name}</CardTitle>
+                <CardText>
+                  <small className="text-muted font-italic">
+                    Organised By: {confid.createdBy}
+                  </small>
+                </CardText>
+                <CardText className="lead">{confid.description}</CardText>
+                <CardText>Date: {confid.date}</CardText>
+                <CardText>Venue: {confid.venue}</CardText>
+                <CardText>
+                  Paper Submission Deadline: {confid.submissionDeadline}
+                </CardText>
+              </CardBody>
+              <CardFooter>
+                {walletAddress == confid.admin && (
+                  <Popup
+                    cancelConference={cancelConference}
+                    modifyConference={modifyConference}
+                    walletAddress={walletAddress}
+                    connectWallet={connectWallet}
+                    existingDetails={confid}
+                    handleSubmit={handleSubmit}
+                  />
+                )}
+                {walletAddress != confid.admin && <Button>Submit Paper</Button>}
+                {/* <Popup cancelConference={cancelConference} modifyConference={modifyConference} walletAddress={walletAddress} connectWallet={connectWallet} existingDetails={confid} handleSubmit={handleSubmit}/> */}
+                {/* <div className="d-flex justify-content-center d-grid col-5 mx-auto">
                 <Popup/>
                 <Button className="btn btn-block btn-primary mr-4 btn-alignment">
                   Edit
@@ -140,21 +163,24 @@ export default function ViewIndividualConferencePage() {
                   Cancel
                 </Button>
               </div> */}
-            </CardFooter>
-          </Card>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <div className="pl-5 pt-4 pb-3">
-            <h2>Conference Details</h2>
-          </div>
-          <div className="pl-5 pb-3 font-italic text-muted text-mono">
-            <p>Something Wrong/The conference has been cancelled.</p>
-          </div>
-        </>
-      );
+              </CardFooter>
+            </Card>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <div className="pl-5 pt-4 pb-3">
+              <h2>Conference Details</h2>
+            </div>
+            <div className="pl-5 pb-3 font-italic text-muted text-mono">
+              <p>Something Wrong/The conference has been cancelled.</p>
+            </div>
+          </>
+        );
+      }
+    } catch (error) {
+      // console.log(error);
     }
   };
 
@@ -162,56 +188,92 @@ export default function ViewIndividualConferencePage() {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
-      const [conference, _] = await PublicKey.findProgramAddressSync(
-        [
-          utils.bytes.utf8.encode("CONFERENCE"),
-          provider.wallet.publicKey.toBuffer(),
-        ],
-        program.programId
-      );
+      const confid = getConferenceFromLists();
+      if (confid.admin != provider.wallet.publicKey.toString()) {
+        alert("you are not the admin");
+      } else {
+        const [conferencePDA, _] = await PublicKey.findProgramAddressSync(
+          [
+            utils.bytes.utf8.encode("CONFERENCE"),
+            provider.wallet.publicKey.toBuffer(),
+          ],
+          program.programId
+        );
 
-      await program.rpc.cancel({
-        accounts: {
-          conference,
-          user: provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-      });
-      console.log("Deleted the conference w address: ", conference.toString());
-      router.push('/main')
+        await program.rpc.deleteConference(confid.id, {
+          accounts: {
+            conferenceList: conferencePDA,
+            user: provider.wallet.publicKey,
+          },
+        });
+
+        console.log(
+          "Deleted the conference w address: ",
+          conferencePDA.toString()
+        );
+        router.push("/main");
+      }
     } catch (error) {
       console.log("Error deleting conference account: ", error);
     }
   };
 
-    const modifyConference = async (name,
-      description,
-      date,
-      venue,
-      deadlines) => {
+  const modifyConference = async (
+    name,
+    description,
+    date,
+    venue,
+    submissionDeadline
+  ) => {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
-      const [conference] = await PublicKey.findProgramAddressSync(
-        [
-          utils.bytes.utf8.encode("CONFERENCE"),
-          provider.wallet.publicKey.toBuffer(),
-        ],
-        program.programId
-      );
+      const confid = getConferenceFromLists();
 
-      await program.rpc.modify(
-        name, description, date, venue, deadlines,
-        {
-          accounts: {
-            conference,
-            user: provider.wallet.publicKey,
-            systemProgram: SystemProgram.programId,
+      if (confid.admin != provider.wallet.publicKey.toString()) {
+        alert("you are not the admin");
+      } else {
+        const [conferencePDA, _] = await PublicKey.findProgramAddressSync(
+          [
+            utils.bytes.utf8.encode("CONFERENCE"),
+            provider.wallet.publicKey.toBuffer(),
+          ],
+          program.programId
+        );
+        let id = confid.id;
+        let paperSubmitted = confid.paperSubmitted;
+        let feeReceived = confid.feeReceived;
+        let createdBy = confid.createdBy;
+        let organiserEmail = confid.organiserEmail;
+        let admin = provider.wallet.publicKey;
+
+        await program.rpc.updateConference(
+          {
+            id,
+            admin,
+            name,
+            description,
+            date,
+            venue,
+            submissionDeadline,
+            paperSubmitted,
+            feeReceived,
+            createdBy,
+            organiserEmail,
           },
-        }
-      );
-      console.log("Modify the conference w address: ", conference.toString());
-      window.location.reload()
+          {
+            accounts: {
+              conferenceList: conferencePDA,
+              user: provider.wallet.publicKey,
+            },
+          }
+        );
+        console.log(
+          "Modify the conference w address: ",
+          conferencePDA.toString()
+        );
+        window.location.reload();
+      }
     } catch (error) {
       console.log("Error modifying conference account: ", error);
     }
@@ -242,9 +304,11 @@ export default function ViewIndividualConferencePage() {
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+    setQuery(conferenceid.split("-"));
     getConferences();
-    checkIfWalletIsConnected()
-  }, []);
+    checkIfWalletIsConnected();
+  }, [router.isReady]);
 
   return (
     <>

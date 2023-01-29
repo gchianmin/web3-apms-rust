@@ -29,7 +29,8 @@ impl ConferenceListAccountData {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Conference {
-  pub id: Pubkey,      
+  pub id: Pubkey,     
+  pub admin: Pubkey, 
   pub name: String,
   pub description: String,
   pub date: String,

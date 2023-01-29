@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import {IDL} from "../utils/const"
+import { IDL } from "../utils/const";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import {
   Program,
@@ -77,22 +77,24 @@ export default function OrganiseConference() {
     }
   };
 
-//   const getConferences = async () => {
-//     const connection = new Connection(network, opts.preflightCommitment);
-//     const provider = getProvider();
-//     const program = new Program(idl, programID, provider);
-//     // each program-derived account is wrapped in the promise
-//     Promise.all(
-//       (await connection.getProgramAccounts(programID)).map(
-//         async (conference) => ({
-//           ...(await program.account.conference.fetch(conference.pubkey)),
-//           pubkey: conference.pubkey,
-//         })
-//       )
-//     ).then((conferences) => setConferences(conferences));
-//   };
+  //   const getConferences = async () => {
+  //     const connection = new Connection(network, opts.preflightCommitment);
+  //     const provider = getProvider();
+  //     const program = new Program(idl, programID, provider);
+  //     // each program-derived account is wrapped in the promise
+  //     Promise.all(
+  //       (await connection.getProgramAccounts(programID)).map(
+  //         async (conference) => ({
+  //           ...(await program.account.conference.fetch(conference.pubkey)),
+  //           pubkey: conference.pubkey,
+  //         })
+  //       )
+  //     ).then((conferences) => setConferences(conferences));
+  //   };
 
   const createConference = async (
+    email,
+    createdby,
     name,
     description,
     date,
@@ -102,7 +104,7 @@ export default function OrganiseConference() {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
-      const [conference] = await PublicKey.findProgramAddressSync(
+      const [conferencePDA, _] = await PublicKey.findProgramAddressSync(
         [
           utils.bytes.utf8.encode("CONFERENCE"),
           provider.wallet.publicKey.toBuffer(),
@@ -110,23 +112,104 @@ export default function OrganiseConference() {
         program.programId
       );
 
-      await program.rpc.create(name, description, date, venue, deadlines, {
-        accounts: {
-          conference,
-          user: provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-      });
+      // await program.rpc.create(name, description, date, venue, deadlines, {
+      //   accounts: {
+      //     conference,
+      //     user: provider.wallet.publicKey,
+      //     systemProgram: SystemProgram.programId,
+      //   },
+      // });
+      await program.rpc.createConference(
+        name,
+        description,
+        date,
+        venue,
+        deadlines,
+        createdby,
+        email,
+        {
+          accounts: {
+            conferenceList: conferencePDA,
+            user: provider.wallet.publicKey,
+          },
+        }
+      );
+
       console.log(
         "Created a new conference w address: ",
-        conference.toString()
+        conferencePDA.toString()
       );
-      router.push("/main")
+      getAll();
+      router.push("/main");
     } catch (error) {
+      const provider = getProvider();
+      const program = new Program(IDL, programID, provider);
       console.log("Error creating conference account: ", error);
+      const [conferencePDA, _] = await PublicKey.findProgramAddressSync(
+        [
+          utils.bytes.utf8.encode("CONFERENCE"),
+          provider.wallet.publicKey.toBuffer(),
+        ],
+        program.programId
+      );
+
+      await program.rpc.initialize({
+        accounts: {
+          systemProgram: SystemProgram.programId,
+          conferenceList: conferencePDA,
+          user: provider.wallet.publicKey,
+        },
+        // signers: [conferenceListKeypair],
+      });
+
+      // await program.rpc.createConference(
+      //   name,
+      //   description,
+      //   date,
+      //   venue,
+      //   deadlines,
+      //   createdby,
+      //   email,
+      //   {
+      //     accounts: {
+      //       conferenceList: conference,
+      //       user: provider.wallet.publicKey,
+      //     },
+      //   }
+      // );
+      await program.rpc.createConference(
+        name,
+        description,
+        date,
+        venue,
+        deadlines,
+        createdby,
+        email,
+        {
+          accounts: {
+            conferenceList: conferencePDA,
+            user: provider.wallet.publicKey,
+          },
+        }
+      );
+
+      console.log(
+        "Created a new conference w address: ",
+        conferencePDA.toString()
+      );
+      getAll();
+      router.push("/main");
+      
     }
   };
 
+  const getAll = async () => {
+    const provider = getProvider();
+    const program = new Program(IDL, programID, provider);
+    const conferenceInfo =
+      await program.account.conferenceListAccountData.all();
+    console.log("Conferences List", conferenceInfo);
+  };
   // const modifyConference = async () => {
   //   try {
   //     const provider = getProvider();
@@ -191,6 +274,7 @@ export default function OrganiseConference() {
     // Get data from the form.
     const data = {
       email: event.target.email.value,
+      createdby: event.target.createdby.value,
       name: event.target.name.value,
       description: event.target.description.value,
       date: event.target.date.value,
@@ -200,13 +284,14 @@ export default function OrganiseConference() {
     };
     console.log(data);
     createConference(
+      data.email,
+      data.createdby,
       data.name,
       data.description,
       data.date,
       data.venue,
       data.deadlines
     );
-    
   };
 
   const renderNotConnectedContainer = () => (
@@ -248,7 +333,7 @@ export default function OrganiseConference() {
       <div className="pl-5 pb-3 font-italic text-muted">
         <p>Complete the following form to organise a conference.</p>
       </div>
-      <FormInput handleSubmit={handleSubmit} empty={true}/>
+      <FormInput handleSubmit={handleSubmit} empty={true} />
     </>
   );
 

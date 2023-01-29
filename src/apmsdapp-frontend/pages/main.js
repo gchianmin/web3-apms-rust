@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 // import idl from "../idl.json";
-import {IDL} from "../utils/const"
+import { IDL } from "../utils/const";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import {
   Program,
@@ -48,25 +48,55 @@ export default function Main() {
     const provider = getProvider();
     const program = new Program(IDL, programID, provider);
     // each program-derived account is wrapped in the promise
-    Promise.all(
-      (await connection.getProgramAccounts(programID)).map(
-        async (conference) => ({
-          ...(await program.account.conference.fetch(conference.pubkey)),
-          pubkey: conference.pubkey,
-        })
-      )
-    ).then((conferences) => setConferences(conferences));
+    const conferenceInfo =
+      await program.account.conferenceListAccountData.all();
+    setConferences(conferenceInfo);
+    console.log(conferenceInfo)
+    // var result = Object.keys(conferenceInfo).map((key) =>
+    //   [key, conferenceInfo[key].account][1].conferences.map((conf) => [conf.id])
+    // );
+    // console.log(result);
+    // console.log(JSON.stringify(conferences[0].publicKey))
+    //   for (let key in conferenceInfo) {
+    //     console.log(conferenceInfo[key].account);
+    // }
+    // Promise.all(
+    //   (await connection.getProgramAccounts(programID)).map(
+    //     async (conference) => ({
+    //       ...(await program.account.conference.fetch(conference.pubkey)),
+    //       pubkey: conference.pubkey,
+    //     })
+    //   )
+    // ).then((conferences) => console.log(conferences));
+  };
+
+  const getAll = async () => {
+    const provider = getProvider();
+    const program = new Program(IDL, programID, provider);
+    const conferenceInfo =
+      await program.account.conferenceListAccountData.all();
+    console.log("Conferences List", conferenceInfo.toString());
   };
 
   const renderConferencesContainer = () => (
     <>
       <br />
-      {conferences.map((conference) => (
+      {/* <p>{conferences}</p> */}
+      {/* {conferences.map((conference)=>(<p>{JSON.stringify(conference)}</p>) )} */}
+      {Object.keys(conferences).map((key) =>
+        [key, conferences[key].account][1].conferences.map((conf) => (
+          <>
+            <CardComponent props={conf} pk={conferences[key].publicKey} />
+            <br />
+          </>
+        ))
+      )}
+      {/* {conferences.map((conference) => (
         <>
           <CardComponent props={conference} />
           <br />
         </>
-      ))}
+      ))} */}
     </>
   );
 

@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-  #[account(init, payer = user, space = 10000)]
+  #[account[init, payer=user, space=10000, seeds=[b"CONFERENCE".as_ref(), user.key().as_ref()], bump]]
   pub conference_list: Account<'info, ConferenceListAccountData>,
   #[account(mut)]
   pub user: Signer<'info>,
