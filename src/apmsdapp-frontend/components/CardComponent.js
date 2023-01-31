@@ -8,8 +8,8 @@ import {
 } from "reactstrap";
 
 export default function CardComponent({ props, pk }) {
-  console.log(props)
-  console.log(pk)
+  // console.log("conf",props)
+  // console.log(pk)
 
   return (
     
@@ -27,6 +27,7 @@ export default function CardComponent({ props, pk }) {
           <img alt="Sample" src="https://picsum.photos/300/200" />
           <CardBody>
             <CardTitle tag="h5">{props.name}</CardTitle>
+            <CardText className="text-sm font-italic text-info">Organised By: {props.createdBy}</CardText>
             <CardSubtitle className="mb-2 text-secondary" tag="h6">
               {props.date}
             </CardSubtitle>

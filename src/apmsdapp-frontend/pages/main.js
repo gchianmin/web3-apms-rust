@@ -13,6 +13,9 @@ import {
 import { useEffect, useState } from "react";
 import { Buffer } from "buffer";
 import CardComponent from "../components/CardComponent";
+import { Button } from "reactstrap";
+import Link from 'next/link';
+import Router, { useRouter } from "next/router";
 
 // This is the address of your solana program, if you forgot, just run solana address -k target/deploy/myepicproject-keypair.json
 const programID = new PublicKey(IDL.metadata.address);
@@ -32,7 +35,7 @@ const { SystemProgram } = web3;
 export default function Main() {
   console.log("main page called");
   const [conferences, setConferences] = useState([]);
-
+  const router = useRouter()
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
     const provider = new AnchorProvider(
@@ -47,36 +50,12 @@ export default function Main() {
     const connection = new Connection(network, opts.preflightCommitment);
     const provider = getProvider();
     const program = new Program(IDL, programID, provider);
-    // each program-derived account is wrapped in the promise
     const conferenceInfo =
       await program.account.conferenceListAccountData.all();
     setConferences(conferenceInfo);
     console.log(conferenceInfo)
-    // var result = Object.keys(conferenceInfo).map((key) =>
-    //   [key, conferenceInfo[key].account][1].conferences.map((conf) => [conf.id])
-    // );
-    // console.log(result);
-    // console.log(JSON.stringify(conferences[0].publicKey))
-    //   for (let key in conferenceInfo) {
-    //     console.log(conferenceInfo[key].account);
-    // }
-    // Promise.all(
-    //   (await connection.getProgramAccounts(programID)).map(
-    //     async (conference) => ({
-    //       ...(await program.account.conference.fetch(conference.pubkey)),
-    //       pubkey: conference.pubkey,
-    //     })
-    //   )
-    // ).then((conferences) => console.log(conferences));
   };
 
-  const getAll = async () => {
-    const provider = getProvider();
-    const program = new Program(IDL, programID, provider);
-    const conferenceInfo =
-      await program.account.conferenceListAccountData.all();
-    console.log("Conferences List", conferenceInfo.toString());
-  };
 
   const renderConferencesContainer = () => (
     <>
@@ -107,13 +86,10 @@ export default function Main() {
       </div>
     </>
   );
+
+  
   useEffect(() => {
     getConferences();
-    // const onLoad = async () => {
-    //   await getConferences();
-    // };
-    // window.addEventListener("load", onLoad);
-    // return () => window.removeEventListener("load", onLoad);
   }, []);
 
   return (
@@ -121,6 +97,7 @@ export default function Main() {
       <Header props={`APMS - Home`} />
       <div className="pl-5 pt-4 pb-3">
         <h2>Upcoming Conferences</h2>
+        <Link className="my-4 font-italic text-success" href='/my-conference'><br/> → View Conferences Organised by me ← <br/></Link>
         {conferences && renderConferencesContainer()}
       </div>
       {conferences.length == 0 && renderEmptyContainer()}

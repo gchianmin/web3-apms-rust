@@ -314,22 +314,6 @@ export default function OrganiseConference() {
 
   const renderConnectedContainer = () => (
     <>
-      {/* <button onClick={createConference}>Create a conference</button> */}
-      {/* <button onClick={getConferences}>Get a list of conferences</button> */}
-      {/* <br /> */}
-      {/* {conferences.map((conference) => (
-        <>
-          <p>Conference ID: {conference.pubkey.toString()}</p>
-          <p>{conference.name}</p>
-          <p>{conference.description}</p>
-          <p>{conference.date}</p>
-          <p>{conference.venue}</p>
-          <p>{conference.submissionDeadline}</p>
-          <br />
-        </>
-      ))} */}
-      {/* <button onClick={modifyConference}>Update a conference</button>
-      <button onClick={cancelConference}>Cancel a conference</button> */}
       <div className="pl-5 pb-3 font-italic text-muted">
         <p>Complete the following form to organise a conference.</p>
       </div>
