@@ -4,54 +4,115 @@ const { SystemProgram } = anchor.web3
 const { PublicKey } = require('@solana/web3.js')
 
 
-// interface ConferenceListAccountData {
-//   count: number;
-//   deletedIndexes: number[];
-//   conferences: Conference[];
-// }
-
-// interface Conference {
-//   id: anchor.web3.PublicKey;
-//   name: String;
-//   description: String;
-//   date: String;
-//   venue: String;
-//   submission_deadline: String;
-//   paper_submitted: anchor.BN;
-//   fee_received: anchor.BN;
-//   created_by: String;
-// }
-
-describe("apmsdapp", async() => {
-  // Configure the client to use the local cluster.
+describe("apmsdapp", async () => {
   const provider = anchor.getProvider();
   anchor.setProvider(provider);
   const program = anchor.workspace.Apmsdapp;
-  // let creatorKey = provider.wallet.publicKey
-  // let stateSigner
   const user = program.provider.wallet;
-  const conferenceListKeypair = anchor.web3.Keypair.generate();
+  const newUser = anchor.web3.Keypair.generate();
+
   const [conferencePDA, _] = await PublicKey
-  .findProgramAddressSync(
-    [
-      anchor.utils.bytes.utf8.encode("CONFERENCE"),
-      provider.wallet.publicKey.toBuffer()
-    ],
-    program.programId
-  );
-  it("initialize account data", async () => {
-    
+    .findProgramAddressSync(
+      [
+        anchor.utils.bytes.utf8.encode("CONFERENCE"),
+        provider.wallet.publicKey.toBuffer()
+      ],
+      program.programId
+    );
+
+  const initialize = async () => {
     await program.rpc.initialize({
+      accounts: {
+        systemProgram: SystemProgram.programId,
+        conferenceList: conferencePDA,
+        user: user.publicKey,
+      },
+    });
+  }
+
+  const createConference = async (name, description, date, venue, submission_deadline, created_by, organiser_email, conference_link) => {
+    await program.rpc.createConference(name, description, date, venue, submission_deadline, created_by, organiser_email, conference_link, {
+      accounts: {
+        conferenceList: conferencePDA,
+        user: user.publicKey,
+      },
+    });
+  }
+
+  const updateConference = async (id, admin, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy, organiserEmail, technicalProgramsCommittees, conferenceLink) => {
+    await program.rpc.updateConference(
+      { id, admin, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy, organiserEmail, technicalProgramsCommittees, conferenceLink },
+      {
         accounts: {
-          systemProgram: SystemProgram.programId,
           conferenceList: conferencePDA,
           user: user.publicKey,
         },
-        // signers: [conferenceListKeypair],
       });
+  }
 
+  const updateTpc = async (id, tpcName, tpcEmail, tpcWallet) => {
+    await program.rpc.updateTpc(
+      id, { tpcName, tpcEmail, tpcWallet },
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    );
+  }
+
+  const deleteConference = async (id) => {
+    await program.rpc.deleteConference(
+      id,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    );
+  }
+
+  const submitPaper = async (id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version) => {
+    await program.rpc.submitPaper(
+      id, paperId, { authorName, authorEmail }, dateSubmitted, paperStatus, version,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    );
+  }
+
+  const deletePaper = async (id, paperId) => {
+    await program.rpc.deletePaper(
+      id, paperId,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    );
+  }
+
+  const getAllConference = async () => {
+    try {
+      const conferenceInfo = await program.account.conferenceListAccountData.all()
+      console.log("Conferences List", conferenceInfo)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
+
+  it("initialize account data", async () => {
+
+    await initialize()
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data)
+    // console.log(data)
     assert.equal(data.count, 0);
     assert.equal(data.conferences.length, 0);
     assert.equal(data.deletedIndexes.length, 0);
@@ -59,15 +120,9 @@ describe("apmsdapp", async() => {
 
   it("create first conference", async () => {
 
-    await program.rpc.createConference("IEEE Conference", "A yearly conference for authors globally.", "2023-04-05 00:00:00", "Marina Bay Sand", "2023-02-05 00:00:00", "May", "a@gmail.com","https://example-link" ,{
-      accounts: {
-        conferenceList: conferencePDA,
-        user: user.publicKey,
-      },
-    });
-
+    await createConference("IEEE Conference", "A yearly conference for authors globally.", "2023-04-05 00:00:00", "Marina Bay Sand", "2023-02-05 00:00:00", "May", "a@gmail.com", "https://example-link")
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data)
+    // console.log(data)
     assert.equal(data.count, 1);
     assert.equal(data.conferences.length, 1);
     assert.equal(data.deletedIndexes.length, 0);
@@ -85,15 +140,9 @@ describe("apmsdapp", async() => {
 
   it("create second conference", async () => {
 
-    await program.rpc.createConference("ACM Conference", "ACM Conference description", "2023-05-05 00:00:00", "Suntec Convention Centre", "2023-04-05 00:00:00", "May","a@gmail.com","https://example-link" ,{
-      accounts: {
-        conferenceList: conferencePDA,
-        user: user.publicKey,
-      },
-    });
-
+    await createConference("ACM Conference", "ACM Conference description", "2023-05-05 00:00:00", "Suntec Convention Centre", "2023-04-05 00:00:00", "May", "a@gmail.com", "https://example-link")
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data)
+    // console.log(data)
     assert.equal(data.count, 2);
     assert.equal(data.conferences.length, 2);
     assert.equal(data.deletedIndexes.length, 0);
@@ -109,22 +158,13 @@ describe("apmsdapp", async() => {
     assert.equal(secondConference.conferenceLink, "https://example-link")
   });
 
+  it("Fetch All Conferences", async () => {
+    getAllConference()
+  });
 
-  it("Fetch All Conferences",async () => {
-      try{
-        const conferenceInfo = await program.account.conferenceListAccountData.all()
-        console.log("Conferences List", conferenceInfo)
-        console.log("Conferences List", conferencePDA)
-      
-      }
-      catch (e) {
-        console.log(e)
-      }
-    });
-  
-  it("Updating IEEE Conference", async() => {
+  it("Updating IEEE Conference", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let admin = data.conferences[0].admin
     let name = "IEEE Conference Updated"
@@ -138,19 +178,11 @@ describe("apmsdapp", async() => {
     let organiserEmail = "a@gmail.com"
     let technicalProgramsCommittees = data.conferences[0].technicalProgramsCommittees
     let conferenceLink = data.conferences[0].conferenceLink
- 
-    await program.rpc.updateConference( 
-      {id, admin, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy, organiserEmail, technicalProgramsCommittees, conferenceLink},
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+
+    await updateConference(id, admin, name, description, date, venue, submissionDeadline, paperSubmitted, feeReceived, createdBy, organiserEmail, technicalProgramsCommittees, conferenceLink)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(updatedData)
+    // console.log(updatedData)
     assert.equal(updatedData.count, 2);
     assert.equal(updatedData.conferences.length, 2);
     assert.equal(updatedData.deletedIndexes.length, 0);
@@ -165,26 +197,18 @@ describe("apmsdapp", async() => {
     assert.equal(firstConference.organiserEmail, "a@gmail.com")
   })
 
-  it("Updating TPC for conference 1", async() => {
+  it("Updating TPC for conference 1", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let tpcName = ["tpc1", "tpc2"]
     let tpcEmail = ["tpc1@gmail.com", "tpc2@gmail.com"]
     let tpcWallet = ["wallet1", "wallet2"]
- 
-    await program.rpc.updateTpc( 
-      id, {tpcName, tpcEmail, tpcWallet},
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+
+    await updateTpc(id, tpcName, tpcEmail, tpcWallet)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(updatedData)
+    // console.log(updatedData)
     assert.equal(updatedData.count, 2);
     assert.equal(updatedData.conferences.length, 2);
     assert.equal(updatedData.deletedIndexes.length, 0);
@@ -201,23 +225,15 @@ describe("apmsdapp", async() => {
     assert.equal(firstConference.organiserEmail, "a@gmail.com")
   })
 
-  it("Updating TPC for conference 1 - editing", async() => {
+  it("Updating TPC for conference 1 - editing", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let tpcName = ["tpc3", "tpc4"]
     let tpcEmail = ["tpc3@gmail.com", "tpc4@gmail.com"]
     let tpcWallet = ["wallet3", "wallet4"]
- 
-    await program.rpc.updateTpc( 
-      id, {tpcName, tpcEmail, tpcWallet},
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+
+    await updateTpc(id, tpcName, tpcEmail, tpcWallet)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     console.log(updatedData)
@@ -237,172 +253,114 @@ describe("apmsdapp", async() => {
     assert.equal(firstConference.organiserEmail, "a@gmail.com")
   })
 
-  
-
-  it("Fetch All Conferences after Updating",async () => {
-    try{
-      const conferenceInfo = await program.account.conferenceListAccountData.all()
-      console.log("Conferences List", conferenceInfo[0].account.conferences)
-    }
-    catch (e) {
-      console.log(e)
-    }
+  it("Fetch All Conferences after Updating", async () => {
+    getAllConference()
   });
 
-  it("Deleting IEEE Conference", async() => {
+  it("Deleting IEEE Conference", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
- 
-    await program.rpc.deleteConference( 
-      id,
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+
+    await deleteConference(id)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(updatedData)
+    // console.log(updatedData)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
   })
 
-  it("Fetch All Conferences after deleting",async () => {
-    try{
-      const conferenceInfo = await program.account.conferenceListAccountData.all()
-      console.log("Conferences List", conferenceInfo)
-    }
-    catch (e) {
-      console.log(e)
-    }
+  it("Fetch All Conferences after deleting", async () => {
+    getAllConference()
   });
 
-  it("Submitting a paper", async() => {
+  it("Submitting a paper", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash"
     let authorName = ["A1", "A2"]
-    let authorEmail = ["E1","E2"]
+    let authorEmail = ["E1", "E2"]
     let dateSubmitted = "2023-02-05"
     let paperStatus = "Submitted"
     let version = new anchor.BN(1)
 
-    await program.rpc.submitPaper( 
-      id, paperId, {authorName, authorEmail}, dateSubmitted, paperStatus, version,
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+    await submitPaper(id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log("sub", updatedData.conferences[0].technicalProgramsCommittees)
-    console.log(updatedData.conferences[0].paperSubmitted[0].paperAuthors)
+    // console.log("sub", updatedData.conferences[0].technicalProgramsCommittees)
+    // console.log(updatedData.conferences[0].paperSubmitted[0].paperAuthors)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString() );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(),"A1,A2" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(),"E1,E2" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted,"2023-02-05" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus,"Submitted" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].version,1 );
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString());
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(), "A1,A2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(), "E1,E2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-05");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
   })
 
-  it("Submitting a 2nd paper", async() => {
+  it("Submitting a 2nd paper", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash2"
     let authorName = ["A3", "A4"]
-    let authorEmail = ["E3","E4"]
+    let authorEmail = ["E3", "E4"]
     let dateSubmitted = "2023-02-06"
     let paperStatus = "Submitted"
     let version = new anchor.BN(1)
 
-    await program.rpc.submitPaper( 
-      id, paperId, {authorName, authorEmail}, dateSubmitted, paperStatus, version,
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+    await submitPaper(id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log("sub", updatedData.conferences[0].paperSubmitted)
+    // console.log("sub", updatedData.conferences[0].paperSubmitted)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 2);
     assert.equal(updatedData.conferences[0].paperSubmitted[1].paperId, "example hash2");
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAdmin.toString(), user.publicKey.toString() );
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorName.toString(),"A3,A4" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorEmail.toString(),"E3,E4" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].dateSubmitted,"2023-02-06" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus,"Submitted" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].version,1 );
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAdmin.toString(), user.publicKey.toString());
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorName.toString(), "A3,A4");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorEmail.toString(), "E3,E4");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].dateSubmitted, "2023-02-06");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].version, 1);
   })
 
-  it("Fetch All Conferences after submitting a paper",async () => {
-    try{
-      const conferenceInfo = await program.account.conferenceListAccountData.all()
-      console.log("Conferences List", conferenceInfo[0].account.conferences.paper_submitted)
-    }
-    catch (e) {
-      console.log(e)
-    }
+  it("Fetch All Conferences after submitting a paper", async () => {
+    getAllConference()
   });
 
-  it("Deleting a paper", async() => {
+  it("Deleting a paper", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(data.conferences[0].id)
+    // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash"
 
-    await program.rpc.deletePaper( 
-      id, paperId,
-      {
-        accounts: {
-          conferenceList: conferencePDA,
-          user: user.publicKey,
-        },
-      }
-    );
+    await deletePaper(id, paperId)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log("sub", updatedData.conferences[0].paperSubmitted)
+    // console.log("sub", updatedData.conferences[0].paperSubmitted)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash2");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString() );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(),"A3,A4" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(),"E3,E4" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted,"2023-02-06" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus,"Submitted" );
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].version,1 );
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString());
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(), "A3,A4");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(), "E3,E4");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
   })
 
-  it("Fetch All Conferences after deleting a paper",async () => {
-    try{
-      const conferenceInfo = await program.account.conferenceListAccountData.all()
-      console.log("Conferences List", conferenceInfo[0].account.conferences[0].paperSubmitted)
-    }
-    catch (e) {
-      console.log(e)
-    }
+  it("Fetch All Conferences after deleting a paper", async () => {
+    getAllConference()
   });
 
 });
