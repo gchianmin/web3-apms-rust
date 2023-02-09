@@ -35,7 +35,6 @@ const { SystemProgram } = web3;
 export default function Main() {
   console.log("main page called");
   const [conferences, setConferences] = useState([]);
-  const router = useRouter()
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
     const provider = new AnchorProvider(
@@ -47,7 +46,6 @@ export default function Main() {
   };
 
   const getConferences = async () => {
-    const connection = new Connection(network, opts.preflightCommitment);
     const provider = getProvider();
     const program = new Program(IDL, programID, provider);
     const conferenceInfo =
@@ -60,8 +58,6 @@ export default function Main() {
   const renderConferencesContainer = () => (
     <>
       <br />
-      {/* <p>{conferences}</p> */}
-      {/* {conferences.map((conference)=>(<p>{JSON.stringify(conference)}</p>) )} */}
       {Object.keys(conferences).map((key) =>
         [key, conferences[key].account][1].conferences.map((conf) => (
           <>
@@ -70,12 +66,6 @@ export default function Main() {
           </>
         ))
       )}
-      {/* {conferences.map((conference) => (
-        <>
-          <CardComponent props={conference} />
-          <br />
-        </>
-      ))} */}
     </>
   );
 

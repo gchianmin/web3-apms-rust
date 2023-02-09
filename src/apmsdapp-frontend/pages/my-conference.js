@@ -106,7 +106,6 @@ export default function MyConference() {
   const renderConferencesContainer = () => (
     <>
       <br />
-      {console.log("PDA--->", conferences)}
       {conferences.conferences?.map((conference) => (
         <>
           <CardComponent props={conference} pk={conferencesPDA} />

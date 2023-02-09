@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import Header from "../../components/Header";
 import React from "react";
 import { IDL } from "../../utils/const";
@@ -21,6 +21,7 @@ import {
   CardFooter,
 } from "reactstrap";
 import Popup from "../../components/Popup";
+import Link from "next/link";
 
 // This is the address of your solana program, if you forgot, just run solana address -k target/deploy/myepicproject-keypair.json
 const programID = new PublicKey(IDL.metadata.address);
@@ -57,6 +58,7 @@ export default function ViewIndividualConferencePage() {
   const checkIfWalletIsConnected = async () => {
     try {
       const { solana } = window;
+      // if solana && solana.isPhantom
       if (solana) {
         if (solana.isPhantom) {
           console.log("Phantom wallet found");
@@ -105,7 +107,7 @@ export default function ViewIndividualConferencePage() {
       for (let i in conf.account.conferences) {
         console.log(conf.account.conferences[i]);
         if (conf.account.conferences[i].id == query[1]) {
-          confid = conf.account.conferences[i];
+          confid = conf.account.conferences[i]; // straight return 
         }
       }
       return confid;
@@ -114,9 +116,25 @@ export default function ViewIndividualConferencePage() {
     }
   };
 
+  const sendProps = (conferenceList, conferencePDA, conferenceName) => {
+    router.push({
+      pathname: "/submit-paper",
+      query : {
+        conferenceList, 
+        conferencePDA, 
+        conferenceName,
+      }, 
+    })
+  }
+
   const getDetails = () => {
     try {
       const confid = getConferenceFromLists();
+      const conferenceList = query[0];
+      const conferencePDA = query[1];
+      const conferenceName = confid.name;
+      console.log("org", conferenceList, conferencePDA, conferenceName)
+
       if (confid) {
         return (
           <>
@@ -140,6 +158,10 @@ export default function ViewIndividualConferencePage() {
                 <CardText>
                   Paper Submission Deadline: {confid.submissionDeadline}
                 </CardText>
+                <CardText>
+                  Conference website: {' '}
+                  <a href={confid.conferenceLink} className="text-primary font-italic">{confid.conferenceLink}</a>
+                </CardText>
               </CardBody>
               <CardFooter>
                 {walletAddress == confid.admin && (
@@ -150,19 +172,22 @@ export default function ViewIndividualConferencePage() {
                     connectWallet={connectWallet}
                     existingDetails={confid}
                     handleSubmit={handleSubmit}
+                    conferenceList={conferenceList}
+                    conferencePDA={conferencePDA}
+                    conferenceName={conferenceName}
+                    // conferenceid={conferenceid}
                   />
                 )}
-                {walletAddress != confid.admin && <Button>Submit Paper</Button>}
-                {/* <Popup cancelConference={cancelConference} modifyConference={modifyConference} walletAddress={walletAddress} connectWallet={connectWallet} existingDetails={confid} handleSubmit={handleSubmit}/> */}
-                {/* <div className="d-flex justify-content-center d-grid col-5 mx-auto">
-                <Popup/>
-                <Button className="btn btn-block btn-primary mr-4 btn-alignment">
-                  Edit
-                </Button>
-                <Button className="btn btn-block btn-danger mt-0 btn-alignment" onClick={cancelConference}>
-                  Cancel
-                </Button>
-              </div> */}
+                {walletAddress != confid.admin && (
+                  <div className="d-flex justify-content-center ">
+                    <Button
+                  className="btn btn-info"
+                  onClick={() => sendProps(conferenceList, conferencePDA, conferenceName)}
+                >
+                  Submit Paper
+                </Button></div>
+                  
+                )}
               </CardFooter>
             </Card>
           </>
@@ -180,7 +205,7 @@ export default function ViewIndividualConferencePage() {
         );
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
@@ -223,7 +248,8 @@ export default function ViewIndividualConferencePage() {
     description,
     date,
     venue,
-    submissionDeadline
+    submissionDeadline, 
+    conferenceLink,
   ) => {
     try {
       const provider = getProvider();
@@ -246,6 +272,7 @@ export default function ViewIndividualConferencePage() {
         let createdBy = confid.createdBy;
         let organiserEmail = confid.organiserEmail;
         let admin = provider.wallet.publicKey;
+        let technicalProgramsCommittees = confid.technicalProgramsCommittees;
 
         await program.rpc.updateConference(
           {
@@ -260,6 +287,8 @@ export default function ViewIndividualConferencePage() {
             feeReceived,
             createdBy,
             organiserEmail,
+            technicalProgramsCommittees,
+            conferenceLink,
           },
           {
             accounts: {
@@ -291,6 +320,7 @@ export default function ViewIndividualConferencePage() {
       date: event.target.date.value,
       venue: event.target.venue.value,
       deadlines: event.target.deadlines.value,
+      conferencelink: event.target.conferencelink.value,
       // image: event.target.image.value,
     };
     console.log(data);
@@ -299,7 +329,8 @@ export default function ViewIndividualConferencePage() {
       data.description,
       data.date,
       data.venue,
-      data.deadlines
+      data.deadlines,
+      data.conferencelink
     );
   };
 

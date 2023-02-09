@@ -5,29 +5,38 @@ import {
   CardTitle,
   CardSubtitle,
   CardText,
+  CardImg,
 } from "reactstrap";
 
-export default function CardComponent({ props, pk }) {
-  // console.log("conf",props)
-  // console.log(pk)
+export default function CardComponent({ props, pk, img }) {
 
   return (
-    
-    <div className="grid">
+    <div className="my-2">
       <a
-        href={"/conferences/" + pk.toString() + "-"+ props.id.toString()}
+        href={"/conferences/" + pk.toString() + "-" + props.id.toString()}
         className="text-decoration-none"
         props={props}
       >
         <Card
           style={{
-            width: "18rem",
+            width: "100%",
           }}
         >
-          <img alt="Sample" src="https://picsum.photos/300/200" />
+          <CardImg
+            alt="Card image"
+            src="https://picsum.photos/900/180"
+            style={{
+              height: 180,
+            }}
+            top
+            width="100%"
+          />
+       
           <CardBody>
             <CardTitle tag="h5">{props.name}</CardTitle>
-            <CardText className="text-sm font-italic text-info">Organised By: {props.createdBy}</CardText>
+            <CardText className="text-sm font-italic text-info">
+              Organised By: {props.createdBy}
+            </CardText>
             <CardSubtitle className="mb-2 text-secondary" tag="h6">
               {props.date}
             </CardSubtitle>

@@ -77,21 +77,6 @@ export default function OrganiseConference() {
     }
   };
 
-  //   const getConferences = async () => {
-  //     const connection = new Connection(network, opts.preflightCommitment);
-  //     const provider = getProvider();
-  //     const program = new Program(idl, programID, provider);
-  //     // each program-derived account is wrapped in the promise
-  //     Promise.all(
-  //       (await connection.getProgramAccounts(programID)).map(
-  //         async (conference) => ({
-  //           ...(await program.account.conference.fetch(conference.pubkey)),
-  //           pubkey: conference.pubkey,
-  //         })
-  //       )
-  //     ).then((conferences) => setConferences(conferences));
-  //   };
-
   const createConference = async (
     email,
     createdby,
@@ -99,7 +84,8 @@ export default function OrganiseConference() {
     description,
     date,
     venue,
-    deadlines
+    deadlines,
+    conferencelink,
   ) => {
     try {
       const provider = getProvider();
@@ -111,14 +97,6 @@ export default function OrganiseConference() {
         ],
         program.programId
       );
-
-      // await program.rpc.create(name, description, date, venue, deadlines, {
-      //   accounts: {
-      //     conference,
-      //     user: provider.wallet.publicKey,
-      //     systemProgram: SystemProgram.programId,
-      //   },
-      // });
       await program.rpc.createConference(
         name,
         description,
@@ -127,6 +105,7 @@ export default function OrganiseConference() {
         deadlines,
         createdby,
         email,
+        conferencelink,
         {
           accounts: {
             conferenceList: conferencePDA,
@@ -161,22 +140,6 @@ export default function OrganiseConference() {
         },
         // signers: [conferenceListKeypair],
       });
-
-      // await program.rpc.createConference(
-      //   name,
-      //   description,
-      //   date,
-      //   venue,
-      //   deadlines,
-      //   createdby,
-      //   email,
-      //   {
-      //     accounts: {
-      //       conferenceList: conference,
-      //       user: provider.wallet.publicKey,
-      //     },
-      //   }
-      // );
       await program.rpc.createConference(
         name,
         description,
@@ -185,6 +148,7 @@ export default function OrganiseConference() {
         deadlines,
         createdby,
         email,
+        conferencelink,
         {
           accounts: {
             conferenceList: conferencePDA,
@@ -199,7 +163,6 @@ export default function OrganiseConference() {
       );
       getAll();
       router.push("/main");
-      
     }
   };
 
@@ -210,67 +173,10 @@ export default function OrganiseConference() {
       await program.account.conferenceListAccountData.all();
     console.log("Conferences List", conferenceInfo);
   };
-  // const modifyConference = async () => {
-  //   try {
-  //     const provider = getProvider();
-  //     const program = new Program(idl, programID, provider);
-  //     const [conference] = await PublicKey.findProgramAddressSync(
-  //       [
-  //         utils.bytes.utf8.encode("CONFERENCE"),
-  //         provider.wallet.publicKey.toBuffer(),
-  //       ],
-  //       program.programId
-  //     );
-
-  //     await program.rpc.modify(
-  //       "Edited ACM Conference",
-  //       "A yearly conference for authors globally.",
-  //       "2023-05-05 00:00:00",
-  //       "Suntec Convention Centre",
-  //       "2023-03-05 00:00:00",
-  //       {
-  //         accounts: {
-  //           conference,
-  //           user: provider.wallet.publicKey,
-  //           systemProgram: SystemProgram.programId,
-  //         },
-  //       }
-  //     );
-  //     console.log("Modify the conference w address: ", conference.toString());
-  //   } catch (error) {
-  //     console.log("Error modifying conference account: ", error);
-  //   }
-  // };
-
-  // const cancelConference = async () => {
-  //   try {
-  //     const provider = getProvider();
-  //     const program = new Program(idl, programID, provider);
-  //     const [conference, _] = await PublicKey.findProgramAddressSync(
-  //       [
-  //         utils.bytes.utf8.encode("CONFERENCE"),
-  //         provider.wallet.publicKey.toBuffer(),
-  //       ],
-  //       program.programId
-  //     );
-
-  //     await program.rpc.cancel({
-  //       accounts: {
-  //         conference,
-  //         user: provider.wallet.publicKey,
-  //         systemProgram: SystemProgram.programId,
-  //       },
-  //     });
-  //     console.log("Deleted the conference w address: ", conference.toString());
-  //   } catch (error) {
-  //     console.log("Error deleting conference account: ", error);
-  //   }
-  // };
 
   const handleSubmit = async (event) => {
     // Stop the form from submitting and refreshing the page.
     event.preventDefault();
-    console.log("passed");
     // Get data from the form.
     const data = {
       email: event.target.email.value,
@@ -280,6 +186,7 @@ export default function OrganiseConference() {
       date: event.target.date.value,
       venue: event.target.venue.value,
       deadlines: event.target.deadlines.value,
+      conferencelink: event.target.conferencelink.value,
       // image: event.target.image.value,
     };
     console.log(data);
@@ -290,7 +197,8 @@ export default function OrganiseConference() {
       data.description,
       data.date,
       data.venue,
-      data.deadlines
+      data.deadlines,
+      data.conferencelink
     );
   };
 

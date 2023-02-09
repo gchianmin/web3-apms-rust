@@ -1,7 +1,7 @@
+use std::ptr::null;
+
 use crate::account_data::*;
-use crate::errors::*;
 use anchor_lang::prelude::*;
-// use anchor_lang::solana_program::entrypoint::ProgramResult;
 
 #[derive(Accounts)]
 pub struct CreateConference<'info> {
@@ -10,7 +10,7 @@ pub struct CreateConference<'info> {
   pub user: Signer<'info>,
 }
 
-pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String, created_by: String, organiser_email: String) -> Result<()> {
+pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String, created_by: String, organiser_email: String, conference_link: String) -> Result<()> {
   let account = &mut ctx.accounts.conference_list;
   let index = match account.deleted_indexes.pop() {
     Some(value) => value,
@@ -27,10 +27,12 @@ pub fn create_conference(ctx: Context<CreateConference>, name: String, descripti
     date,
     venue,
     submission_deadline,
-    paper_submitted: 0,
+    paper_submitted: Vec::new(),
     fee_received: 0,
     created_by,
-    organiser_email
+    organiser_email,
+    technical_programs_committees: Tpc::default(),
+    conference_link,
   });
   Ok(())
 }

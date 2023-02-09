@@ -65,6 +65,10 @@
         {
           "name": "organiserEmail",
           "type": "string"
+        },
+        {
+          "name": "conferenceLink",
+          "type": "string"
         }
       ]
     },
@@ -109,6 +113,101 @@
         {
           "name": "id",
           "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "updateTpc",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "tpc",
+          "type": {
+            "defined": "Tpc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "submitPaper",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperId",
+          "type": "string"
+        },
+        {
+          "name": "paperAuthors",
+          "type": {
+            "defined": "Author"
+          }
+        },
+        {
+          "name": "dateSubmitted",
+          "type": "string"
+        },
+        {
+          "name": "paperStatus",
+          "type": "string"
+        },
+        {
+          "name": "version",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "deletePaper",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperId",
+          "type": "string"
         }
       ]
     }
@@ -175,7 +274,11 @@
           },
           {
             "name": "paperSubmitted",
-            "type": "u64"
+            "type": {
+              "vec": {
+                "defined": "Paper"
+              }
+            }
           },
           {
             "name": "feeReceived",
@@ -188,6 +291,106 @@
           {
             "name": "organiserEmail",
             "type": "string"
+          },
+          {
+            "name": "technicalProgramsCommittees",
+            "type": {
+              "defined": "Tpc"
+            }
+          },
+          {
+            "name": "conferenceLink",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Paper",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "paperId",
+            "type": "string"
+          },
+          {
+            "name": "paperAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "paperAuthors",
+            "type": {
+              "defined": "Author"
+            }
+          },
+          {
+            "name": "dateSubmitted",
+            "type": "string"
+          },
+          {
+            "name": "paperStatus",
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "feePaid",
+            "type": "u64"
+          },
+          {
+            "name": "reviewer",
+            "type": {
+              "defined": "Tpc"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Author",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authorName",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "authorEmail",
+            "type": {
+              "vec": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tpc",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tpcName",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "tpcEmail",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "tpcWallet",
+            "type": {
+              "vec": "string"
+            }
           }
         ]
       }
@@ -201,6 +404,6 @@
     }
   ],
   "metadata": {
-    "address": "FwYZN1BjDu3Szoc1rUMbMyuAQFPHNxFJMo7ijWCUcPRM"
+    "address": "7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ"
   }
 }

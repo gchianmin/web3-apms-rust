@@ -8,7 +8,10 @@ function Popup({
   connectWallet,
   walletAddress,
   handleSubmit,
-  existingDetails
+  existingDetails,
+  conferenceList,
+  conferencePDA,
+  conferenceName
 }) {
   const [editModal, setEditModal] = useState(false);
   const editToggle = () => setEditModal(!editModal);
@@ -16,11 +19,29 @@ function Popup({
   const toggle = () => setModal(!modal);
   const router = useRouter();
 
+  const sendProps = (conferenceList, conferencePDA, conferenceName) => {
+    router.push({
+      pathname: "/submit-paper",
+      query : {
+        conferenceList, 
+        conferencePDA, 
+        conferenceName,
+      }
+    })
+  }
+
   return (
     <div>
-      <div className="d-flex justify-content-center d-grid col-5 mx-auto">
+      <div className="d-flex justify-content-center d-grid col-7 mx-auto">
+      <Button
+          className="btn btn-block btn-info mr-4 btn-alignment"
+          onClick={() => sendProps(conferenceList, conferencePDA, conferenceName)}
+        >
+          Submit Paper
+        </Button>
+
         <Button
-          className="btn btn-block btn-primary mr-4 btn-alignment"
+          className="btn btn-block btn-primary mr-4 mt-0 btn-alignment"
           onClick={editToggle}
         >
           Edit
@@ -31,6 +52,7 @@ function Popup({
         >
           Cancel
         </Button>
+
       </div>
 
       <Modal isOpen={editModal} toggle={editToggle} size="xl">

@@ -1,4 +1,3 @@
-// use std::mem::size_of;
 use account_data::*;
 use anchor_lang::prelude::*;
 use instructions::*;
@@ -7,18 +6,19 @@ mod account_data;
 mod errors;
 mod instructions;
 
-declare_id!("FwYZN1BjDu3Szoc1rUMbMyuAQFPHNxFJMo7ijWCUcPRM");
+declare_id!("7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ");
 
 #[program]
 pub mod apmsdapp {
+
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         instructions::initialize(ctx)
     }
 
-    pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String, created_by: String, organiser_email: String) -> Result<()> {
-        instructions::create_conference(ctx, name, description, date, venue, submission_deadline, created_by, organiser_email)
+    pub fn create_conference(ctx: Context<CreateConference>, name: String, description: String, date: String, venue: String, submission_deadline: String, created_by: String, organiser_email: String, conference_link:String) -> Result<()> {
+        instructions::create_conference(ctx, name, description, date, venue, submission_deadline, created_by, organiser_email, conference_link)
     }
 
     pub fn update_conference(ctx: Context<UpdateConference>, conference: Conference) -> Result<()> {
@@ -29,4 +29,15 @@ pub mod apmsdapp {
         instructions::delete_conference(ctx, id)
     }
 
+    pub fn update_tpc(ctx: Context<UpdateTpc>, conferenceid:Pubkey, tpc:Tpc) -> Result<()> {
+        instructions::update_tpc(ctx, conferenceid, tpc)
+    }
+
+    pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_authors: Author, date_submitted: String, paper_status: String, version:u8) -> Result<()> {
+        instructions::submit_paper(ctx, conferenceid, paper_id, paper_authors, date_submitted, paper_status, version)
+    }
+
+    pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_id: String) -> Result<()> {
+        instructions::delete_paper(ctx, conferenceid, paper_id)
+    }
 }

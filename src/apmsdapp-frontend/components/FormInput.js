@@ -5,9 +5,7 @@ import {
   Label,
   Col,
   Input,
-  FormText,
   Button,
-  FormFeedback,
 } from "reactstrap";
 
 export default function FormInput({ handleSubmit, empty, existingDetails, editToggle }) {
@@ -111,15 +109,14 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
             </Col>
           </FormGroup>
 
-          {/* <FormGroup row>
-            <Label for="image" sm={2} className="text-monospace">
-              Image
+          <FormGroup row>
+            <Label for="conferencelink" sm={2} className="text-monospace">
+              Website Link
             </Label>
             <Col sm={10}>
-              <Input id="image" name="image" type="file" required />
-              <FormText className="font-italic">Max image size: 3MB</FormText>
+              <Input id="conferencelink" name="conferencelink" type="url" required />
             </Col>
-          </FormGroup> */}
+          </FormGroup>
           <div className="d-flex justify-content-center align-items-center">
             <Button color="primary">Submit</Button>
           </div>
@@ -131,21 +128,6 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
           className="align-items-center justify-contents-center "
           onSubmit={handleSubmit}
         >
-          {/* <FormGroup row>
-            <Label className="text-monospace" for="email" sm={2}>
-              Email address
-            </Label>
-            <Col sm={10}>
-              <Input
-                id="email"
-                name="email"
-                placeholder="email address of the organiser"
-                type="email"
-                required
-              />
-            </Col>
-          </FormGroup> */}
-
           <FormGroup row>
             <Label for="name" sm={2} className="text-monospace">
               Conference Name
@@ -212,15 +194,14 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
             </Col>
           </FormGroup>
 
-          {/* <FormGroup row>
-            <Label for="image" sm={2} className="text-monospace">
-              Image
+          <FormGroup row>
+            <Label for="conferencelink" sm={2} className="text-monospace">
+              Website Link
             </Label>
             <Col sm={10}>
-              <Input id="image" name="image" type="file" required />
-              <FormText className="font-italic">Max image size: 3MB</FormText>
+              <Input id="conferencelink" name="conferencelink" type="url" required defaultValue={existingDetails.conferenceLink}/>
             </Col>
-          </FormGroup> */}
+          </FormGroup>
           <div className="d-flex justify-content-center d-grid mx-auto">
             <Button className="mr-5 px-5" color="primary">Submit</Button>
             <Button className="px-5" color="secondary" onClick={editToggle}>

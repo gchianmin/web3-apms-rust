@@ -9,12 +9,6 @@ pub struct ConferenceListAccountData {
 }
 
 impl ConferenceListAccountData {
-  // const COUNT_SIZE: usize = 1;
-  // const DELETED_INDEXES: usize = 4 + MAX_TODO_LIST_LENGTH * 1;
-  // const TODOS_SIZE: usize = 4 + MAX_TODO_LIST_LENGTH * (32 + 4 + 200 + 1);
-  // pub const MAX_SIZE: usize = TodoListAccountData::COUNT_SIZE
-  //   + TodoListAccountData::DELETED_INDEXES
-  //   + TodoListAccountData::TODOS_SIZE;
 
   pub fn get_conference_index(&self, id: Pubkey) -> Result<usize> {
     for (index, conference) in self.conferences.iter().enumerate() {
@@ -36,8 +30,47 @@ pub struct Conference {
   pub date: String,
   pub venue: String,
   pub submission_deadline: String,
-  pub paper_submitted: u64,
+  pub paper_submitted: Vec<Paper>,
   pub fee_received: u64,
   pub created_by: String,
   pub organiser_email: String,
+  pub technical_programs_committees: Tpc,
+  pub conference_link: String,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Paper {
+  pub paper_id: String,
+  pub paper_admin: Pubkey,
+  pub paper_authors: Author,
+  pub date_submitted: String,
+  pub paper_status: String,
+  pub version: u8,
+  pub fee_paid: u64,
+  pub reviewer: Tpc,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Author {
+  pub author_name: Vec<String>,
+  pub author_email: Vec<String>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Tpc {
+  pub tpc_name: Vec<String>,
+  pub tpc_email: Vec<String>,
+  pub tpc_wallet: Vec<String>,
+}
+
+impl Default for Tpc {
+  fn default () -> Tpc {
+      Tpc{tpc_name: Vec::new(), tpc_email: Vec::new(), tpc_wallet: Vec::new() }
+  }
+}
+
+impl Default for Author {
+  fn default () -> Author {
+    Author{author_name: Vec::new(), author_email: Vec::new() }
+  }
 }
