@@ -1,5 +1,4 @@
 use crate::account_data::*;
-use crate::errors::*;
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
