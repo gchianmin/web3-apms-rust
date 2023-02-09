@@ -1,5 +1,3 @@
-use std::ptr::null;
-
 use crate::account_data::*;
 use anchor_lang::prelude::*;
 
