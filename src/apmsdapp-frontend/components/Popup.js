@@ -83,7 +83,7 @@ function Popup({
             </Button>
 
             <Button
-              className="btn btn-block mr-4 mt-0 btn-alignment"
+              className="btn btn-block mr-4 mt-0 btn-alignment btn-success"
               onClick={() =>
                 sendProps("/view-paper", conferenceList, conferencePDA, conferenceName)
               }

@@ -54,10 +54,10 @@ export default function AccordionTable({
     setFileData(JSON.parse(props));
   }, [props]);
 
-  const DownloadButton = (paperId, paperName) => {
+  const DownloadButton = (paperHash, paperName) => {
     const handleDownload = (event) => {
       event.preventDefault();
-      const fileUrl = `/files/${conference.conferenceList}/${conference.conferencePDA}/${paperId}/${paperName}`;
+      const fileUrl = `/files/${conference.conferenceList}/${conference.conferencePDA}/${paperHash}/${paperName}`;
       console.log(fileUrl);
       const a = document.createElement("a");
       a.href = fileUrl;
@@ -71,7 +71,7 @@ export default function AccordionTable({
       <RiDownload2Fill
         type="button"
         color="green"
-        size={30}
+        size={25}
         onClick={handleDownload}
         className="mr-3"
       />
@@ -80,10 +80,13 @@ export default function AccordionTable({
 
   return (
     <>
-    {filedata.length>0? <Table responsive={true} borderless >
+    {filedata.length>0? <Table responsive={true} borderless>
         <thead >
           <tr>
+            <th> </th>
+            <th>ID</th>
             <th>Paper</th>
+            <th>Abstract</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -97,24 +100,29 @@ export default function AccordionTable({
                   activeIndexes.includes(index) ? "active" : ""
                 }`}
               >
-                <td className="accordion-title">
-                  {" "}
-                  <RiArrowDownSLine className="accordion-arrow" size={28} />
-                  {item.paperName}
+                <td className="accordion-title align-middle pr-0 mr-0">
+                  <RiArrowDownSLine className="accordion-arrow " size={25} />
                 </td>
 
-                <td className="accordion-title">{getStatus(item.paperStatus)}</td>
+                <td className="accordion-title align-middle">
+                  {item.paperId}
+                </td>
+                
+                <td className="accordion-title align-middle">{item.paperTitle}</td>
+                <td className="accordion-title align-middle">{item.paperAbstract}</td>
 
-                <td className="accordion-title ">
+                <td className="accordion-title align-middle">{getStatus(item.paperStatus)}</td>
+
+                <td className="accordion-title align-middle">
                   <RiDeleteBin6Line
                     type="button"
                     color="red"
                     size={30}
-                    onClick={() => deletePaper(item.paperId)}
+                    onClick={() => deletePaper(item.paperHash, item.paperName)}
                     className="mr-3"
                   />
 
-                  {DownloadButton(item.paperId, item.paperName)}
+                  {/* {DownloadButton(item.paperHash, item.paperName)} */}
 
                   <RiTeamLine type="button" size={30} className="mr-3"/>
 
@@ -127,19 +135,23 @@ export default function AccordionTable({
               {activeIndexes.includes(index) && (
                 <>
                 <tr >
-                <td colSpan="3" className="text-monospace accordion-content">Version: {item.version}</td>
+                <td colSpan="5" className="text-monospace accordion-content">Paper Name: {item.paperName} {DownloadButton(item.paperHash, item.paperName)}</td>
                 </tr>
                 <tr >
-                <td colSpan="3" className="text-monospace">Date Submitted: {item.dateSubmitted}</td>
+                <td colSpan="5" className="text-monospace accordion-content">Version: {item.version}</td>
+                </tr>
+                <tr >
+                <td colSpan="5" className="text-monospace">Date Submitted: {item.dateSubmitted}</td>
                 </tr>
                 <tr>
-                <td colSpan="3" className="text-monospace">Authors: {item.paperAuthors.map(author => (
-                <p>{author.authorName} [{author.authorEmail}]</p>))}</td>
+                <td colSpan="5" className="text-monospace">Authors: {item.paperAuthors.map(author => (
+                <p>{author.authorName} - {author.authorEmail} [{author.authorAffiliation}]</p>))}</td>
                 </tr>
 
                 <tr>
-                <td colSpan="3" className="text-monospace">Reviewers: {item.reviewer.length > 0 ? <p>Have</p> : <p>No reviewers assigned yet</p>}</td>
+                <td colSpan="5" className="text-monospace">Reviewers: {item.reviewer.length > 0 ? <p>Have</p> : <p>No reviewers assigned yet</p>}</td>
                 </tr>
+
                 </>
               )}
             </React.Fragment>

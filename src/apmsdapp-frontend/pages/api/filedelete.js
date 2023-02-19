@@ -17,10 +17,10 @@ export default async (req, res) => {
   });
   try {
     console.log(data)
-    const paperId = data.fields.paperId
+    const paperHash = data.fields.paperHash
     const conferenceListPDA = data.fields.conferenceListPDA
     const conferenceId = data.fields.conferenceId
-    const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperId}/`;
+    const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperHash}/`;
     fs.remove(pathToDeletePaper, (err) => {
       if (err) return console.error(err);
       console.log("success!"); 

@@ -21,14 +21,14 @@ import { useRouter } from "next/router";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const DynamicForm = ({ user, submitPaper, props}) => {
-  const [formFields, setFormFields] = useState([{ name: "", email: "" }]);
+  const [formFields, setFormFields] = useState([{ name: "", email: "", affiliation: ""}]);
   const [file, setFile] = useState(null);
-  const [hash, setHash] = useState(null);
+  // const [hash, setHash] = useState(null);
   const router = useRouter();
   const userEmail = user == undefined ? null : user.email;
   console.log("passed", {props})
   const handleAddField = () => {
-    setFormFields([...formFields, { name: "", email: "" }]);
+    setFormFields([...formFields, { name: "", email: "", affiliation: "" }]);
   };
 
   const handleRemoveField = (index) => {
@@ -74,8 +74,13 @@ const DynamicForm = ({ user, submitPaper, props}) => {
     event.preventDefault();
     var authors = []
     formFields.map((field, index)=>{
-      authors.push({authorName: field.name, authorEmail: field.email})
+      authors.push({authorName: field.name, authorEmail: field.email, authorAffiliation: field.affiliation})
     })
+    const paper = {
+      title: event.target.title.value,
+      abstract: event.target.abstract.value,
+    };
+
     console.log(authors)
     if (file.size > MAX_FILE_SIZE) {
       alert("File size too big");
@@ -96,9 +101,8 @@ const DynamicForm = ({ user, submitPaper, props}) => {
         alert(`Error ${response.status}!! ${data.message}`)
         throw data.message;
       }
-      setHash(data.hash)
-      console.log("Data", data.hash);
-      const submitted = await submitPaper(data.hash, data.fileName, authors, d.toLocaleDateString() + " " + d.toLocaleTimeString(), new BN(1), "");
+      
+      const submitted = await submitPaper(data.entropy, data.hash, data.fileName, paper.title, paper.abstract, authors, d.toLocaleDateString() + " " + d.toLocaleTimeString(), new BN(1), "");
       // console.log(submitted)
       if (submitted=="ok" && response.ok) {
         alert("Paper Submitted Successfully. You may view the status under myHistory.")
@@ -148,7 +152,7 @@ const DynamicForm = ({ user, submitPaper, props}) => {
                   type="text"
                   value={field.name}
                   onChange={(event) => handleInputChange(index, event)}
-                  className="form-control col-5 mr-2"
+                  className="form-control col-3 mr-3"
                 />
                 <input
                   id="email"
@@ -157,7 +161,16 @@ const DynamicForm = ({ user, submitPaper, props}) => {
                   type="email"
                   value={field.email}
                   onChange={(event) => handleInputChange(index, event)}
-                  className="form-control col-5"
+                  className="form-control col-3 mr-3"
+                />
+                <input
+                  id="affiliation"
+                  placeholder="affiliation"
+                  name="affiliation"
+                  type="text"
+                  value={field.affiliation}
+                  onChange={(event) => handleInputChange(index, event)}
+                  className="form-control col-4"
                 />
                 {formFields.length != 1 && (
                   <RiDeleteBin6Line
@@ -176,6 +189,36 @@ const DynamicForm = ({ user, submitPaper, props}) => {
               size={30}
               color="green"
               onClick={handleAddField}
+            />
+          </Col>
+        </FormGroup>
+
+        <FormGroup row>
+          <Label className="text-monospace d-flex align-items-center " for="title" sm={2}>
+            Paper Title
+          </Label>
+          <Col sm={10} className="d-flex align-items-center ">
+            <Input
+              id="title"
+              name="title"
+              placeholder="Title of the paper"
+              type="text"
+              required
+            />
+          </Col>
+        </FormGroup>
+
+        <FormGroup row>
+          <Label className="text-monospace d-flex align-items-center" for="abstract" sm={2}>
+            Paper Abstract
+          </Label>
+          <Col sm={10} className="d-flex align-items-center">
+            <Input
+              id="abstract"
+              name="abstract"
+              placeholder="Abstract of the paper"
+              type="text"
+              required
             />
           </Col>
         </FormGroup>

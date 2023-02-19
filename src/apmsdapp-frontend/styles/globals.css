@@ -152,6 +152,7 @@ a {
   
 }
 
+
 .accordion.active {
   padding-top: 1rem;
   background-color: #e7f1ff;
@@ -183,6 +184,7 @@ a {
 
 .accordion-title {
   font-size: 1.2rem;
+  /* vertical-align: auto; */
 }
 
 .accordion-content {
@@ -207,3 +209,5 @@ a {
   color: #79a8f2;
   
 }
+
+

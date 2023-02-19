@@ -37,7 +37,7 @@ pub mod apmsdapp {
         instructions::submit_paper(ctx, conferenceid, paper_id, paper_hash, paper_name, paper_title, paper_abstract, paper_authors, date_submitted, version, prev_version)
     }
 
-    pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_id: String) -> Result<()> {
-        instructions::delete_paper(ctx, conferenceid, paper_id)
+    pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_hash: String) -> Result<()> {
+        instructions::delete_paper(ctx, conferenceid, paper_hash)
     }
 }
