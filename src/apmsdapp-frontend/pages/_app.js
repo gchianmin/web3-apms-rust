@@ -1,13 +1,14 @@
 import "../styles/globals.css";
 import React from "react";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
-import NavBar from "../components/NavBar";
+import Layout from "../components/Layout";
 
 export default function App({ Component, pageProps }) {
   return (
-      <UserProvider>
-        <NavBar />
+    <UserProvider>
+      <Layout>
         <Component {...pageProps} />
-      </UserProvider>
+      </Layout>
+    </UserProvider>
   );
 }

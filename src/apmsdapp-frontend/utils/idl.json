@@ -1,0 +1,450 @@
+{
+  "version": "0.1.0",
+  "name": "apmsdapp",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "name": "date",
+          "type": "string"
+        },
+        {
+          "name": "venue",
+          "type": "string"
+        },
+        {
+          "name": "submissionDeadline",
+          "type": "string"
+        },
+        {
+          "name": "createdBy",
+          "type": "string"
+        },
+        {
+          "name": "organiserEmail",
+          "type": "string"
+        },
+        {
+          "name": "conferenceLink",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conference",
+          "type": {
+            "defined": "Conference"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleteConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "updateTpc",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "tpc",
+          "type": {
+            "vec": {
+              "defined": "Tpc"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "submitPaper",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperId",
+          "type": "string"
+        },
+        {
+          "name": "paperName",
+          "type": "string"
+        },
+        {
+          "name": "paperAuthors",
+          "type": {
+            "vec": {
+              "defined": "Author"
+            }
+          }
+        },
+        {
+          "name": "dateSubmitted",
+          "type": "string"
+        },
+        {
+          "name": "version",
+          "type": "u8"
+        },
+        {
+          "name": "prevVersion",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "deletePaper",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperId",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ConferenceListAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u8"
+          },
+          {
+            "name": "deletedIndexes",
+            "type": "bytes"
+          },
+          {
+            "name": "conferences",
+            "type": {
+              "vec": {
+                "defined": "Conference"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Conference",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "publicKey"
+          },
+          {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "type": "string"
+          },
+          {
+            "name": "venue",
+            "type": "string"
+          },
+          {
+            "name": "submissionDeadline",
+            "type": "string"
+          },
+          {
+            "name": "paperSubmitted",
+            "type": {
+              "vec": {
+                "defined": "Paper"
+              }
+            }
+          },
+          {
+            "name": "feeReceived",
+            "type": "u64"
+          },
+          {
+            "name": "createdBy",
+            "type": "string"
+          },
+          {
+            "name": "organiserEmail",
+            "type": "string"
+          },
+          {
+            "name": "technicalProgramsCommittees",
+            "type": {
+              "vec": {
+                "defined": "Tpc"
+              }
+            }
+          },
+          {
+            "name": "conferenceLink",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Paper",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "paperId",
+            "type": "string"
+          },
+          {
+            "name": "paperAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "paperName",
+            "type": "string"
+          },
+          {
+            "name": "paperAuthors",
+            "type": {
+              "vec": {
+                "defined": "Author"
+              }
+            }
+          },
+          {
+            "name": "dateSubmitted",
+            "type": "string"
+          },
+          {
+            "name": "paperStatus",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "prevVersion",
+            "type": "string"
+          },
+          {
+            "name": "feePaid",
+            "type": "u64"
+          },
+          {
+            "name": "reviewer",
+            "type": {
+              "vec": {
+                "defined": "Reviwers"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Author",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authorName",
+            "type": "string"
+          },
+          {
+            "name": "authorEmail",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tpc",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tpcName",
+            "type": "string"
+          },
+          {
+            "name": "tpcEmail",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reviwers",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tpcName",
+            "type": "string"
+          },
+          {
+            "name": "tpcEmail",
+            "type": "string"
+          },
+          {
+            "name": "tpcWallet",
+            "type": "string"
+          },
+          {
+            "name": "approval",
+            "type": "u8"
+          },
+          {
+            "name": "feedback",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ConferenceNotFound",
+      "msg": "The conference with the given id is not found"
+    },
+    {
+      "code": 6001,
+      "name": "NotAuthorized",
+      "msg": "You are not authorized to perform this action"
+    }
+  ],
+  "metadata": {
+    "address": "7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ"
+  }
+}

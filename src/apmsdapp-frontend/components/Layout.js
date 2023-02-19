@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from 'reactstrap';
 import Head from 'next/head';
-import NavBar from './NavbarOld';
+import NavBar from './NavBar';
 
 export default function Layout({ children })
 {
