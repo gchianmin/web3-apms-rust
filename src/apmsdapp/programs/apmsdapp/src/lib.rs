@@ -33,8 +33,8 @@ pub mod apmsdapp {
         instructions::update_tpc(ctx, conferenceid, tpc)
     }
 
-    pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_name: String, paper_authors: Vec<Author>, date_submitted: String, version:u8, prev_version:String) -> Result<()> {
-        instructions::submit_paper(ctx, conferenceid, paper_id, paper_name, paper_authors, date_submitted, version, prev_version)
+    pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_hash: String, paper_name: String, paper_title: String, paper_abstract: String, paper_authors: Vec<Author>, date_submitted: String, version:u8, prev_version:String) -> Result<()> {
+        instructions::submit_paper(ctx, conferenceid, paper_id, paper_hash, paper_name, paper_title, paper_abstract, paper_authors, date_submitted, version, prev_version)
     }
 
     pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_id: String) -> Result<()> {

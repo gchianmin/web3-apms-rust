@@ -74,9 +74,9 @@ describe("apmsdapp", async () => {
     );
   }
 
-  const submitPaper = async (id, paperId, paperName, authors, dateSubmitted, version, preVersion) => {
+  const submitPaper = async (id, paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, prevVersion) => {
     await program.rpc.submitPaper(
-      id, paperId, paperName, authors, dateSubmitted, version, preVersion, 
+      id, paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, prevVersion, 
       {
         accounts: {
           conferenceList: conferencePDA,
@@ -273,61 +273,84 @@ describe("apmsdapp", async () => {
     getAllConference()
   });
 
+
+  //id, paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, preVersion
   it("Submitting a paper", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
-    let paperId = "example hash"
+    let paperId = "Po90y"
+    let paperHash = "example hash"
     let paperName = "filename"
-    let authors = [{authorName: "A1", authorEmail:"E1"}]
+    let paperTitle = "example title"
+    let paperAbstract = "example abstract"
+    let authors = [{authorName: "A1", authorEmail:"E1", authorAffiliation: "AU1"}]
     let dateSubmitted = "2023-02-05"
     // let paperStatus = new anchor.BN(0)
     let version = new anchor.BN(1)
     let prevVersion = "";
 
-    await submitPaper(id, paperId, paperName,authors, dateSubmitted, version, prevVersion)
+    await submitPaper(id, paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, prevVersion)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log("sub", updatedData.conferences[0].technicalProgramsCommittees)
-    // console.log(updatedData.conferences[0].paperSubmitted[0].paperAuthors)
+    console.log(updatedData.conferences[0].paperSubmitted[0])
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "Po90y");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperHash, "example hash");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperName, "filename");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperTitle, "example title");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract");
     assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-05");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].reviewer.length, 0);
+    // assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair, []);
+    // assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair, {});
+
   })
 
   it("Submitting a 2nd paper", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(data.conferences[0].id)
+    
     let id = data.conferences[0].id
-    let paperId = "example hash2"
+    let paperId = "Po904"
+    let paperHash = "example hash2"
     let paperName = "filename2"
-    let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
+    let paperTitle = "example title2"
+    let paperAbstract = "example abstract2"
+    let authors = [{authorName: "A3", authorEmail:"E3", authorAffiliation: "AU3"},{authorName: "A4", authorEmail:"E4", authorAffiliation: "AU4"} ]
     let dateSubmitted = "2023-02-06"
     // let paperStatus = new anchor.BN(0)
     let version = new anchor.BN(1)
     let prevVersion = "";
 
-    await submitPaper(id, paperId, paperName,authors, dateSubmitted, version, prevVersion)
+    await submitPaper(id, paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, prevVersion)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     console.log("sub", updatedData.conferences[0].paperSubmitted)
+    console.log(updatedData.conferences[0].paperSubmitted[1].paperAuthors)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 2);
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperId, "example hash2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperId, "Po904");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperHash, "example hash2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperName, "filename2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperTitle, "example title2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAbstract, "example abstract2");
     assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[1].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[1].dateSubmitted, "2023-02-06");
     assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus, 0);
     assert.equal(updatedData.conferences[0].paperSubmitted[1].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[1].version, 1);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].reviewer.length, 0);
   })
 
   it("Fetch All Conferences after submitting a paper", async () => {
@@ -338,7 +361,7 @@ describe("apmsdapp", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
-    let paperId = "example hash"
+    let paperId = "Po90y"
     let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
 
     await deletePaper(id, paperId)
@@ -349,7 +372,11 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "Po904");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperHash, "example hash2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperName, "filename2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperTitle, "example title2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
     assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
@@ -360,5 +387,4 @@ describe("apmsdapp", async () => {
   it("Fetch All Conferences after deleting a paper", async () => {
     getAllConference()
   });
-
 });

@@ -41,21 +41,26 @@ pub struct Conference {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Paper {
   pub paper_id: String,
+  pub paper_hash: String,
   pub paper_admin: Pubkey,
   pub paper_name: String,
+  pub paper_title: String, 
+  pub paper_abstract: String,
   pub paper_authors: Vec<Author>,
   pub date_submitted: String,
   pub paper_status: u8,
   pub version: u8,
   pub prev_version: String,
   pub fee_paid: u64,
-  pub reviewer: Vec<Reviwers>,
+  pub reviewer: Vec<Reviewers>,
+  pub paper_chair: Reviewers,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Author {
   pub author_name: String,
   pub author_email: String,
+  pub author_affiliation: String,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -65,7 +70,7 @@ pub struct Tpc {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct Reviwers {
+pub struct Reviewers {
   pub tpc_name: String,
   pub tpc_email: String,
   pub tpc_wallet: String,
@@ -81,6 +86,12 @@ impl Default for Tpc {
 
 impl Default for Author {
   fn default () -> Author {
-    Author{author_name: String::new(), author_email: String::new() }
+    Author{author_name: String::new(), author_email: String::new(), author_affiliation: String::new()}
+  }
+}
+
+impl Default for Reviewers {
+  fn default () -> Reviewers {
+    Reviewers{tpc_name: String::new(), tpc_email: String::new(), tpc_wallet: String::new(), approval: 0, feedback: String::new()}
   }
 }
