@@ -29,12 +29,12 @@ pub mod apmsdapp {
         instructions::delete_conference(ctx, id)
     }
 
-    pub fn update_tpc(ctx: Context<UpdateTpc>, conferenceid:Pubkey, tpc:Tpc) -> Result<()> {
+    pub fn update_tpc(ctx: Context<UpdateTpc>, conferenceid:Pubkey, tpc:Vec<Tpc>) -> Result<()> {
         instructions::update_tpc(ctx, conferenceid, tpc)
     }
 
-    pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_authors: Author, date_submitted: String, paper_status: String, version:u8) -> Result<()> {
-        instructions::submit_paper(ctx, conferenceid, paper_id, paper_authors, date_submitted, paper_status, version)
+    pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_name: String, paper_authors: Vec<Author>, date_submitted: String, version:u8, prev_version:String) -> Result<()> {
+        instructions::submit_paper(ctx, conferenceid, paper_id, paper_name, paper_authors, date_submitted, version, prev_version)
     }
 
     pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_id: String) -> Result<()> {

@@ -35,7 +35,7 @@ export default async (req, res) => {
       const fullPathToWritePaper =
         pathToWritePaper + `${paper.originalFilename}`;
       await fs.writeFile(fullPathToWritePaper, file);
-      res.status(200).json({ message: "file uploaded!", hash: hash });
+      res.status(200).json({ message: "file uploaded!", hash: hash, fileName: paper.originalFilename});
     } catch (error) {
       res.status(500).json({ message: error.message });
       return;

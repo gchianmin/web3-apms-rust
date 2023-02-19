@@ -22,6 +22,7 @@ import {
 } from "reactstrap";
 import Popup from "../../components/Popup";
 import Link from "next/link";
+// import TpcForm from "../../components/TpcForm";
 
 // This is the address of your solana program, if you forgot, just run solana address -k target/deploy/myepicproject-keypair.json
 const programID = new PublicKey(IDL.metadata.address);
@@ -107,7 +108,7 @@ export default function ViewIndividualConferencePage() {
       for (let i in conf.account.conferences) {
         console.log(conf.account.conferences[i]);
         if (conf.account.conferences[i].id == query[1]) {
-          confid = conf.account.conferences[i]; // straight return 
+          confid = conf.account.conferences[i]; // straight return
         }
       }
       return confid;
@@ -119,13 +120,41 @@ export default function ViewIndividualConferencePage() {
   const sendProps = (conferenceList, conferencePDA, conferenceName) => {
     router.push({
       pathname: "/submit-paper",
-      query : {
-        conferenceList, 
-        conferencePDA, 
+      query: {
+        conferenceList,
+        conferencePDA,
         conferenceName,
-      }, 
-    })
+      },
+    });
+  };
+
+  const updateTpc = async (conferenceId, tpc) => {
+    const provider = getProvider();
+      const program = new Program(IDL, programID, provider);
+      const confid = getConferenceFromLists();
+      if (confid.admin != provider.wallet.publicKey.toString()) {
+        alert("you are not the admin");
+      } else {
+        const [conferencePDA, _] = await PublicKey.findProgramAddressSync(
+          [
+            utils.bytes.utf8.encode("CONFERENCE"),
+            provider.wallet.publicKey.toBuffer(),
+          ],
+          program.programId
+        );
+   console.log(tpc)
+    await program.rpc.updateTpc(
+      conferenceId, tpc,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: provider.wallet.publicKey,
+        },
+      }
+    );
+    window.location.reload();
   }
+}
 
   const getDetails = () => {
     try {
@@ -133,7 +162,7 @@ export default function ViewIndividualConferencePage() {
       const conferenceList = query[0];
       const conferencePDA = query[1];
       const conferenceName = confid.name;
-      console.log("org", conferenceList, conferencePDA, conferenceName)
+      console.log("org", conferenceList, conferencePDA, conferenceName);
 
       if (confid) {
         return (
@@ -159,10 +188,55 @@ export default function ViewIndividualConferencePage() {
                   Paper Submission Deadline: {confid.submissionDeadline}
                 </CardText>
                 <CardText>
-                  Conference website: {' '}
-                  <a href={confid.conferenceLink} className="text-primary font-italic">{confid.conferenceLink}</a>
+                  Conference website:{" "}
+                  <a
+                    href={confid.conferenceLink}
+                    className="text-primary font-italic"
+                  >
+                    {confid.conferenceLink}
+                  </a>
                 </CardText>
               </CardBody>
+
+              <hr />
+
+              <CardBody>
+                <CardTitle tag="h4">Technical Programs Committees </CardTitle>
+                {/* <u className="text-info" type="button" onClick={()=>console.log("click")}>Update</u> */}
+                <CardText>
+                  {/* <small> */}
+                    {confid.technicalProgramsCommittees.length == 0 ? (
+                      <div>
+                        <p>Committees have not been added by the organiser. Please check back later..</p>
+                      {walletAddress == confid.admin &&
+                      <Popup tpc={true} updateTpc={updateTpc} existingDetails={confid} walletAddress={walletAddress}
+                      connectWallet={connectWallet}/>
+                      // <Button type="button" onClick={()=>updateTpc(confid.id, [])}> Add Committees</Button>
+                      }
+                      </div>
+                    ) : 
+                    
+                    Object.keys(confid.technicalProgramsCommittees).map((key) =>
+                      [key, confid.technicalProgramsCommittees[key]].map((conf) => (
+                          <div>
+                            <p>{conf.tpcName}</p>
+                          </div>
+                      )))
+                    }
+                  {/* </small> */}
+                </CardText>
+                {/* <CardText className="lead">{confid.description}</CardText>
+                <CardText>Date: {confid.date}</CardText>
+                <CardText>Venue: {confid.venue}</CardText>
+                <CardText>
+                  Paper Submission Deadline: {confid.submissionDeadline}
+                </CardText>
+                <CardText>
+                  Conference website: {' '}
+                  <a href={confid.conferenceLink} className="text-primary font-italic">{confid.conferenceLink}</a>
+                </CardText> */}
+              </CardBody>
+                {/* <TpcForm existingTpc={confid.technicalProgramsCommittees}/> */}
               <CardFooter>
                 {walletAddress == confid.admin && (
                   <Popup
@@ -175,18 +249,21 @@ export default function ViewIndividualConferencePage() {
                     conferenceList={conferenceList}
                     conferencePDA={conferencePDA}
                     conferenceName={conferenceName}
+                    tpc={false}
                     // conferenceid={conferenceid}
                   />
                 )}
                 {walletAddress != confid.admin && (
                   <div className="d-flex justify-content-center ">
                     <Button
-                  className="btn btn-info"
-                  onClick={() => sendProps(conferenceList, conferencePDA, conferenceName)}
-                >
-                  Submit Paper
-                </Button></div>
-                  
+                      className="btn btn-info"
+                      onClick={() =>
+                        sendProps(conferenceList, conferencePDA, conferenceName)
+                      }
+                    >
+                      Submit Paper
+                    </Button>
+                  </div>
                 )}
               </CardFooter>
             </Card>
@@ -248,8 +325,9 @@ export default function ViewIndividualConferencePage() {
     description,
     date,
     venue,
-    submissionDeadline, 
-    conferenceLink,
+    submissionDeadline,
+    technicalProgramsCommittees,
+    conferenceLink
   ) => {
     try {
       const provider = getProvider();
@@ -272,7 +350,7 @@ export default function ViewIndividualConferencePage() {
         let createdBy = confid.createdBy;
         let organiserEmail = confid.organiserEmail;
         let admin = provider.wallet.publicKey;
-        let technicalProgramsCommittees = confid.technicalProgramsCommittees;
+        // let technicalProgramsCommittees = confid.technicalProgramsCommittees;
 
         await program.rpc.updateConference(
           {

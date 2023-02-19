@@ -1,4 +1,5 @@
 const fs = require("fs-extra");
+import { IncomingForm } from "formidable";
 
 export const config = {
   api: {
@@ -7,8 +8,19 @@ export const config = {
 };
 
 export default async (req, res) => {
+  const data = await new Promise((resolve, reject) => {
+    const form = new IncomingForm();
+    form.parse(req, (err, fields) => {
+      if (err) return reject(err);
+      resolve({ fields});
+    });
+  });
   try {
-    const pathToDeletePaper = `public/files/EJ2KoVBXzhLE8XefxwSQ21zWNTGxuVvDxjG2D7DpcySC/FiqBvKGUzEuCJ4qp8YjdqRL8o3fTXvvsRotRJjYcgJY/969e9f7f1f336a6309cd66080502c15d/`;
+    console.log(data)
+    const paperId = data.fields.paperId
+    const conferenceListPDA = data.fields.conferenceListPDA
+    const conferenceId = data.fields.conferenceId
+    const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperId}/`;
     fs.remove(pathToDeletePaper, (err) => {
       if (err) return console.error(err);
       console.log("success!"); 

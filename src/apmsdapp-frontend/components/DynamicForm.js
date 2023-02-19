@@ -8,9 +8,6 @@ import {
   Button,
   Label,
   Col,
-  Toast,
-  ToastHeader,
-  ToastBody,
 } from "reactstrap";
 import {
   Program,
@@ -52,34 +49,34 @@ const DynamicForm = ({ user, submitPaper, props}) => {
     }
   };
 
-  const deleteFile = async() => {
-    try {
-      const response = await fetch("/api/filedelete", {
-        // method: "POST",
-        // body: formData,
-      });
-      const data = await response.json();
+  // const deleteFile = async(paperId) => {
+  //   try {
+  //     paperId = "969e9f7f1f336a6309cd66080502c15d"
+  //     const response = await fetch("/api/filedelete", {
+  //       // method: "POST",
+  //       body: paperId,
+  //     });
+  //     const data = await response.json();
 
-      if (!response.ok) {
-        alert(`Error ${response.status}!! ${data.message}`)
-        throw data.message;
-      }
+  //     if (!response.ok) {
+  //       alert(`Error ${response.status}!! ${data.message}`)
+  //       throw data.message;
+  //     }
 
-      alert("Paper Deleted Successfully.")
-      // router.push('/my-history')
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+  //     alert("Paper Deleted Successfully.")
+  //     // router.push('/my-history')
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // }
 
   const uploadFile = async (event) => {
     event.preventDefault();
-    var authorName = []
-    var authorEmail = []
+    var authors = []
     formFields.map((field, index)=>{
-      authorName.push(field.name)
-      authorEmail.push(field.email)
+      authors.push({authorName: field.name, authorEmail: field.email})
     })
+    console.log(authors)
     if (file.size > MAX_FILE_SIZE) {
       alert("File size too big");
       return;
@@ -101,10 +98,13 @@ const DynamicForm = ({ user, submitPaper, props}) => {
       }
       setHash(data.hash)
       console.log("Data", data.hash);
-      await submitPaper(data.hash, authorName, authorEmail, d.toLocaleDateString() + " " + d.toLocaleTimeString(), "under review", new BN(1));
-      alert("Paper Submitted Successfully. You may view the status under myHistory.")
-      // router.push('/my-history')
-      router.back()
+      const submitted = await submitPaper(data.hash, data.fileName, authors, d.toLocaleDateString() + " " + d.toLocaleTimeString(), new BN(1), "");
+      // console.log(submitted)
+      if (submitted=="ok" && response.ok) {
+        alert("Paper Submitted Successfully. You may view the status under myHistory.")
+        router.back()
+    }
+      else alert("error")
     } catch (error) {
       console.log(error.message);
     }
@@ -154,7 +154,7 @@ const DynamicForm = ({ user, submitPaper, props}) => {
                   id="email"
                   placeholder="email address"
                   name="email"
-                  type="text"
+                  type="email"
                   value={field.email}
                   onChange={(event) => handleInputChange(index, event)}
                   className="form-control col-5"
@@ -202,7 +202,7 @@ const DynamicForm = ({ user, submitPaper, props}) => {
           <Button color="primary">Submit</Button>
         </div>
         {/* <div className="d-flex justify-content-center align-items-center">
-          <Button color="primary" onClick={deleteFile}>Delete</Button>
+          <Button color="primary" onClick={uploadFile}>Delete</Button>
         </div> */}
       </Form>
     </div>

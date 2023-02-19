@@ -34,7 +34,7 @@ pub struct Conference {
   pub fee_received: u64,
   pub created_by: String,
   pub organiser_email: String,
-  pub technical_programs_committees: Tpc,
+  pub technical_programs_committees: Vec<Tpc>,
   pub conference_link: String,
 }
 
@@ -42,35 +42,45 @@ pub struct Conference {
 pub struct Paper {
   pub paper_id: String,
   pub paper_admin: Pubkey,
-  pub paper_authors: Author,
+  pub paper_name: String,
+  pub paper_authors: Vec<Author>,
   pub date_submitted: String,
-  pub paper_status: String,
+  pub paper_status: u8,
   pub version: u8,
+  pub prev_version: String,
   pub fee_paid: u64,
-  pub reviewer: Tpc,
+  pub reviewer: Vec<Reviwers>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Author {
-  pub author_name: Vec<String>,
-  pub author_email: Vec<String>,
+  pub author_name: String,
+  pub author_email: String,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Tpc {
-  pub tpc_name: Vec<String>,
-  pub tpc_email: Vec<String>,
-  pub tpc_wallet: Vec<String>,
+  pub tpc_name: String,
+  pub tpc_email: String,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Reviwers {
+  pub tpc_name: String,
+  pub tpc_email: String,
+  pub tpc_wallet: String,
+  pub approval: u8,
+  pub feedback: String,
 }
 
 impl Default for Tpc {
   fn default () -> Tpc {
-      Tpc{tpc_name: Vec::new(), tpc_email: Vec::new(), tpc_wallet: Vec::new() }
+      Tpc{tpc_name: String::new(), tpc_email: String::new() }
   }
 }
 
 impl Default for Author {
   fn default () -> Author {
-    Author{author_name: Vec::new(), author_email: Vec::new() }
+    Author{author_name: String::new(), author_email: String::new() }
   }
 }

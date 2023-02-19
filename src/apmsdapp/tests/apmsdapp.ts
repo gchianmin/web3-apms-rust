@@ -50,9 +50,9 @@ describe("apmsdapp", async () => {
       });
   }
 
-  const updateTpc = async (id, tpcName, tpcEmail, tpcWallet) => {
+  const updateTpc = async (id, tpc) => {
     await program.rpc.updateTpc(
-      id, { tpcName, tpcEmail, tpcWallet },
+      id, tpc,
       {
         accounts: {
           conferenceList: conferencePDA,
@@ -74,9 +74,9 @@ describe("apmsdapp", async () => {
     );
   }
 
-  const submitPaper = async (id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version) => {
+  const submitPaper = async (id, paperId, paperName, authors, dateSubmitted, version, preVersion) => {
     await program.rpc.submitPaper(
-      id, paperId, { authorName, authorEmail }, dateSubmitted, paperStatus, version,
+      id, paperId, paperName, authors, dateSubmitted, version, preVersion, 
       {
         accounts: {
           conferenceList: conferencePDA,
@@ -201,11 +201,10 @@ describe("apmsdapp", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
-    let tpcName = ["tpc1", "tpc2"]
-    let tpcEmail = ["tpc1@gmail.com", "tpc2@gmail.com"]
-    let tpcWallet = ["wallet1", "wallet2"]
+    let tpcName = "tpc1"
+    let tpcEmail = "tpc1@gmail.com"
 
-    await updateTpc(id, tpcName, tpcEmail, tpcWallet)
+    await updateTpc(id, [{tpcName, tpcEmail}])
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(updatedData)
@@ -213,9 +212,7 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences.length, 2);
     assert.equal(updatedData.deletedIndexes.length, 0);
     const firstConference = updatedData.conferences[0];
-    assert.equal(firstConference.technicalProgramsCommittees.tpcName.toString(), "tpc1,tpc2");
-    assert.equal(firstConference.technicalProgramsCommittees.tpcEmail.toString(), "tpc1@gmail.com,tpc2@gmail.com");
-    assert.equal(firstConference.technicalProgramsCommittees.tpcWallet.toString(), "wallet1,wallet2");
+    assert.equal( Object.entries(firstConference.technicalProgramsCommittees).toString(), Object.entries([{tpcEmail:'tpc1@gmail.com',tpcName:'tpc1'}]).toString())
     assert.equal(firstConference.name, "IEEE Conference Updated");
     assert.equal(firstConference.description, "IEEE Conference description");
     assert.equal(firstConference.date, "2023-08-05 00:00:00");
@@ -229,21 +226,22 @@ describe("apmsdapp", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     console.log(data.conferences[0].id)
     let id = data.conferences[0].id
-    let tpcName = ["tpc3", "tpc4"]
-    let tpcEmail = ["tpc3@gmail.com", "tpc4@gmail.com"]
-    let tpcWallet = ["wallet3", "wallet4"]
+    let tpc1 = {tpcName:"tpc3",tpcEmail:"tpc3@gmail.com"}
+    let tpc2 = {tpcName:"tpc4",tpcEmail:"tpc4@gmail.com"}
+    let newArr = []
+    newArr.push(tpc1)
+    newArr.push(tpc2)
 
-    await updateTpc(id, tpcName, tpcEmail, tpcWallet)
+
+    await updateTpc(id, newArr)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    console.log(updatedData)
+    // console.log(updatedData)
     assert.equal(updatedData.count, 2);
     assert.equal(updatedData.conferences.length, 2);
     assert.equal(updatedData.deletedIndexes.length, 0);
     const firstConference = updatedData.conferences[0];
-    assert.equal(firstConference.technicalProgramsCommittees.tpcName.toString(), "tpc3,tpc4");
-    assert.equal(firstConference.technicalProgramsCommittees.tpcEmail.toString(), "tpc3@gmail.com,tpc4@gmail.com");
-    assert.equal(firstConference.technicalProgramsCommittees.tpcWallet.toString(), "wallet3,wallet4");
+    assert.equal( Object.entries(firstConference.technicalProgramsCommittees).toString(), Object.entries(newArr).toString())
     assert.equal(firstConference.name, "IEEE Conference Updated");
     assert.equal(firstConference.description, "IEEE Conference description");
     assert.equal(firstConference.date, "2023-08-05 00:00:00");
@@ -280,13 +278,14 @@ describe("apmsdapp", async () => {
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash"
-    let authorName = ["A1", "A2"]
-    let authorEmail = ["E1", "E2"]
+    let paperName = "filename"
+    let authors = [{authorName: "A1", authorEmail:"E1"}]
     let dateSubmitted = "2023-02-05"
-    let paperStatus = "Submitted"
+    // let paperStatus = new anchor.BN(0)
     let version = new anchor.BN(1)
+    let prevVersion = "";
 
-    await submitPaper(id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version)
+    await submitPaper(id, paperId, paperName,authors, dateSubmitted, version, prevVersion)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log("sub", updatedData.conferences[0].technicalProgramsCommittees)
@@ -296,11 +295,10 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString());
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(), "A1,A2");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(), "E1,E2");
+    assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-05");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
   })
 
@@ -309,26 +307,26 @@ describe("apmsdapp", async () => {
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash2"
-    let authorName = ["A3", "A4"]
-    let authorEmail = ["E3", "E4"]
+    let paperName = "filename2"
+    let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
     let dateSubmitted = "2023-02-06"
-    let paperStatus = "Submitted"
+    // let paperStatus = new anchor.BN(0)
     let version = new anchor.BN(1)
+    let prevVersion = "";
 
-    await submitPaper(id, paperId, authorName, authorEmail, dateSubmitted, paperStatus, version)
+    await submitPaper(id, paperId, paperName,authors, dateSubmitted, version, prevVersion)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
-    // console.log("sub", updatedData.conferences[0].paperSubmitted)
+    console.log("sub", updatedData.conferences[0].paperSubmitted)
     assert.equal(updatedData.count, 1);
     assert.equal(updatedData.conferences.length, 1);
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 2);
     assert.equal(updatedData.conferences[0].paperSubmitted[1].paperId, "example hash2");
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAdmin.toString(), user.publicKey.toString());
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorName.toString(), "A3,A4");
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAuthors.authorEmail.toString(), "E3,E4");
+    assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[1].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[1].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[1].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[1].version, 1);
   })
 
@@ -341,6 +339,7 @@ describe("apmsdapp", async () => {
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
     let paperId = "example hash"
+    let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
 
     await deletePaper(id, paperId)
 
@@ -351,11 +350,10 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.deletedIndexes.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "example hash2");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAdmin.toString(), user.publicKey.toString());
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorName.toString(), "A3,A4");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAuthors.authorEmail.toString(), "E3,E4");
+    assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].paperAuthors).toString(), Object.entries(authors).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, "Submitted");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
   })
 

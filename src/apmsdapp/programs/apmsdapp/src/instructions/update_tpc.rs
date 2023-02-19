@@ -8,7 +8,7 @@ pub struct UpdateTpc<'info> {
   pub user: Signer<'info>,
 }
 
-pub fn update_tpc(ctx: Context<UpdateTpc>, conferenceid: Pubkey, tpc: Tpc) -> Result<()> {
+pub fn update_tpc(ctx: Context<UpdateTpc>, conferenceid: Pubkey, tpc: Vec<Tpc>) -> Result<()> {
     let account = &mut ctx.accounts.conference_list;
     let index = account.get_conference_index(conferenceid)?;
     let conf =  &mut (account.conferences.get_mut(index).expect(""));

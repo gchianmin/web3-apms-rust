@@ -9,7 +9,7 @@ pub struct SubmitPaper<'info> {
   pub user: Signer<'info>,
 }
 
-pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_authors: Author, date_submitted: String, paper_status: String, version:u8) -> Result<()> {
+pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: String, paper_name:String, paper_authors: Vec<Author>, date_submitted: String, version:u8, prev_version:String) -> Result<()> {
     let account = &mut ctx.accounts.conference_list;
     let index = account.get_conference_index(conferenceid)?;
     let conf =  &mut (account.conferences.get_mut(index).expect(""));
@@ -17,12 +17,14 @@ pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: St
     conf.paper_submitted.push(Paper {
         paper_id,
         paper_admin,
+        paper_name,
         paper_authors,
         date_submitted,
-        paper_status,
+        paper_status:0,
         version,
+        prev_version,
         fee_paid:0,
-        reviewer:Tpc::default()
+        reviewer:Vec::new(),
     });
     Ok(())
 }

@@ -1,14 +1,124 @@
-import React from "react";
-import {
-  Form,
-  FormGroup,
-  Label,
-  Col,
-  Input,
-  Button,
-} from "reactstrap";
+import { Form, FormGroup, Label, Col, Input, Button } from "reactstrap";
+import React, { useState } from "react";
+import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
+// import TpcForm from "./TpcForm";
 
-export default function FormInput({ handleSubmit, empty, existingDetails, editToggle }) {
+export default function FormInput({
+  modifyConference,
+  handleSubmit,
+  empty,
+  existingDetails,
+  editToggle,
+}) {
+  // console.log(existingDetails.technicalProgramsCommittees)
+  var initialData = [];
+  if (existingDetails!=undefined) {
+    initialData = existingDetails.technicalProgramsCommittees
+  }
+  const [formData, setFormData] = useState(initialData);
+  // console.log(formData);
+  const addField = () => {
+    setFormData([...formData, { tpcName: "", tpcEmail: "" }]);
+  };
+
+  const deleteField = (index) => {
+    setFormData(formData.filter((_, i) => i !== index));
+  };
+
+  const handleChange = (event, index) => {
+    const { name, value } = event.target;
+    setFormData(
+      formData.map((field, i) =>
+        index === i ? { ...field, [name]: value } : field
+      )
+    );
+  };
+
+  const editSubmit = async (event) => {
+    // Stop the form from submitting and refreshing the page.
+    event.preventDefault();
+    // console.log("passed", formData);
+    // Get data from the form.
+    const data = {
+      // email: event.target.email.value,
+      name: event.target.name.value,
+      description: event.target.description.value,
+      date: event.target.date.value,
+      venue: event.target.venue.value,
+      deadlines: event.target.deadlines.value,
+      conferencelink: event.target.conferencelink.value,
+      technicalProgramsCommittees: formData
+      // image: event.target.image.value,
+    };
+    console.log(data);
+    await modifyConference(
+      data.name,
+      data.description,
+      data.date,
+      data.venue,
+      data.deadlines,
+      data.technicalProgramsCommittees,
+      data.conferencelink,
+    );
+  };
+
+  const renderForm = () => (
+    <Form >
+      <FormGroup>
+        <Col sm={10}>
+          {formData.map((field, index) => (
+            <div key={`${field}-${index}`} className="form-row pl-1 pb-2">
+              <label
+                htmlFor={`field${index + 1}`}
+                className="text-monospace d-flex align-items-center mr-2"
+              >
+                Name
+              </label>
+              <input
+                type="text"
+                id="tpcName"
+                name={Object.keys(field)[0]}
+                value={field[Object.keys(field)[0]]}
+                onChange={(event) => handleChange(event, index)}
+                className="form-control col-4 mr-2"
+                placeholder="Name"
+              />
+              <label
+                htmlFor={`field${index + 1}`}
+                className="text-monospace d-flex align-items-center mr-2"
+              >
+                Email
+              </label>
+              <input
+                type="text"
+                id="tpcEmail"
+                name={Object.keys(field)[1]}
+                value={field[Object.keys(field)[1]]}
+                onChange={(event) => handleChange(event, index)}
+                className="form-control col-4"
+                placeholder="Email Address"
+              />
+              <RiDeleteBin6Line
+                className=" my-auto"
+                type="button"
+                onClick={() => deleteField(index)}
+                size={27}
+                color="red"
+              />
+            </div>
+          ))}
+          <RiAddCircleFill
+            className="pt-1"
+            type="button"
+            size={30}
+            color="green"
+            onClick={addField}
+          />
+        </Col>
+      </FormGroup>
+    </Form>
+  );
+
   return (
     <div>
       {empty ? (
@@ -114,19 +224,22 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
               Website Link
             </Label>
             <Col sm={10}>
-              <Input id="conferencelink" name="conferencelink" type="url" required />
+              <Input
+                id="conferencelink"
+                name="conferencelink"
+                type="url"
+                required
+              />
             </Col>
           </FormGroup>
           <div className="d-flex justify-content-center align-items-center">
             <Button color="primary">Submit</Button>
           </div>
         </Form>
-      ) 
-      : 
-      (
+      ) : (
         <Form
           className="align-items-center justify-contents-center "
-          onSubmit={handleSubmit}
+          onSubmit={editSubmit}
         >
           <FormGroup row>
             <Label for="name" sm={2} className="text-monospace">
@@ -165,7 +278,13 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
               Date
             </Label>
             <Col sm={10}>
-              <Input id="date" name="date" type="date" required defaultValue={existingDetails.date}/>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                required
+                defaultValue={existingDetails.date}
+              />
             </Col>
           </FormGroup>
 
@@ -190,7 +309,13 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
               Paper Submission Deadlines
             </Label>
             <Col sm={10}>
-              <Input id="deadlines" name="deadlines" type="date" required defaultValue={existingDetails.submissionDeadline}/>
+              <Input
+                id="deadlines"
+                name="deadlines"
+                type="date"
+                required
+                defaultValue={existingDetails.submissionDeadline}
+              />
             </Col>
           </FormGroup>
 
@@ -199,14 +324,144 @@ export default function FormInput({ handleSubmit, empty, existingDetails, editTo
               Website Link
             </Label>
             <Col sm={10}>
-              <Input id="conferencelink" name="conferencelink" type="url" required defaultValue={existingDetails.conferenceLink}/>
+              <Input
+                id="conferencelink"
+                name="conferencelink"
+                type="url"
+                required
+                defaultValue={existingDetails.conferenceLink}
+              />
             </Col>
           </FormGroup>
+
+          <FormGroup row>
+            <Label for="tpc" sm={2} className="text-monospace">
+              Technical Programs Committees
+            </Label>
+            {/* <TpcForm existingTpc={existingDetails.technicalProgramsCommittees}/> */}
+            {/* <FormGroup> */}
+        <Col sm={10}>
+          {formData.map((field, index) => (
+            <div key={`${field}-${index}`} className="form-row pl-1 pb-2">
+              <label
+                htmlFor={`field${index + 1}`}
+                className="text-monospace d-flex align-items-center mr-2"
+              >
+                Name
+              </label>
+              <Input
+                type="text"
+                id="tpcName"
+                name={Object.keys(field)[0]}
+                value={field[Object.keys(field)[0]]}
+                onChange={(event) => handleChange(event, index)}
+                className="form-control col-4 mr-2"
+                placeholder="Name"
+              />
+              <label
+                htmlFor={`field${index + 1}`}
+                className="text-monospace d-flex align-items-center mr-2"
+              >
+                Email
+              </label>
+              <Input
+                type="text"
+                id="tpcEmail"
+                name={Object.keys(field)[1]}
+                value={field[Object.keys(field)[1]]}
+                onChange={(event) => handleChange(event, index)}
+                className="form-control col-4"
+                placeholder="Email Address"
+              />
+              <RiDeleteBin6Line
+                className=" my-auto"
+                type="button"
+                onClick={() => deleteField(index)}
+                size={27}
+                color="red"
+              />
+            </div>
+          ))}
+          <RiAddCircleFill
+            className="pt-1"
+            type="button"
+            size={30}
+            color="green"
+            onClick={addField}
+          />
+        </Col>
+      {/* </FormGroup> */}
+            </FormGroup>
+
+          {/* <FormGroup row>
+            <Label for="tpc" sm={2} className="text-monospace">
+              Technical Programs Committees
+            </Label>
+            <Col sm={10} >
+            {formFields.map((field, index) => (
+              <div key={`${field}-${index}`} className="form-row pl-1 pb-2">
+                <input
+                  id="name"
+                  placeholder="name"
+                  name="name"
+                  type="text"
+                  value={field.name}
+                  onChange={(event) => handleInputChange(index, event)}
+                  className="form-control col-5 mr-2"
+                  
+                />
+                <input
+                  id="email"
+                  placeholder="email address"
+                  name="email"
+                  type="text"
+                  value={field.email}
+                  onChange={(event) => handleInputChange(index, event)}
+                  className="form-control col-5"
+                />
+                {formFields.length != 1 && (
+                  <RiDeleteBin6Line
+                    className="col-1 my-auto"
+                    type="button"
+                    onClick={() => handleRemoveField(index)}
+                    size={27}
+                    color="red"
+                  />
+                )}
+              </div>
+            ))}
+            <RiAddCircleFill
+              className="pt-1"
+              type="button"
+              size={30}
+              color="green"
+              onClick={handleAddField}
+            />
+          </Col> */}
+            {/* <Col sm={10}>
+              {existingDetails.technicalProgramsCommittees ? (
+                <Button type="button" color="info" onClick={updateTpc}>
+                  Add Committees
+                </Button>
+              ) : (
+                <Input
+                  id="tpc"
+                  name="tpc"
+                  type="text"
+                  required
+                  defaultValue={existingDetails.technicalProgramsCommittees}
+                />
+              )}
+            </Col> */}
+          {/* </FormGroup> */}
+
           <div className="d-flex justify-content-center d-grid mx-auto">
-            <Button className="mr-5 px-5" color="primary">Submit</Button>
+            <Button className="mr-5 px-5" color="primary">
+              Submit
+            </Button>
             <Button className="px-5" color="secondary" onClick={editToggle}>
-            Cancel
-          </Button>
+              Cancel
+            </Button>
           </div>
         </Form>
       )}

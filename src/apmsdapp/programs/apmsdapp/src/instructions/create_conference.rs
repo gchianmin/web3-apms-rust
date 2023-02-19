@@ -29,7 +29,7 @@ pub fn create_conference(ctx: Context<CreateConference>, name: String, descripti
     fee_received: 0,
     created_by,
     organiser_email,
-    technical_programs_committees: Tpc::default(),
+    technical_programs_committees: Vec::new(),
     conference_link,
   });
   Ok(())

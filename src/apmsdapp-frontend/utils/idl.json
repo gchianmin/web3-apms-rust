@@ -138,7 +138,9 @@
         {
           "name": "tpc",
           "type": {
-            "defined": "Tpc"
+            "vec": {
+              "defined": "Tpc"
+            }
           }
         }
       ]
@@ -167,9 +169,15 @@
           "type": "string"
         },
         {
+          "name": "paperName",
+          "type": "string"
+        },
+        {
           "name": "paperAuthors",
           "type": {
-            "defined": "Author"
+            "vec": {
+              "defined": "Author"
+            }
           }
         },
         {
@@ -177,12 +185,12 @@
           "type": "string"
         },
         {
-          "name": "paperStatus",
-          "type": "string"
-        },
-        {
           "name": "version",
           "type": "u8"
+        },
+        {
+          "name": "prevVersion",
+          "type": "string"
         }
       ]
     },
@@ -295,7 +303,9 @@
           {
             "name": "technicalProgramsCommittees",
             "type": {
-              "defined": "Tpc"
+              "vec": {
+                "defined": "Tpc"
+              }
             }
           },
           {
@@ -319,9 +329,15 @@
             "type": "publicKey"
           },
           {
+            "name": "paperName",
+            "type": "string"
+          },
+          {
             "name": "paperAuthors",
             "type": {
-              "defined": "Author"
+              "vec": {
+                "defined": "Author"
+              }
             }
           },
           {
@@ -330,11 +346,15 @@
           },
           {
             "name": "paperStatus",
-            "type": "string"
+            "type": "u8"
           },
           {
             "name": "version",
             "type": "u8"
+          },
+          {
+            "name": "prevVersion",
+            "type": "string"
           },
           {
             "name": "feePaid",
@@ -343,7 +363,9 @@
           {
             "name": "reviewer",
             "type": {
-              "defined": "Tpc"
+              "vec": {
+                "defined": "Reviwers"
+              }
             }
           }
         ]
@@ -356,15 +378,11 @@
         "fields": [
           {
             "name": "authorName",
-            "type": {
-              "vec": "string"
-            }
+            "type": "string"
           },
           {
             "name": "authorEmail",
-            "type": {
-              "vec": "string"
-            }
+            "type": "string"
           }
         ]
       }
@@ -376,21 +394,39 @@
         "fields": [
           {
             "name": "tpcName",
-            "type": {
-              "vec": "string"
-            }
+            "type": "string"
           },
           {
             "name": "tpcEmail",
-            "type": {
-              "vec": "string"
-            }
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reviwers",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tpcName",
+            "type": "string"
+          },
+          {
+            "name": "tpcEmail",
+            "type": "string"
           },
           {
             "name": "tpcWallet",
-            "type": {
-              "vec": "string"
-            }
+            "type": "string"
+          },
+          {
+            "name": "approval",
+            "type": "u8"
+          },
+          {
+            "name": "feedback",
+            "type": "string"
           }
         ]
       }
@@ -401,6 +437,11 @@
       "code": 6000,
       "name": "ConferenceNotFound",
       "msg": "The conference with the given id is not found"
+    },
+    {
+      "code": 6001,
+      "name": "NotAuthorized",
+      "msg": "You are not authorized to perform this action"
     }
   ],
   "metadata": {

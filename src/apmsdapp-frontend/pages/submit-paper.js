@@ -124,7 +124,7 @@ export default function SubmitPaper() {
 //       console.log("Error submitting a paper : ", error);
 //     }
 //   };
-const submitPaper = async (paperId, authorName, authorEmail, dateSubmitted, paperStatus, version) => {
+const submitPaper = async (paperId, paperName, authors, dateSubmitted, version, prevVersion) => {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
@@ -140,20 +140,15 @@ const submitPaper = async (paperId, authorName, authorEmail, dateSubmitted, pape
       let id = new PublicKey(
         props.conferencePDA
       );
-    //   console.log(id.toString()==props.conferencePDA)
-    //   let paperId = "example hash";
-    //   let authorName = ["A1", "A2"];
-    //   let authorEmail = ["E1", "E2"];
-    //   let dateSubmitted = "2023-02-05";
-    //   let paperStatus = "Submitted";
-    //   let version = new BN(1);
+    
       await program.rpc.submitPaper(
         id,
         paperId,
-        {authorName, authorEmail},
+        paperName,
+        authors,
         dateSubmitted,
-        paperStatus,
         version,
+        prevVersion,
         {
           accounts: {
             conferenceList: conferenceListPDA,
@@ -161,76 +156,82 @@ const submitPaper = async (paperId, authorName, authorEmail, dateSubmitted, pape
           },
         }
       );
+      return "ok";
     } catch (error) {
       console.log("Error submitting a paper : ", error);
     }
   };
 
-  const deletePaper = async () => {
-    try {
-      const provider = getProvider();
-      const program = new Program(IDL, programID, provider);
-      //   const confid = getConferenceFromLists();
-      const conferenceListPDA = new PublicKey(
-        props.conferenceList
-      );
-      const data = await program.account.conferenceListAccountData.fetch(
-        conferenceListPDA
-      );
-      //   console.log(conferenceInfo.conferences[0].id);
-      let id = new PublicKey(
-        props.conferencePDA
-      );
-      let paperId = "969e9f7f1f336a6309cd66080502c15d";
+  // const deletePaper = async (paperId) => {
+  //   try {
+  //     const provider = getProvider();
+  //     const program = new Program(IDL, programID, provider);
+  //     //   const confid = getConferenceFromLists();
+  //     const conferenceListPDA = new PublicKey(
+  //       props.conferenceList
+  //     );
+  //     const data = await program.account.conferenceListAccountData.fetch(
+  //       conferenceListPDA
+  //     );
+  //     //   console.log(conferenceInfo.conferences[0].id);
+  //     let id = new PublicKey(
+  //       props.conferencePDA
+  //     );
+  //   paperId = "969e9f7f1f336a6309cd66080502c15d";
 
-      await program.rpc.deletePaper(id, paperId, {
-        accounts: {
-          conferenceList: conferenceListPDA,
-          user: provider.wallet.publicKey,
-        },
-      });
-      await deleteFile();
-    } catch (error) {
-      console.log("Error deleting paper: ", error);
-    }
-  };
+  //     await program.rpc.deletePaper(id, paperId, {
+  //       accounts: {
+  //         conferenceList: conferenceListPDA,
+  //         user: provider.wallet.publicKey,
+  //       },
+  //     });
+  //     await deleteFile(paperId, conferenceListPDA, id);
+  //   } catch (error) {
+  //     console.log("Error deleting paper: ", error);
+  //   }
+  // };
 
-  const deleteFile = async() => {
-    try {
-      const response = await fetch("/api/filedelete", {
-        // method: "POST",
-        // body: formData,
-      });
-      const data = await response.json();
+  // const deleteFile = async(paperId, conferenceListPDA, conferenceId) => {
+  //   try {
+  //       const formData = new FormData();
+  //       formData.append("paperId", paperId);
+  //       formData.append("conferenceListPDA", conferenceListPDA);
+  //       formData.append("conferenceId", conferenceId);
 
-      if (!response.ok) {
-        alert(`Error ${response.status}!! ${data.message}`)
-        throw data.message;
-      }
+  //     const response = await fetch("/api/filedelete", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     const data = await response.json();
 
-      alert("Paper Deleted Successfully.")
-      // router.push('/my-history')
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+  //     if (!response.ok) {
+  //       alert(`Error ${response.status}!! ${data.message}`)
+  //       throw data.message;
+  //     }
 
-  const getPaper = async () => {
-    try {
-      const provider = getProvider();
-      const program = new Program(IDL, programID, provider);
-      //   const confid = getConferenceFromLists();
-      const conferenceListPDA = new PublicKey(
-        props.conferenceList
-      );
-      const data = await program.account.conferenceListAccountData.fetch(
-        conferenceListPDA
-      );
-      console.log(data.conferences);
-    } catch (error) {
-      console.log("Error getting a paper : ", error);
-    }
-  };
+  //     alert("Paper Deleted Successfully.")
+  //     // router.push('/my-history')
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // }
+
+  // const getPaper = async () => {
+  //   try {
+  //     const provider = getProvider();
+  //     const program = new Program(IDL, programID, provider);
+  //     //   const confid = getConferenceFromLists();
+  //     const conferenceListPDA = new PublicKey(
+  //       props.conferenceList
+  //     );
+  //     const data = await program.account.conferenceListAccountData.fetch(
+  //       conferenceListPDA
+  //     );
+  //     console.log(data.conferences);
+  //   } catch (error) {
+  //     console.log("Error getting a paper : ", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -255,7 +256,7 @@ const submitPaper = async (paperId, authorName, authorEmail, dateSubmitted, pape
             {/* <FileUpload user={user}/> */}
           </div>
           {/* <Button onClick={submitPaper}>Submit</Button>{" "} */}
-          <Button onClick={deletePaper}>Delete</Button>{" "}
+          {/* <Button onClick={deletePaper}>Delete</Button>{" "} */}
           {/* <Button onClick={getPaper}>Get</Button> */}
         
       </div>
