@@ -83,7 +83,7 @@ export default function ViewPaper() {
     }
   };
 
-  const deletePaper = async (paperId) => {
+  const deletePaper = async (paperHash) => {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
@@ -100,22 +100,22 @@ export default function ViewPaper() {
       );
     // paperId = "969e9f7f1f336a6309cd66080502c15d";
 
-      await program.rpc.deletePaper(id, paperId, {
+      await program.rpc.deletePaper(id, paperHash, {
         accounts: {
           conferenceList: conferenceListPDA,
           user: provider.wallet.publicKey,
         },
       });
-      await deleteFile(paperId, conferenceListPDA, id);
+      await deleteFile(paperHash, conferenceListPDA, id);
     } catch (error) {
       console.log("Error deleting paper: ", error);
     }
   };
 
-  const deleteFile = async(paperId, conferenceListPDA, conferenceId) => {
+  const deleteFile = async(paperHash, conferenceListPDA, conferenceId) => {
     try {
         const formData = new FormData();
-        formData.append("paperId", paperId);
+        formData.append("paperHash", paperHash);
         formData.append("conferenceListPDA", conferenceListPDA);
         formData.append("conferenceId", conferenceId);
 

@@ -169,7 +169,19 @@
           "type": "string"
         },
         {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
           "name": "paperName",
+          "type": "string"
+        },
+        {
+          "name": "paperTitle",
+          "type": "string"
+        },
+        {
+          "name": "paperAbstract",
           "type": "string"
         },
         {
@@ -214,7 +226,7 @@
           "type": "publicKey"
         },
         {
-          "name": "paperId",
+          "name": "paperHash",
           "type": "string"
         }
       ]
@@ -325,11 +337,23 @@
             "type": "string"
           },
           {
+            "name": "paperHash",
+            "type": "string"
+          },
+          {
             "name": "paperAdmin",
             "type": "publicKey"
           },
           {
             "name": "paperName",
+            "type": "string"
+          },
+          {
+            "name": "paperTitle",
+            "type": "string"
+          },
+          {
+            "name": "paperAbstract",
             "type": "string"
           },
           {
@@ -364,8 +388,14 @@
             "name": "reviewer",
             "type": {
               "vec": {
-                "defined": "Reviwers"
+                "defined": "Reviewers"
               }
+            }
+          },
+          {
+            "name": "paperChair",
+            "type": {
+              "defined": "Reviewers"
             }
           }
         ]
@@ -382,6 +412,10 @@
           },
           {
             "name": "authorEmail",
+            "type": "string"
+          },
+          {
+            "name": "authorAffiliation",
             "type": "string"
           }
         ]
@@ -404,7 +438,7 @@
       }
     },
     {
-      "name": "Reviwers",
+      "name": "Reviewers",
       "type": {
         "kind": "struct",
         "fields": [

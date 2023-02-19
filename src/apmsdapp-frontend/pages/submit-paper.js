@@ -124,7 +124,9 @@ export default function SubmitPaper() {
 //       console.log("Error submitting a paper : ", error);
 //     }
 //   };
-const submitPaper = async (paperId, paperName, authors, dateSubmitted, version, prevVersion) => {
+
+
+const submitPaper = async (paperId, paperHash, paperName, paperTitle, paperAbstract, authors, dateSubmitted, version, prevVersion) => {
     try {
       const provider = getProvider();
       const program = new Program(IDL, programID, provider);
@@ -144,10 +146,13 @@ const submitPaper = async (paperId, paperName, authors, dateSubmitted, version, 
       await program.rpc.submitPaper(
         id,
         paperId,
-        paperName,
-        authors,
-        dateSubmitted,
-        version,
+        paperHash, 
+        paperName, 
+        paperTitle, 
+        paperAbstract, 
+        authors, 
+        dateSubmitted, 
+        version, 
         prevVersion,
         {
           accounts: {

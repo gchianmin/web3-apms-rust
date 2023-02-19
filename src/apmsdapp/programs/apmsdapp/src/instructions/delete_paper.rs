@@ -9,10 +9,10 @@ pub struct DeletePaper<'info> {
   pub user: Signer<'info>,
 }
 
-pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_id: String) -> Result<()> {
+pub fn delete_paper(ctx: Context<DeletePaper>, conferenceid:Pubkey, paper_hash: String) -> Result<()> {
     let account = &mut ctx.accounts.conference_list;
     let index = account.get_conference_index(conferenceid)?;
     let conf =  &mut (account.conferences.get_mut(index).expect(""));
-    conf.paper_submitted.remove(conf.paper_submitted.iter().position(|x| *x.paper_id == paper_id).expect("not found"));
+    conf.paper_submitted.remove(conf.paper_submitted.iter().position(|x| *x.paper_hash == paper_hash).expect("not found"));
     Ok(())
 }
