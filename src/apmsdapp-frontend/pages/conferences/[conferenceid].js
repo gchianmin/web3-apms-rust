@@ -40,6 +40,7 @@ const { SystemProgram } = web3;
 
 export default function ViewIndividualConferencePage() {
   console.log("enter individual page");
+
   const [conferences, setConferences] = useState([]);
   const [query, setQuery] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);

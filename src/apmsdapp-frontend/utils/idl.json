@@ -230,6 +230,76 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "assignReviewer",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "reviewer",
+          "type": {
+            "vec": {
+              "defined": "Reviewers"
+            }
+          }
+        },
+        {
+          "name": "chair",
+          "type": {
+            "defined": "Reviewers"
+          }
+        }
+      ]
+    },
+    {
+      "name": "assignChair",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "chair",
+          "type": {
+            "defined": "Reviewers"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -476,6 +546,11 @@
       "code": 6001,
       "name": "NotAuthorized",
       "msg": "You are not authorized to perform this action"
+    },
+    {
+      "code": 6002,
+      "name": "PaperNotFound",
+      "msg": "The paper with the given id is not found"
     }
   ],
   "metadata": {

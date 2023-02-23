@@ -105,8 +105,6 @@ function Popup({
             </Button>
           </div>
 
-         
-
           <Modal isOpen={editModal} toggle={editToggle} size="xl">
             <ModalHeader toggle={editToggle}>Editing a conference</ModalHeader>
             <ModalBody>

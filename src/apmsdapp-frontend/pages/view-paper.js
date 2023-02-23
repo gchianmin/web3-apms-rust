@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { Button } from "reactstrap";
 import DynamicForm from "../components/DynamicForm";
 import { useUser } from "@auth0/nextjs-auth0/client";
+
 // import PaperList from "../components/PaperList";
 import AccordionTable from "../components/AccordionTable";
 
@@ -192,7 +193,7 @@ export default function ViewPaper() {
         
         {/* <Button onClick={deletePaper}>Delete</Button>{" "} */}
         {/* <Button onClick={getPaper}>Get</Button> */}
-        <AccordionTable props={JSON.stringify(papers)} conference={props} deletePaper={deletePaper}/> 
+        <AccordionTable props={JSON.stringify(papers)} conference={props} deletePaper={deletePaper} walletAddress={walletAddress} connectWallet={connectWallet}/> 
       </div>
       {/* <PaperList props={JSON.stringify(papers)} conference={props} deletePaper={deletePaper}/> */}
       

@@ -217,7 +217,7 @@ const DynamicForm = ({ user, submitPaper, props}) => {
               id="abstract"
               name="abstract"
               placeholder="Abstract of the paper"
-              type="text"
+              type="textarea"
               required
             />
           </Col>

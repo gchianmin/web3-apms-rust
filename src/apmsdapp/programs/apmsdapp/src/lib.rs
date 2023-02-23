@@ -41,12 +41,8 @@ pub mod apmsdapp {
         instructions::delete_paper(ctx, conferenceid, paper_hash)
     }
 
-    pub fn assign_reviewer(ctx: Context<AssignReviewer>, conferenceid: Pubkey, paper_hash: String, reviewer: Vec<Reviewers>) -> Result<()> {
-        instructions::assign_reviewer(ctx, conferenceid, paper_hash, reviewer)
-    }
-
-    pub fn assign_chair(ctx: Context<AssignChair>, conferenceid: Pubkey, paper_hash: String, chair: Reviewers) -> Result<()> {
-        instructions::assign_chair(ctx, conferenceid, paper_hash, chair)
+    pub fn assign_reviewer(ctx: Context<AssignReviewer>, conferenceid: Pubkey, paper_hash: String, reviewer: Vec<Reviewers>, chair: Reviewers) -> Result<()> {
+        instructions::assign_reviewer(ctx, conferenceid, paper_hash, reviewer, chair)
     }
 
 }
