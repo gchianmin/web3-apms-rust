@@ -193,12 +193,7 @@ export const assignReviewersandChair = async (
         user: provider.wallet.publicKey,
       })
       .rpc();
-    // await program.rpc.assignReviewer(id, paperId, reviewers, chair, {
-    //   accounts: {
-    //     conferenceList: conferenceListPDA,
-    //     user: provider.wallet.publicKey,
-    //   },
-    // });
+
     alert("added successfully");
     window.location.reload();
   } catch (error) {
