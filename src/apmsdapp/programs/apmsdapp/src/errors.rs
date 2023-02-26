@@ -8,4 +8,6 @@ pub enum ConferenceError {
   NotAuthorized,
   #[msg("The paper with the given id is not found")]
   PaperNotFound,
+  #[msg("All the reviewers must finish reviewing before the chair can make the final review")]
+  NotReviewedByAll,
 }

@@ -45,4 +45,8 @@ pub mod apmsdapp {
         instructions::assign_reviewer(ctx, conferenceid, paper_hash, reviewer, chair)
     }
 
+    pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String) -> Result<()> {
+        instructions::review_paper(ctx, conferenceid, paper_hash, reviewer_email, chair, approval, feedback)
+    }
+
 }
