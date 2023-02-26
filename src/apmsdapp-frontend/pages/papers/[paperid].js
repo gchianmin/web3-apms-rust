@@ -1,137 +1,158 @@
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Header from "../../components/Header";
 import React from "react";
-import { IDL } from "../../utils/const";
-import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
-import {
-  Program,
-  AnchorProvider,
-  web3,
-  utils,
-  BN,
-} from "@project-serum/anchor";
 import { useEffect, useState } from "react";
+import { Button } from "reactstrap";
 import {
-  Button,
-  Card,
-  CardBody,
-  CardTitle,
-  CardText,
-  CardImg,
-  CardFooter,
-} from "reactstrap";
-import Popup from "../../components/Popup";
-import Link from "next/link";
-// import TpcForm from "../../components/TpcForm";
-
-// This is the address of your solana program, if you forgot, just run solana address -k target/deploy/myepicproject-keypair.json
-const programID = new PublicKey(IDL.metadata.address);
-
-// Set our network to devnet.
-const network = clusterApiUrl("devnet");
-
-// Controls how we want to acknowledge when a transaction is "done". processed - only the node connected; finalize - to be very very sure
-const opts = {
-  preflightCommitment: "processed",
-};
-
-// SystemProgram is a reference to the Solana runtime!
-const { SystemProgram } = web3;
+  RiDeleteBin6Line,
+  RiDownload2Fill,
+  RiInformationLine,
+  RiArrowDownSLine,
+  RiTeamLine,
+} from "react-icons/ri";
+import AssignReviewerModal from "../../components/AssignReviewerModal";
+import {
+  checkIfWalletIsConnected,
+  connectWallet,
+} from "../../Common/WalletConnection";
+import { getPaperStatus, getPaper } from "../../Common/GetPapers";
+import DownloadButton from "../../components/DownloadButton";
+import { deletePaper } from "../../Common/AuthorInstructions";
+import { getConference } from "../../Common/getConferences";
 
 export default function ViewIndividualPaperPage() {
-  console.log("enter individual paper page");
-//   const [conferences, setConferences] = useState([]);
-  const [query, setQuery] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
+  const [paper, setPaper] = useState([]);
   const router = useRouter();
-  const { paperid } = router.query;
+  const [tpc, setTpc] = useState([]);
+  const {
+    query: { conferencePDA, conferenceId, conferenceName },
+  } = router;
+  const conference = { conferencePDA, conferenceId, conferenceName };
 
-  const getProvider = () => {
-    const connection = new Connection(network, opts.preflightCommitment);
-    const provider = new AnchorProvider(
-      connection,
-      window.solana,
-      opts.preflightCommitment
-    );
-    return provider;
+  const getSpecificPaper = async () => {
+    try {
+      const conf = await getConference(
+        conference.conferencePDA,
+        conference.conferenceId
+      );
+      setTpc(conf.technicalProgramsCommittees);
+
+      const papers = await getPaper(
+        conference.conferencePDA,
+        conference.conferenceId
+      );
+      const getPaperFromList = papers.find(
+        (element) => element.paperHash == router.query.paperid
+      );
+      setPaper(getPaperFromList);
+    } catch (error) {
+      console.log("Error getting a paper : ", error);
+    }
   };
 
-  const checkIfWalletIsConnected = async () => {
+  const getPaperDetails = () => {
     try {
-      const { solana } = window;
-      // if solana && solana.isPhantom
-      if (solana) {
-        if (solana.isPhantom) {
-          console.log("Phantom wallet found");
-          const response = await solana.connect({
-            onlyIfTruested: true,
-          });
-          console.log(
-            "Connected with public key",
-            response.publicKey.toString()
-          );
-          setWalletAddress(response.publicKey.toString());
-        }
-      } else {
-        alert("Solana object not found! Get a Phantom wallet");
+      if (paper) {
+        return (
+          <>
+            <p>Conference: {conference.conferenceName}</p>
+            <p>
+              Paper ID: {paper.paperId}{" "}
+              <DownloadButton
+                conference={conference}
+                paperHash={paper.paperHash}
+                paperName={paper.paperName}
+              />
+            </p>
+            <p>Paper Title: {paper.paperTitle}</p>
+            <p>Paper Abstract: {paper.paperAbstract}</p>
+            <p>Paper Version: {paper.version}</p>
+            <p>
+              Previous Version:{" "}
+              {paper.prevVersion == "" ? (
+                <span>None</span>
+              ) : (
+                <p>{paper.prevVersion}</p>
+              )}
+            </p>
+            <p>Paper Status: {getPaperStatus(paper.paperStatus)}</p>
+            <p>Date Submitted: {paper.dateSubmitted}</p>
+            <p>Paper Authors</p>
+            {paper.paperAuthors.map((author) => (
+              <li key={author.authorEmail}>
+                {" "}
+                {author.authorName} - {author.authorEmail} (
+                {author.authorAffiliation})
+              </li>
+            ))}
+            <p>Paper Reviewers</p>
+            {paper.reviewer.map((reviewer) => (
+              <li key={reviewer.tpcEmail}>
+                {" "}
+                {reviewer.tpcName} - {reviewer.tpcEmail}{" "}
+              </li>
+            ))}
+            <p>
+              Paper Chair:
+              <li>
+                {paper.paperChair.tpcName} - {paper.paperChair.tpcEmail}
+              </li>
+            </p>
+            <AssignReviewerModal
+              walletAddress={walletAddress}
+              connectWallet={connectWallet}
+              tpc={tpc}
+              conference={conference}
+              paperId={paper.paperHash}
+            />
+            <Button
+              className="btn-danger"
+              type="button"
+              onClick={() =>
+                deletePaper(
+                  conference.conferencePDA,
+                  conference.conferenceId,
+                  paper.paperHash
+                )
+              }
+            >
+              DELETE SUBMISSION
+            </Button>
+            {/* <RiDeleteBin6Line
+              type="button"
+              color="red"
+              size={30}
+              onClick={() => deletePaper(item.paperHash, item.paperName)}
+              className="mr-3"
+            /> */}
+          </>
+        );
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const connectWallet = async () => {
-    const { solana } = window;
-    if (solana) {
-      const response = await solana.connect();
-      console.log("Connected with public key: ", response.publicKey.toString());
-      setWalletAddress(response.publicKey.toString());
-    }
-  };
-
-//   const getConferences = async () => {
-//     const provider = getProvider();
-//     const program = new Program(IDL, programID, provider);
-//     const conferenceInfo =
-//       await program.account.conferenceListAccountData.all();
-//     setConferences(conferenceInfo);
-//   };
-
-//   const getConferenceFromLists = () => {
-//     try {
-//       const conf = conferences.find(
-//         (element) => element.publicKey.toString() == query[0]
-//       );
-
-//       let confid;
-
-//       for (let i in conf.account.conferences) {
-//         console.log(conf.account.conferences[i]);
-//         if (conf.account.conferences[i].id == query[1]) {
-//           confid = conf.account.conferences[i]; // straight return
-//         }
-//       }
-//       return confid;
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-
-  
-
-  
   useEffect(() => {
     if (!router.isReady) return;
-    setQuery(paperid.split("-"));
-    // getConferences();
-    checkIfWalletIsConnected();
+    checkIfWalletIsConnected().then((res) => setWalletAddress(res));
+    getSpecificPaper();
   }, [router.isReady]);
 
   return (
     <>
       <Header props={`Paper Details`} />
-      {/* <div>{getDetails()}</div> */}
+      <h2>Paper Details </h2>
+      <div>{paper && getPaperDetails()}</div>
+      {!paper && (
+        <div className="pt-4">
+          <p className="text-muted font-italic">Paper has been deleted</p>
+          <a className="text-primary lead" type="button" onClick={router.back}>
+            ← Return
+          </a>
+        </div>
+      )}
     </>
   );
 }

@@ -98,7 +98,19 @@ describe("apmsdapp", async () => {
     );
   }
 
-  const getAllConference = async () => {
+  const assignReviewer =async (conferenceId, paperId, reviewers, chair) => {
+    await program.rpc.assignReviewer(
+      conferenceId, paperId, reviewers,chair,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    ); 
+  }
+
+  const getAllConference = async () => { 
     try {
       const conferenceInfo = await program.account.conferenceListAccountData.all()
       console.log("Conferences List", conferenceInfo)
@@ -361,7 +373,7 @@ describe("apmsdapp", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // console.log(data.conferences[0].id)
     let id = data.conferences[0].id
-    let paperId = "Po90y"
+    let paperId = "example hash"
     let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
 
     await deletePaper(id, paperId)
@@ -387,4 +399,40 @@ describe("apmsdapp", async () => {
   it("Fetch All Conferences after deleting a paper", async () => {
     getAllConference()
   });
+
+  it("Assigning a reviewer", async () => {
+    const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    // console.log(data.conferences[0].id)
+    let id = data.conferences[0].id
+    let paperId = "example hash2"
+    let reviewers = [{tpcName: "Reviewer1", tpcEmail: "E1", tpcWallet: "", approval: new anchor.BN(0), feedback:""}]
+    let chair = {tpcName: "Chair", tpcEmail: "C1", tpcWallet: "", approval: new anchor.BN(0), feedback:""}
+    // let authors = [{authorName: "A3", authorEmail:"E3"},{authorName: "A4", authorEmail:"E4"} ]
+
+    await assignReviewer(id, paperId, reviewers, chair)
+
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    console.log("sub", updatedData.conferences[0].paperSubmitted[0].reviewer)
+    assert.equal(updatedData.count, 1);
+    assert.equal(updatedData.conferences.length, 1);
+    assert.equal(updatedData.deletedIndexes.length, 1);
+    assert.equal(updatedData.conferences[0].paperSubmitted.length, 1);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperId, "Po904");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperHash, "example hash2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperName, "filename2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperTitle, "example title2");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
+    assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].reviewer).toString(), Object.entries(reviewers).toString())
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcName, "Chair");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcEmail, "C1");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcWallet, "");
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.approval, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.feedback, "");
+  })
+
+
 });

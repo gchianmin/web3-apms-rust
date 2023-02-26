@@ -19,6 +19,28 @@ impl ConferenceListAccountData {
 
     err!(ConferenceError::ConferenceNotFound)
   }
+
+  pub fn get_paper_index(&self, conference_index: usize, hash: String) -> Result<usize> {
+    // let conf_index = self.get_conference_index(conferenceid)?;
+
+    // let conference = self.conferences[conf_index];
+    // let mut conference_index:usize;
+
+    // for (index, conference) in self.conferences.iter().enumerate() {
+    //   if conference.id == conferenceid {
+    //     conf = conference;
+    //     conference_index = index;
+    //   }
+    // }
+    for (index, paper) in self.conferences[conference_index].paper_submitted.iter().enumerate() {
+      if paper.paper_hash == hash {
+        return Ok(index);
+      }
+    }
+
+    err!(ConferenceError::PaperNotFound)
+  }
+
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

@@ -7,15 +7,31 @@ import {
   CardText,
   CardImg,
 } from "reactstrap";
+import { useRouter } from "next/router";
 
-export default function CardComponent({ props, pk, img }) {
+const sendProps = (href, conferenceId, router) => {
+  router.push({
+    pathname: href,
+    query: {
+      conferenceId,
+    },
+  });
+};
 
-  return (
+// if page == main
+const renderMainContainer = (props, pk, router) => (
+  <>
     <div className="my-2">
       <a
-        href={"/conferences/" + pk.toString() + "-" + props.id.toString()}
         className="text-decoration-none"
-        props={props}
+        onClick={() =>
+          sendProps(
+            `/conferences/${pk.toString()}`,
+            props.id.toString(),
+            router
+          )
+        }
+        type="button"
       >
         <Card
           style={{
@@ -31,7 +47,7 @@ export default function CardComponent({ props, pk, img }) {
             top
             width="100%"
           />
-       
+
           <CardBody>
             <CardTitle tag="h5">{props.name}</CardTitle>
             <CardText className="text-sm font-italic text-info">
@@ -45,5 +61,18 @@ export default function CardComponent({ props, pk, img }) {
         </Card>
       </a>
     </div>
-  );
+  </>
+);
+
+
+export default function CardComponent({
+  props,
+  pk,
+  page,
+}) {
+  console.log(props)
+  const router = useRouter();
+  return page == "main"
+    ? renderMainContainer(props, pk, router)
+    : <p>Not Main</p>
 }

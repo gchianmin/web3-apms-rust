@@ -1,6 +1,7 @@
 use crate::account_data::*;
 use anchor_lang::prelude::*;
 
+
 #[derive(Accounts)]
 pub struct CreateConference<'info> {
   #[account(mut)]

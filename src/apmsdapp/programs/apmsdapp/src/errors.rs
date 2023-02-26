@@ -6,4 +6,6 @@ pub enum ConferenceError {
   ConferenceNotFound,
   #[msg("You are not authorized to perform this action")]
   NotAuthorized,
+  #[msg("The paper with the given id is not found")]
+  PaperNotFound,
 }
