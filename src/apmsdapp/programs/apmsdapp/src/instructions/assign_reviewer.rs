@@ -20,5 +20,6 @@ pub fn assign_reviewer(ctx: Context<AssignReviewer>, conferenceid: Pubkey, paper
     let paper = &mut account.conferences.get_mut(index).ok_or(ConferenceError::ConferenceNotFound)?.paper_submitted.get_mut(paper_index).expect("");    
     paper.reviewer = reviewer;
     paper.paper_chair = chair;
+    paper.paper_status = 1;
     Ok(())
 }

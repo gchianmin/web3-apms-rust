@@ -439,7 +439,7 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
     assert.equal(Object.entries(updatedData.conferences[0].paperSubmitted[0].reviewer).toString(), Object.entries(reviewers).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcName, "Chair");
@@ -473,7 +473,7 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
     // assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].reviewer).toString(), Object.entries(reviewers).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcName, "Chair");
@@ -525,7 +525,7 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
     // assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].reviewer).toString(), Object.entries(reviewers).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 0);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcName, "Chair");
