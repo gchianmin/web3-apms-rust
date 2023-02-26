@@ -43,7 +43,7 @@ export default async (req, res) => {
       const entropy = generateEntropy()
       console.log(entropy)
       console.log("isit ths",hash);
-      const pathToWritePaper = `public/files/${props.conferenceList}/${props.conferencePDA}/${hash}/`;
+      const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
       
       if (fs.pathExistsSync(pathToWritePaper)) {
         res.status(409).json({ message: "Same file already exists in the system!" });

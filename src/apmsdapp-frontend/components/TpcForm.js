@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-import { Form, FormGroup, Col, Button } from "reactstrap";
+import { Form, FormGroup, Col, Button, Input } from "reactstrap";
 import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
+import { updateTpc } from "../Common/AdminInstructions";
 
-const TpcForm = ({ conferenceId, existingTpc, updateTpc, tpcToggle }) => {
+const TpcForm = ({
+  existingDetails,
+  tpcToggle,
+  conferencePDA,
+}) => {
   var initialData = [];
-  if (existingTpc.length>0) {
-    initialData = existingTpc
+  if (existingDetails.technicalProgramsCommittees.length > 0) {
+    initialData = existingDetails.technicalProgramsCommittees;
   }
   const [formData, setFormData] = useState(initialData);
-  // console.log(formData);
   const addField = () => {
     setFormData([...formData, { tpcName: "", tpcEmail: "" }]);
   };
@@ -28,11 +32,11 @@ const TpcForm = ({ conferenceId, existingTpc, updateTpc, tpcToggle }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // console.log(formData);
+    updateTpc(conferencePDA, existingDetails, formData);
   };
 
   const renderForm = () => (
-    <Form >
+    <Form onSubmit={handleSubmit}>
       <FormGroup>
         <Col sm={10}>
           {formData.map((field, index) => (
@@ -43,7 +47,7 @@ const TpcForm = ({ conferenceId, existingTpc, updateTpc, tpcToggle }) => {
               >
                 Name
               </label>
-              <input
+              <Input
                 type="text"
                 id="tpcName"
                 name={Object.keys(field)[0]}
@@ -58,8 +62,8 @@ const TpcForm = ({ conferenceId, existingTpc, updateTpc, tpcToggle }) => {
               >
                 Email
               </label>
-              <input
-                type="text"
+              <Input
+                type="email"
                 id="tpcEmail"
                 name={Object.keys(field)[1]}
                 value={field[Object.keys(field)[1]]}
@@ -85,27 +89,18 @@ const TpcForm = ({ conferenceId, existingTpc, updateTpc, tpcToggle }) => {
           />
         </Col>
       </FormGroup>
+      <div className="d-flex justify-content-center d-grid mx-auto">
+        <Button className="mr-5 px-5" color="primary">
+          Submit
+        </Button>
+        <Button className="px-5" color="secondary" onClick={tpcToggle}>
+          Cancel
+        </Button>
+      </div>
     </Form>
   );
-  return (
-    <div>
-      {conferenceId == undefined
-        ? renderForm() 
-        :  (
-          <div>
-            {renderForm()}
-          <div className="d-flex justify-content-center d-grid mx-auto">
-            <Button className="mr-5 px-5" color="primary" onClick={()=>updateTpc(conferenceId, formData)}>
-              Submit
-            </Button>
-            <Button className="px-5" color="secondary" onClick={tpcToggle}>
-              Cancel
-            </Button>
-          </div>
-          </div>
-        )}
-    </div>
-  );
+
+  return <>{renderForm()}</>;
 };
 
 export default TpcForm;

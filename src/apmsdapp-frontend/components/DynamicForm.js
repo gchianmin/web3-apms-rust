@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
 import {
   FormGroup,
@@ -9,24 +9,20 @@ import {
   Label,
   Col,
 } from "reactstrap";
-import {
-  Program,
-  AnchorProvider,
-  web3,
-  utils,
-  BN,
-} from "@project-serum/anchor";
+import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
+import { submitPaper } from "../Common/AuthorInstructions";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import ApiCallers from "../Common/ApiCallers";
+import { MAX_FILE_SIZE } from "../utils/const";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-const DynamicForm = ({ user, submitPaper, props}) => {
-  const [formFields, setFormFields] = useState([{ name: "", email: "", affiliation: ""}]);
+const DynamicForm = ({ props }) => {
+  const [formFields, setFormFields] = useState([
+    { name: "", email: "", affiliation: "" },
+  ]);
   const [file, setFile] = useState(null);
-  // const [hash, setHash] = useState(null);
   const router = useRouter();
-  const userEmail = user == undefined ? null : user.email;
-  console.log("passed", {props})
+  const { user } = useUser();
   const handleAddField = () => {
     setFormFields([...formFields, { name: "", email: "", affiliation: "" }]);
   };
@@ -49,66 +45,84 @@ const DynamicForm = ({ user, submitPaper, props}) => {
     }
   };
 
-  // const deleteFile = async(paperId) => {
-  //   try {
-  //     paperId = "969e9f7f1f336a6309cd66080502c15d"
-  //     const response = await fetch("/api/filedelete", {
-  //       // method: "POST",
-  //       body: paperId,
-  //     });
-  //     const data = await response.json();
+  const inputValidaton = (emailValidation) => {
+    if (!emailValidation.includes(user.email)) {
+      alert(
+        "Please include yourself as an author and use the login email address"
+      );
+      return false;
+    }
 
-  //     if (!response.ok) {
-  //       alert(`Error ${response.status}!! ${data.message}`)
-  //       throw data.message;
-  //     }
+    if (file.type != "application/pdf") {
+      alert("Only PDF is accepted");
+      return false;
+    }
 
-  //     alert("Paper Deleted Successfully.")
-  //     // router.push('/my-history')
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // }
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size too big");
+      return false;
+    }
+
+    return true;
+  };
 
   const uploadFile = async (event) => {
     event.preventDefault();
-    var authors = []
-    formFields.map((field, index)=>{
-      authors.push({authorName: field.name, authorEmail: field.email, authorAffiliation: field.affiliation})
-    })
+    var authors = [];
+    var emailValidation = [];
+
+    formFields.map((field, index) => {
+      authors.push({
+        authorName: field.name,
+        authorEmail: field.email,
+        authorAffiliation: field.affiliation,
+      });
+      emailValidation.push(field.email);
+    });
+
+    if (!inputValidaton(emailValidation)) {
+      return;
+    }
+
     const paper = {
       title: event.target.title.value,
       abstract: event.target.abstract.value,
     };
 
-    console.log(authors)
-    if (file.size > MAX_FILE_SIZE) {
-      alert("File size too big");
-      return;
-    }
     const d = new Date();
     const formData = new FormData();
     formData.append("file", file);
     formData.append("props", JSON.stringify(props));
+
     try {
-      const response = await fetch("/api/fileupload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await ApiCallers({ apiUrl: "/api/fileupload", method: "POST", body: formData });
       const data = await response.json();
 
       if (!response.ok) {
-        alert(`Error ${response.status}!! ${data.message}`)
+        alert(`Error ${response.status}!! ${data.message}`);
         throw data.message;
       }
-      
-      const submitted = await submitPaper(data.entropy, data.hash, data.fileName, paper.title, paper.abstract, authors, d.toLocaleDateString() + " " + d.toLocaleTimeString(), new BN(1), "");
-      // console.log(submitted)
-      if (submitted=="ok" && response.ok) {
-        alert("Paper Submitted Successfully. You may view the status under myHistory.")
-        router.back()
-    }
-      else alert("error")
+
+      const submitted = await submitPaper(
+        props.conferencePDA,
+        props.conferenceId,
+        data.entropy,
+        data.hash,
+        data.fileName,
+        paper.title,
+        paper.abstract,
+        authors,
+        d.toLocaleDateString() + " " + d.toLocaleTimeString(),
+        new BN(1),
+        ""
+      );
+
+      if (submitted == "ok" && response.ok) {
+        alert(
+          "Paper Submitted Successfully. You may view the status under myHistory."
+        );
+        router.back();
+      } else console.log("error");
     } catch (error) {
       console.log(error.message);
     }
@@ -118,27 +132,15 @@ const DynamicForm = ({ user, submitPaper, props}) => {
     <div>
       <Form onSubmit={uploadFile}>
         <FormGroup row>
-          <Label className="text-monospace d-flex align-items-center" for="main-email" sm={2}>
-            Email Address
-          </Label>
-          <Col sm={10} className="d-flex align-items-center">
-            <Input
-              id="main-email"
-              name="main-email"
-              placeholder="email address of the organiser"
-              type="email"
-              value={userEmail}
-              required
-            />
-          </Col>
-        </FormGroup>
-
-        <FormGroup row>
-          <Label className="text-monospace d-flex align-items-center" for="author" sm={2}>
+          <Label
+            className="text-monospace d-flex align-items-center"
+            for="author"
+            sm={2}
+          >
             Authors
           </Label>
 
-          <Col sm={10} >
+          <Col sm={10}>
             <FormText className="font-italic">
               {" "}
               * Please inclulde yourself as an author
@@ -194,7 +196,11 @@ const DynamicForm = ({ user, submitPaper, props}) => {
         </FormGroup>
 
         <FormGroup row>
-          <Label className="text-monospace d-flex align-items-center " for="title" sm={2}>
+          <Label
+            className="text-monospace d-flex align-items-center "
+            for="title"
+            sm={2}
+          >
             Paper Title
           </Label>
           <Col sm={10} className="d-flex align-items-center ">
@@ -209,7 +215,11 @@ const DynamicForm = ({ user, submitPaper, props}) => {
         </FormGroup>
 
         <FormGroup row>
-          <Label className="text-monospace d-flex align-items-center" for="abstract" sm={2}>
+          <Label
+            className="text-monospace d-flex align-items-center"
+            for="abstract"
+            sm={2}
+          >
             Paper Abstract
           </Label>
           <Col sm={10} className="d-flex align-items-center">
@@ -244,9 +254,6 @@ const DynamicForm = ({ user, submitPaper, props}) => {
         <div className="d-flex justify-content-center align-items-center">
           <Button color="primary">Submit</Button>
         </div>
-        {/* <div className="d-flex justify-content-center align-items-center">
-          <Button color="primary" onClick={uploadFile}>Delete</Button>
-        </div> */}
       </Form>
     </div>
   );

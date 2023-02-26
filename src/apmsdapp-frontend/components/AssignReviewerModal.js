@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import { useRouter } from "next/router";
-import FormInput from "./FormInput";
-import TpcForm from "./TpcForm";
 import {
   RiDeleteBin6Line,
   RiDownload2Fill,
@@ -11,19 +8,12 @@ import {
   RiTeamLine,
 } from "react-icons/ri";
 import Multiselect from "multiselect-react-dropdown";
-import {
-  Program,
-  AnchorProvider,
-  web3,
-  utils,
-  BN,
-} from "@project-serum/anchor";
+import { BN } from "@project-serum/anchor";
+import { assignReviewersandChair } from "../Common/AdminInstructions";
 
 function AssignReviewerModal({
-  reviewers,
-  chair,
   paperId,
-  assignReviewersandChair,
+  conference,
   tpc,
   walletAddress,
   connectWallet,
@@ -37,14 +27,12 @@ function AssignReviewerModal({
     selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
-    // console.log(selectedList);
     setSelectedReviewers(selectedList);
   };
   const onSelectChair = (selectedList, selectedItem) => {
     selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
-    // console.log(selectedItem);
     setSelectedChair(selectedItem);
   };
 
@@ -57,14 +45,19 @@ function AssignReviewerModal({
       alert("A paper chair cannot be one of the reviewers!!");
       return;
     }
-    // console.log(selectedReviewers)
-    // console.log(selectedChair)
-
-    await assignReviewersandChair(paperId, selectedReviewers, selectedChair);
+    await assignReviewersandChair(
+      conference.conferencePDA,
+      conference.conferenceId,
+      paperId,
+      selectedReviewers,
+      selectedChair
+    );
   };
   return (
     <div>
-      <Button type="button" onClick={reviewerToggle} className="btn-info">Assign/Modify Reviewers</Button>
+      <Button type="button" onClick={reviewerToggle} className="btn-info">
+        Assign/Modify Reviewers
+      </Button>
       {/* <RiTeamLine
         type="button"
         size={30}
@@ -83,29 +76,27 @@ function AssignReviewerModal({
         <ModalBody>
           <p>Select reviewers:</p>
           <Multiselect
-            options={tpc} // Options to display in the dropdown
+            options={tpc}
             showCheckbox={true}
             placeholder="Select"
             hidePlaceholder={true}
-            onSelect={onSelectReviewers} // Function will trigger on select event
+            onSelect={onSelectReviewers}
             showArrow={true}
             selectionLimit={3}
-            // selectedValues={reviewers}
             emptyRecordMsg="Not found"
-            displayValue="tpcName" // Property name to display in the dropdown options
+            displayValue="tpcName"
           />
 
           <p className="pt-5">Select a paper chair:</p>
 
           <Multiselect
-            options={tpc} // Options to display in the dropdown
+            options={tpc}
             singleSelect={true}
             placeholder="Select"
             hidePlaceholder={true}
-            onSelect={onSelectChair} // Function will trigger on select event
-            // selectedValues={chair}
+            onSelect={onSelectChair}
             emptyRecordMsg="Not found"
-            displayValue="tpcName" // Property name to display in the dropdown options
+            displayValue="tpcName"
           />
         </ModalBody>
         <ModalFooter>
