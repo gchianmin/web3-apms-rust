@@ -271,7 +271,7 @@
       ]
     },
     {
-      "name": "assignChair",
+      "name": "reviewPaper",
       "accounts": [
         {
           "name": "conferenceList",
@@ -294,10 +294,20 @@
           "type": "string"
         },
         {
+          "name": "reviewerEmail",
+          "type": "string"
+        },
+        {
           "name": "chair",
-          "type": {
-            "defined": "Reviewers"
-          }
+          "type": "bool"
+        },
+        {
+          "name": "approval",
+          "type": "u8"
+        },
+        {
+          "name": "feedback",
+          "type": "string"
         }
       ]
     }
@@ -551,6 +561,11 @@
       "code": 6002,
       "name": "PaperNotFound",
       "msg": "The paper with the given id is not found"
+    },
+    {
+      "code": 6003,
+      "name": "NotReviewedByAll",
+      "msg": "All the reviewers must finish reviewing before the chair can make the final review"
     }
   ],
   "metadata": {

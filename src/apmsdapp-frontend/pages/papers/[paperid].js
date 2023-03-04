@@ -18,9 +18,12 @@ import {
 import { getPaperStatus, getPaper } from "../../Common/GetPapers";
 import DownloadButton from "../../components/DownloadButton";
 import { deletePaper } from "../../Common/AuthorInstructions";
-import { getConference } from "../../Common/getConferences";
+import { getConference } from "../../Common/GetConferences";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import Expander from "../../components/Expander";
 
 export default function ViewIndividualPaperPage() {
+  const { user } = useUser();
   const [walletAddress, setWalletAddress] = useState(null);
   const [paper, setPaper] = useState([]);
   const router = useRouter();
@@ -29,6 +32,26 @@ export default function ViewIndividualPaperPage() {
     query: { conferencePDA, conferenceId, conferenceName },
   } = router;
   const conference = { conferencePDA, conferenceId, conferenceName };
+
+  const sendProps = (
+    href,
+    conferencePDA,
+    conferenceId,
+    conferenceName,
+    paperTitle,
+    paperHash
+  ) => {
+    router.push({
+      pathname: href,
+      query: {
+        conferencePDA,
+        conferenceId,
+        conferenceName,
+        paperTitle,
+        paperHash,
+      },
+    });
+  };
 
   const getSpecificPaper = async () => {
     try {
@@ -78,7 +101,7 @@ export default function ViewIndividualPaperPage() {
             </p>
             <p>Paper Status: {getPaperStatus(paper.paperStatus)}</p>
             <p>Date Submitted: {paper.dateSubmitted}</p>
-            <p>Paper Authors</p>
+            <p>Paper Authors:</p>
             {paper.paperAuthors.map((author) => (
               <li key={author.authorEmail}>
                 {" "}
@@ -86,18 +109,28 @@ export default function ViewIndividualPaperPage() {
                 {author.authorAffiliation})
               </li>
             ))}
-            <p>Paper Reviewers</p>
-            {paper.reviewer.map((reviewer) => (
-              <li key={reviewer.tpcEmail}>
-                {" "}
-                {reviewer.tpcName} - {reviewer.tpcEmail}{" "}
-              </li>
-            ))}
+            <p className="pt-3">
+              Paper Reviewers:
+              {paper.reviewer.length > 0 ? (
+                paper.reviewer.map((reviewer) => (
+                  <li key={reviewer.tpcEmail}>
+                    {" "}
+                    {reviewer.tpcName} - {reviewer.tpcEmail}{" "}
+                  </li>
+                ))
+              ) : (
+                <p>Not assigned yet</p>
+              )}
+            </p>
             <p>
               Paper Chair:
-              <li>
-                {paper.paperChair.tpcName} - {paper.paperChair.tpcEmail}
-              </li>
+              {paper.paperChair.tpcName == "" ? (
+                <p>Not assigned yet</p>
+              ) : (
+                <li>
+                  {paper.paperChair.tpcName} - {paper.paperChair.tpcEmail}
+                </li>
+              )}
             </p>
             <AssignReviewerModal
               walletAddress={walletAddress}
@@ -119,6 +152,30 @@ export default function ViewIndividualPaperPage() {
             >
               DELETE SUBMISSION
             </Button>
+            <br />
+            {paper.reviewer.length > 0 &&
+            paper.reviewer.find((element) => element.tpcEmail == user.email) ? (
+              // <Button
+              //   type="button"
+              //   className="btn-primary"
+              //   onClick={() =>
+              //     sendProps(
+              //       "/review-paper",
+              //       conferencePDA,
+              //       conferenceId,
+              //       conference.conferenceName,
+              //       paper.paperTitle,
+              //       paper.paperHash
+              //     )
+              //   }
+              // >
+              //   {" "}
+              //   Review{" "}
+              // </Button>
+              <Expander props={conference} paperHash={paper.paperHash} />
+            ) : (
+              <p></p>
+            )}
             {/* <RiDeleteBin6Line
               type="button"
               color="red"
