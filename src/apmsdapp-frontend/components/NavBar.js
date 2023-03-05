@@ -102,11 +102,11 @@ export default function NavBar() {
                   </DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem header>{user.name}</DropdownItem>
-                    <DropdownItem className="dropdown-profile" tag="span">
+                    {/* <DropdownItem className="dropdown-profile" tag="span">
                       <AnchorLink href="/profile" icon="user">
                         Profile
                       </AnchorLink>
-                    </DropdownItem>
+                    </DropdownItem> */}
                     <DropdownItem id="qsLogoutBtn">
                       <AnchorLink href="/api/auth/logout" icon="power-off">
                         Log out
@@ -146,11 +146,11 @@ export default function NavBar() {
                     <h6 className="d-inline-block">{user.name}</h6>
                   </span>
                 </NavItem>
-                <NavItem>
+                {/* <NavItem>
                   <AnchorLink href="/profile" icon="user">
                     Profile
                   </AnchorLink>
-                </NavItem>
+                </NavItem> */}
                 <NavItem id="qsLogoutBtn">
                   <AnchorLink
                     href="/api/auth/logout"

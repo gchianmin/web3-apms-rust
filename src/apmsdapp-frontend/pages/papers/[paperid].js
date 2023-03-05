@@ -153,7 +153,7 @@ export default function ViewIndividualPaperPage() {
               DELETE SUBMISSION
             </Button>
             <br />
-            {paper.reviewer.length > 0 &&
+            {/* {paper.reviewer.length > 0 &&
             paper.reviewer.find((element) => element.tpcEmail == user.email) ? (
               // <Button
               //   type="button"
@@ -175,7 +175,7 @@ export default function ViewIndividualPaperPage() {
               <Expander props={conference} paperHash={paper.paperHash} />
             ) : (
               <p></p>
-            )}
+            )} */}
             {/* <RiDeleteBin6Line
               type="button"
               color="red"

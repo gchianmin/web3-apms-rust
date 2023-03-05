@@ -15,7 +15,12 @@ import { reviewPaper } from "../Common/ReviewerInstructions";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { getPaper } from "../Common/GetPapers";
 
-export default function Expander({props, paperHash}) {
+export default function Expander({
+  role,
+  conferencePDA,
+  conferenceId,
+  paperHash,
+}) {
   const { user } = useUser();
   const [review, setReview] = useState(null);
   const [radioSelected, setRadioSelected] = useState(null);
@@ -32,18 +37,36 @@ export default function Expander({props, paperHash}) {
     };
     console.log("data", data);
     try {
-      const res = await reviewPaper(
-        props.conferencePDA,
-        props.conferenceId,
-        paperHash,
-        user.email,
-        false,
-        data.approval,
-        data.feedback
-      );
-      console.log("res", res);
-      if (res == "ok") {
-        alert("reviewed success");
+      if (role == "reviewer") {
+        const res = await reviewPaper(
+          conferencePDA,
+          conferenceId,
+          paperHash,
+          user.email,
+          false,
+          data.approval,
+          data.feedback
+        );
+        console.log("res", res);
+        if (res == "ok") {
+          alert("reviewed success");
+          window.location.reload();
+        }
+      } else if (role == "chair") {
+        const res = await reviewPaper(
+          conferencePDA,
+          conferenceId,
+          paperHash,
+          user.email,
+          true,
+          data.approval,
+          data.feedback
+        );
+        console.log("res", res);
+        if (res == "ok") {
+          alert("reviewed success");
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.error(error);
@@ -51,11 +74,12 @@ export default function Expander({props, paperHash}) {
   };
 
   const getFeedback = async () => {
-    const paps = await getPaper(props.conferencePDA, props.conferenceId);
+    const paps = await getPaper(conferencePDA, conferenceId);
     const pap = paps.find((element) => element.paperHash == paperHash);
     setReview(pap.reviewer);
     // return (<p>{JSON.stringify(pap.reviewer)}</p>)
   };
+
   return (
     <div>
       <Button

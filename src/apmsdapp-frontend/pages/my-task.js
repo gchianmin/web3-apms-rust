@@ -1,19 +1,6 @@
 import Header from "../components/Header";
-import { getPaperPendingReview } from "../Common/GetPapers";
+import { getPaperPendingReview, getPaperPendingPayment} from "../Common/GetPapers";
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  UncontrolledCollapse,
-  Card,
-  CardBody,
-  Form,
-  FormGroup,
-  Label,
-  Col,
-  Input,
-} from "reactstrap";
-import TableList from "../components/TableList";
 import AccordionTable from "../components/AccordionTable";
 import { useRouter } from "next/router";
 import {
@@ -28,71 +15,64 @@ function MyTask() {
   console.log("mytask page");
   const [paperToReview, setPaperToReview] = useState([]);
   const [walletAddress, setWalletAddress] = useState(null);
+  const [paperToReviewChair, setPaperToReviewChair] = useState([]);
+  const [paperToRevise, setPaperToRevise] = useState([]);
+  const [paperToPay, setPaperToPay] = useState([]);
 
   const getPapersToBeReviewed = async () => {
     try {
-      const res = await getPaperPendingReview(user.email);
+      const res = await getPaperPendingReview("reviewer", user.email);
       console.log(res);
       setPaperToReview(res);
     } catch (error) {
       console.log("error in my-task page", error);
     }
+  };
 
-    // setPaperToReview(res)
+  const getPapersToBeReviewedChair = async () => {
+    try {
+      const res = await getPaperPendingReview("chair", user.email);
+      console.log(res);
+      setPaperToReviewChair(res);
+    } catch (error) {
+      console.log("error in my-task page", error);
+    }
+  };
+
+  // const getPapersToBeRevised = async () => {
+  //   try {
+  //     const res = await getPaperPendingReview("reviewer", user.email);
+  //     console.log(res);
+  //     setPaperToReview(res);
+  //   } catch (error) {
+  //     console.log("error in my-task page", error);
+  //   }
+  // };
+  const getPapersToBePaid = async () => {
+    try {
+      const res = await getPaperPendingPayment(walletAddress);
+      console.log(res);
+      setPaperToPay(res);
+    } catch (error) {
+      console.log("error in my-task page", error);
+    }
   };
 
   useEffect(() => {
     if (!router.isReady) return;
-    checkIfWalletIsConnected().then((res) => setWalletAddress(res));
+
+    const getWallet = async () => {
+      const res = await checkIfWalletIsConnected();
+      setWalletAddress(res);
+    };
+    getWallet().catch(console.error);
+    if (walletAddress) {
+      getPapersToBePaid().catch(console.error);
+    }
     getPapersToBeReviewed();
-  }, [router.isReady]);
-
-  // const TableList = (list) => {
-  //     console.log(typeof(list))
-
-  // const data = list.map(
-  //     (info) => {
-  //         return (
-  //             <tr key={info.name}>
-  //                 <td>{info.name}</td>
-  //                 {/* <td>{info.createdOn}</td> */}
-  //             </tr>
-  //         )
-  //     }
-  // )
-  // return(
-  //     <Table hover>
-  //         <thead>
-  //             <tr>
-  //                 <th>Conference</th>
-  //                 {/* <th>Uploaded On</th> */}
-  //                 {/* <th>Expiration Date</th> */}
-  //                 {/* <th>Link</th>
-  //                 <th>Action</th> */}
-  //             </tr>
-  //         </thead>
-  //         <tbody>
-  //             {data}
-  //         </tbody>
-  //     </Table>
-  // )
-
-  // }
-
-  // const displayPapersToBeReviewed = ( myMap ) =>(
-  //       <div>
-  //         {Array.from(myMap).map(([key, value]) => (
-  //         //   <div key={key}>{`${key}: ${JSON.stringify(value)}`}</div>
-  //         // value.map(val => <div>{val.name}</div>)
-  //         // value.map(val =>
-  //         <>
-  //         <TableList list={value} key={key}/>
-  //         </>
-  //         // )
-
-  //         ))}
-  //       </div>
-  // )
+    getPapersToBeReviewedChair();
+    
+  }, [walletAddress]);
 
   return (
     <>
@@ -103,17 +83,56 @@ function MyTask() {
         This page shows the tasks assigned to you eg pending payment or papers
         pending for your reviews
       </p>
-      {/* <button type="button" onClick={getPapersToBeReviewed}>click</button> */}
-      {/* <p> Conference that you are a TPC:</p>
-         <p>testinig</p>
-         {conf && displayPapersToBeReviewed(conf)}
-         {console.log(conf)} */}
-      {paperToReview && (
+      <h4 className="pt-3">Paper To Revise</h4>
+      {paperToRevise.length > 0 ? (
+        <AccordionTable
+          props={JSON.stringify(paperToRevise)}
+          action="authorViewPaperPendingRevision"
+          walletAddress={walletAddress}
+        />
+      ) : (
+        <p className="text-muted font-italic">
+          {" "}
+          No papers pending for revision
+        </p>
+      )}
+
+      <h4 className="pt-3">Pending Payment</h4>
+      {paperToPay.length > 0 ? (
+        <AccordionTable
+          props={JSON.stringify(paperToPay)}
+          action="authorViewPaperPendingPayment"
+          walletAddress={walletAddress}
+        />
+      ) : (
+        <p className="text-muted font-italic"> No papers pending for payment</p>
+      )}
+
+      <h4 className="pt-3">Paper To Review (Reviewer)</h4>
+      {paperToReview.length > 0 ? (
         <AccordionTable
           props={JSON.stringify(paperToReview)}
           action="reviewerViewPaperPendingReviewed"
           walletAddress={walletAddress}
         />
+      ) : (
+        <p className="text-muted font-italic">
+          {" "}
+          No papers pending for your review
+        </p>
+      )}
+      <h4 className="pt-3">Paper To Review (Chair)</h4>
+      {paperToReviewChair.length > 0 ? (
+        <AccordionTable
+          props={JSON.stringify(paperToReviewChair)}
+          action="chairViewPaperPendingReviewed"
+          walletAddress={walletAddress}
+        />
+      ) : (
+        <p className="text-muted font-italic">
+          {" "}
+          No papers pending for your review
+        </p>
       )}
     </>
   );
