@@ -124,6 +124,18 @@ describe("apmsdapp", async () => {
     )
   }
 
+  const revisePaper = async (conferenceId, prevPaperHash, paperId, paperHash, paperName, paperTitle, paperAbstract, dateSubmitted ) => {
+    await program.rpc.revisePaper(
+      conferenceId, prevPaperHash, paperId, paperHash, paperName, paperTitle, paperAbstract, dateSubmitted,
+      {
+        accounts: {
+          conferenceList: conferencePDA,
+          user: user.publicKey,
+        },
+      }
+    )
+  }
+
   const getAllConference = async () => {
     try {
       const conferenceInfo = await program.account.conferenceListAccountData.all()
@@ -542,7 +554,7 @@ describe("apmsdapp", async () => {
     let paperId = "example hash2"
     let reviewers = [{ tpcName: "Reviewer1", tpcEmail: "E1", tpcWallet: "", approval: new anchor.BN(0), feedback: "" }]
     let feedback = "example feedback from a chair"
-    await reviewPaper(id, paperId, "C1", true, 2, feedback)
+    await reviewPaper(id, paperId, "C1", true, 3, feedback)
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     console.log("paper chair", updatedData.conferences[0].paperSubmitted[0].paperChair)
@@ -559,15 +571,61 @@ describe("apmsdapp", async () => {
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperAbstract, "example abstract2");
     // assert.equal( Object.entries(updatedData.conferences[0].paperSubmitted[0].reviewer).toString(), Object.entries(reviewers).toString())
     assert.equal(updatedData.conferences[0].paperSubmitted[0].dateSubmitted, "2023-02-06");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 2);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperStatus, 3);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].prevVersion, "");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].version, 1);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcName, "Chair");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcEmail, "C1");
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.tpcWallet, "7jdhFZXG4scaJbpyG9FwfQdid428a5BdAj2Z8G9SDrD3");
-    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.approval, 2);
+    assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.approval, 3);
     assert.equal(updatedData.conferences[0].paperSubmitted[0].paperChair.feedback, "example feedback from a chair");
 
   })
+
+  it("Fetch Papers", async () => {
+    const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    let conferenceId = data.conferences[0].id
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    console.log("paper", updatedData.conferences[0].paperSubmitted[0])
+  });
+
+  it("Revise a paper", async () => {
+    const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    let conferenceId = data.conferences[0].id
+    let prevPaperHash = "example hash2"
+    let paperId = "Po905"
+    let paperName = "resubmitfilename"
+    let paperHash = "example hash2 (resubmit)"
+    let paperTitle = "example title (resubmit)"
+    let paperAbstract = "example abstract (resubmit)"
+    // let authors = [{ authorName: "A3", authorEmail: "E3", authorAffiliation: "AU3" }, { authorName: "A4", authorEmail: "E4", authorAffiliation: "AU4" }]
+    let dateSubmitted = "2023-03-06"
+    // let paperStatus = new anchor.BN(0)
+    // let version = new anchor.BN(1)
+    // let prevVersion = "";
+
+    await revisePaper(conferenceId, prevPaperHash, paperId, paperHash, paperName, paperTitle, paperAbstract, dateSubmitted)
+
+    const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    console.log("prev", updatedData.conferences[0].paperSubmitted.find((p) => p.paperHash ==="example hash2"))
+    console.log("revised", updatedData.conferences[0].paperSubmitted.find((p) => p.paperHash ==="example hash2 (resubmit)"))
+    // console.log(updatedData.conferences[0].paperSubmitted[1].paperAuthors)
+    // assert.equal(updatedData.count, 1);
+    // assert.equal(updatedData.conferences.length, 1);
+    // assert.equal(updatedData.deletedIndexes.length, 1);
+    // assert.equal(updatedData.conferences[0].paperSubmitted.length, 2);
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperId, "Po904");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperHash, "example hash2");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperName, "filename2");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperTitle, "example title2");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperAbstract, "example abstract2");
+    // assert.equal(Object.entries(updatedData.conferences[0].paperSubmitted[1].paperAuthors).toString(), Object.entries(authors).toString())
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].dateSubmitted, "2023-02-06");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].paperStatus, 0);
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].prevVersion, "");
+    // assert.equal(updatedData.conferences[0].paperSubmitted[1].version, 1);
+    // assert.equal(updatedData.conferences[0].paperSubmitted[0].reviewer.length, 0);
+  })
+
 
 });

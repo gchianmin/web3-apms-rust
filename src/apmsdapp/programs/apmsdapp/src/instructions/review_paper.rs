@@ -36,7 +36,6 @@ pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash:
         paper.paper_chair.feedback = feedback;
         paper.paper_status = approval;
     }
-    //TO-DO:
-    // Email validation check for reviewer/chair email stored
+    
     Ok(())
 }

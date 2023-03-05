@@ -7,6 +7,7 @@ pub use delete_paper::*;
 pub use update_tpc::*;
 pub use assign_reviewer::*;
 pub use review_paper::*;
+pub use revise_paper::*;
 
 mod initialize;
 mod create_conference;
@@ -17,3 +18,4 @@ mod delete_paper;
 mod update_tpc;
 mod assign_reviewer;
 mod review_paper;
+mod revise_paper;
