@@ -97,14 +97,14 @@ export default function ViewIndividualConferencePage() {
                 </CardText>
               </CardBody>
               <CardFooter>
-                {user && (
+                {/* {( */}
                   <Popup
                     walletAddress={walletAddress}
                     existingDetails={conferenceDetails}
                     conferencePDA={queryProps.conference}
                     tpc={false}
                   />
-                )}
+                {/* )} */}
               </CardFooter>
             </Card>
           </>

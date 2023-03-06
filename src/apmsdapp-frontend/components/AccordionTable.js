@@ -12,15 +12,21 @@ import { useRouter } from "next/router";
 import { connectWallet } from "../Common/WalletConnection";
 import { deletePaper } from "../Common/AuthorInstructions";
 import { getPaperStatus } from "../Common/GetPapers";
-import { getConference } from "../Common/getConferences";
+import { getConference } from "../Common/GetConferences";
 import DownloadButton from "./DownloadButton";
+import Expander from "./Expander";
 
-export default function AccordionTable({ props, conference, walletAddress }) {
+export default function AccordionTable({
+  props,
+  conference,
+  walletAddress,
+  action,
+}) {
   const router = useRouter();
   const [filedata, setFileData] = useState(JSON.parse(props));
   const [activeIndexes, setActiveIndexes] = useState([]);
   const [tpc, setTpc] = useState([]);
-
+  console.log(filedata);
   function toggleActive(index) {
     if (activeIndexes.includes(index)) {
       setActiveIndexes(activeIndexes.filter((i) => i !== index));
@@ -31,7 +37,9 @@ export default function AccordionTable({ props, conference, walletAddress }) {
 
   useEffect(() => {
     setFileData(JSON.parse(props));
-    getTpcList();
+    if (action == "organiserViewAllPapersSubmitted") {
+      getTpcList();
+    }
   }, [props]);
 
   const getTpcList = async () => {
@@ -57,223 +65,1467 @@ export default function AccordionTable({ props, conference, walletAddress }) {
     });
   };
 
-  // const DownloadButton = (paperHash, paperName) => {
-  //   const handleDownload = (event) => {
-  //     event.preventDefault();
-  //     const fileUrl = `/files/${conference.conferencePDA}/${conference.conferenceId}/${paperHash}/${paperName}`;
-  //     console.log(fileUrl);
-  //     const a = document.createElement("a");
-  //     a.href = fileUrl;
-  //     a.download = paperName;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     document.body.removeChild(a);
-  //   };
+  const sendPropsWithHash = (
+    href,
+    conferencePDA,
+    conferenceId,
+    conferenceName,
+    paperHash
+  ) => {
+    router.push({
+      pathname: href,
+      query: {
+        conferencePDA,
+        conferenceId,
+        conferenceName,
+        paperHash,
+      },
+    });
+  };
 
-  //   return (
-  //     <RiDownload2Fill
-  //       type="button"
-  //       color="green"
-  //       size={25}
-  //       onClick={handleDownload}
-  //       className="mr-3"
-  //     />
-  //   );
-  // };
-
-  return (
-    <>
-      {filedata.length > 0 ? (
-        <Table responsive={true} borderless>
-          <thead>
-            <tr>
-              <th> </th>
-              <th>ID</th>
-              <th>Paper</th>
-              <th>Abstract</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filedata.map((item, index) => (
-              <React.Fragment key={item.paperId}>
-                <tr
-                  className={`accordion-item ${
-                    activeIndexes.includes(index) ? "active" : ""
-                  }`}
-                >
-                  <td
-                    className="accordion-title align-middle pr-0 mr-0"
-                    onClick={() => toggleActive(index)}
+  const tableToDisplay = () => {
+    switch (action) {
+      case "organiserViewAllPapersSubmitted":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>ID</th>
+                <th>Paper</th>
+                <th>Abstract</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
                   >
-                    <RiArrowDownSLine className="accordion-arrow " size={25} />
-                  </td>
-
-                  <td
-                    className="accordion-title align-middle"
-                    onClick={() => toggleActive(index)}
-                  >
-                    {item.paperId}
-                  </td>
-
-                  <td
-                    className="accordion-title align-middle"
-                    onClick={() => toggleActive(index)}
-                  >
-                    {item.paperTitle}
-                  </td>
-                  <td
-                    className="accordion-title align-middle"
-                    onClick={() => toggleActive(index)}
-                  >
-                    <small>{item.paperAbstract}</small>
-                  </td>
-
-                  <td
-                    className="accordion-title align-middle"
-                    onClick={() => toggleActive(index)}
-                  >
-                    {getPaperStatus(item.paperStatus)}
-                  </td>
-
-                  <td className="accordion-title align-middle">
-                    <Button
-                      className="btn-danger"
-                      type="button"
-                      onClick={() =>
-                        deletePaper(
-                          conference.conferencePDA,
-                          conference.conferenceId,
-                          item.paperHash
-                        )
-                      }
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
                     >
-                      DELETE SUBMISSION
-                    </Button>
-                    {/* <RiDeleteBin6Line
-                      type="button"
-                      color="red"
-                      size={30}
-                      onClick={() =>
-                        deletePaper(item.paperHash, item.paperName)
-                      }
-                      className="mr-3"
-                    /> */}
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
 
-                    {/* {DownloadButton(item.paperHash, item.paperName)} */}
-                    <AssignReviewerModal
-                      walletAddress={walletAddress}
-                      connectWallet={connectWallet}
-                      tpc={tpc}
-                      conference={conference}
-                      paperId={item.paperHash}
-                    />
-                    <Button
-                      className="btn-primary"
-                      type="button"
-                      onClick={() =>
-                        sendProps(
-                          `/papers/${item.paperHash}`,
-                          conference.conferencePDA,
-                          conference.conferenceId,
-                          conference.conferenceName
-                        )
-                      }
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
                     >
-                      View more
-                    </Button>
-                    {/* <RiInformationLine
-                      type="button"
-                      color="blue"
-                      size={30}
-                      className="mr-0"
-                      onClick={() =>
-                        sendProps(`/papers/${item.paperHash}`, conference.conferenceList, conference.conferencePDA, conference.conferenceName)
-                      }
-                    /> */}
-                  </td>
-                </tr>
-                {activeIndexes.includes(index) && (
-                  <>
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-monospace accordion-content"
-                      >
-                        Paper Name: {item.paperName}{" "}
-                        <DownloadButton conference={conference}  paperHash={item.paperHash} paperName={item.paperName}/>
-                      </td>
-                    </tr>
+                      {item.paperId}
+                    </td>
 
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-monospace accordion-content"
-                      >
-                        Abstract: {item.paperAbstract}
-                      </td>
-                    </tr>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <small>{item.paperAbstract}</small>
+                    </td>
 
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-monospace accordion-content"
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperStatus)}
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <Button
+                        className="btn-danger mb-3"
+                        type="button"
+                        onClick={() =>
+                          deletePaper(
+                            conference.conferencePDA,
+                            conference.conferenceId,
+                            item.paperHash
+                          )
+                        }
                       >
-                        Version: {item.version}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="5" className="text-monospace">
-                        Date Submitted: {item.dateSubmitted}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="5" className="text-monospace">
-                        Authors:{" "}
-                        {item.paperAuthors.map((author) => (
-                          <p key={author.authorEmail}>
-                            {author.authorName} - {author.authorEmail} [
-                            {author.authorAffiliation}]
+                        DELETE SUBMISSION
+                      </Button>
+                      {item.reviewer.find(
+                        (r) => r.approval > 0 || item.version > 1
+                      ) ? null : (
+                        <AssignReviewerModal
+                          walletAddress={walletAddress}
+                          connectWallet={connectWallet}
+                          tpc={tpc}
+                          conference={conference}
+                          paperId={item.paperHash}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={conference.conferencePDA}
+                              conferenceId={conference.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
                           </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    conference.conferencePDA,
+                                    conference.conferenceId,
+                                    conference.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                          Authors:{" "}
+                          {item.paperAuthors.map((author) => (
+                            <p key={author.authorEmail}>
+                              {author.authorName} - {author.authorEmail} [
+                              {author.authorAffiliation}]
+                            </p>
+                          ))}
+                          Reviewers:{" "}
+                          {item.reviewer.length > 0 ? (
+                            <Table bordered={true}>
+                              <thead>
+                                <tr>
+                                  <th>Reviewer</th>
+                                  <th>Approval</th>
+                                  <th>Feedback</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {item.reviewer.map((name) => (
+                                  <tr>
+                                    <td>{name.tpcName}</td>
+                                    {getPaperStatus(name.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>{getPaperStatus(name.approval)}</td>
+                                    )}
+                                    <td>{name.feedback}</td>
+                                  </tr>
+                                  // </>
+                                ))}
+                              </tbody>
+                            </Table>
+                          ) : (
+                            <p>No reviewers assigned yet</p>
+                          )}
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>{item.paperChair.tpcName}</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+
+      case "reviewerViewPaperPendingReviewed":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper Title</th>
+                <th>Abstract</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <small>{item.paperAbstract}</small>
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+
+                          <p>Abstract: {item.paperAbstract}</p>
+
+                          <p>Version: {item.version}</p>
+
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+
+                          <Expander
+                            role="reviewer"
+                            conferencePDA={item.pk}
+                            conferenceId={item.conferenceId}
+                            paperHash={item.paperHash}
+                          />
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+
+      case "chairViewPaperPendingReviewed":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper Title</th>
+                <th>Abstract</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <small>{item.paperAbstract}</small>
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+
+                          <p>Abstract: {item.paperAbstract}</p>
+
+                          <p>Version: {item.version}</p>
+
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+
+                          <p>
+                            Reviewers:{" "}
+                            {item.reviewer.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Reviewer</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {item.reviewer.map((name) => (
+                                    <tr>
+                                      <td>{name.tpcName}</td>
+                                      {getPaperStatus(name.approval) ==
+                                      "Submitted" ? (
+                                        <td>Pending Review</td>
+                                      ) : (
+                                        <td>{getPaperStatus(name.approval)}</td>
+                                      )}
+                                      <td>{name.feedback}</td>
+                                    </tr>
+                                    // </>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No reviewers assigned yet</p>
+                            )}
+                          </p>
+
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>{item.paperChair.tpcName}</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                          {item.reviewer.find((r) => r.approval == 0) ? (
+                            <Button
+                              style={{
+                                marginBottom: "1rem",
+                              }}
+                              disabled
+                              onClick={() =>
+                                alert(
+                                  "Please wait for other reviewers to review first"
+                                )
+                              }
+                            >
+                              Review
+                            </Button>
+                          ) : (
+                            <Expander
+                              role="chair"
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+
+      case "authorViewPaperSubmittedHistory":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperStatus)}
+                    </td>
+
+                    <td className="accordion-title align-middle ">
+                      {item.reviewer.length == 0 && (
+                        <Button
+                          className="btn-danger"
+                          type="button"
+                          onClick={() =>
+                            deletePaper(
+                              item.pk,
+                              item.conferenceId,
+                              item.paperHash
+                            )
+                          }
+                        >
+                          DELETE SUBMISSION
+                        </Button>
+                      )}
+                      {item.paperStatus == 2 && (
+                        <>
+                          <Button
+                            className="btn-primary"
+                            type="button"
+                            // onClick={() =>
+                            //   sendProps(
+                            //     "/submit-paper",
+                            //     item.pk.toString(),
+                            //     item.conferenceId.toString(),
+                            //     item.conferenceName
+                            //   )
+                            // }
+                          >
+                            Make payment
+                          </Button>
+                        </>
+                      )}
+                      {(item.paperStatus == 3 || item.paperStatus == 4) && (
+                        <>
+                          <Button
+                            className="btn-info"
+                            type="button"
+                            onClick={() =>
+                              sendPropsWithHash(
+                                "/revise-paper",
+                                item.pk.toString(),
+                                item.conferenceId.toString(),
+                                item.conferenceName,
+                                item.paperHash
+                              )
+                            }
+                          >
+                            Submit a Revised Paper
+                          </Button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                          Authors:{" "}
+                          {item.paperAuthors.map((author) => (
+                            <p key={author.authorEmail}>
+                              {author.authorName} - {author.authorEmail} [
+                              {author.authorAffiliation}]
+                            </p>
+                          ))}
+                          <p>
+                            Reviewers:{" "}
+                            {item.reviewer.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Reviewer</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {item.reviewer.map((name) => (
+                                    <tr>
+                                      <td>Anonymous Reviewer</td>
+                                      {getPaperStatus(name.approval) ==
+                                      "Submitted" ? (
+                                        <td>Pending Review</td>
+                                      ) : (
+                                        <td>{getPaperStatus(name.approval)}</td>
+                                      )}
+                                      <td>{name.feedback}</td>
+                                    </tr>
+                                    // </>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No reviewers assigned yet</p>
+                            )}
+                          </p>
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Anonymous Chair</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+
+      case "authorViewPaperPendingPayment":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperStatus)}
+                    </td>
+
+                    <td className="accordion-title align-middle ">
+                      {item.reviewer.length == 0 && (
+                        <Button
+                          className="btn-danger"
+                          type="button"
+                          onClick={() =>
+                            deletePaper(
+                              item.pk,
+                              item.conferenceId,
+                              item.paperHash
+                            )
+                          }
+                        >
+                          DELETE SUBMISSION
+                        </Button>
+                      )}
+                      {item.paperStatus == 2 && (
+                        <>
+                          <Button
+                            className="btn-primary"
+                            type="button"
+                            // onClick={() =>
+                            //   sendProps(
+                            //     "/submit-paper",
+                            //     item.pk.toString(),
+                            //     item.conferenceId.toString(),
+                            //     item.conferenceName
+                            //   )
+                            // }
+                          >
+                            Make payment
+                          </Button>
+                        </>
+                      )}
+                      {item.paperStatus == 3 ||
+                        (item.paperStatus == 4 && (
+                          <>
+                            <Button
+                              className="btn-primary mt-3"
+                              type="button"
+                              onClick={() =>
+                                sendProps(
+                                  "/submit-paper",
+                                  item.pk.toString(),
+                                  item.conferenceId.toString(),
+                                  item.conferenceName
+                                )
+                              }
+                            >
+                              Submit a Revised Paper
+                            </Button>
+                          </>
                         ))}
-                      </td>
-                    </tr>
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                          Authors:{" "}
+                          {item.paperAuthors.map((author) => (
+                            <p key={author.authorEmail}>
+                              {author.authorName} - {author.authorEmail} [
+                              {author.authorAffiliation}]
+                            </p>
+                          ))}
+                          {/* <p> */}
+                            Reviewers:{" "}
+                            {item.reviewer.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Reviewer</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {item.reviewer.map((name) => (
+                                    <tr>
+                                      <td>Anonymous Reviewer</td>
+                                      {getPaperStatus(name.approval) ==
+                                      "Submitted" ? (
+                                        <td>Pending Review</td>
+                                      ) : (
+                                        <td>{getPaperStatus(name.approval)}</td>
+                                      )}
+                                      <td>{name.feedback}</td>
+                                    </tr>
+                                    // </>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No reviewers assigned yet</p>
+                            )}
+                          {/* </p> */}
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Anonymous Chair</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+      
+        case "authorViewPaperPendingRevision":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
 
-                    <tr>
-                      <td colSpan="5" className="text-monospace">
-                        Reviewers:{" "}
-                        {item.reviewer.length > 0 ? (
-                          item.reviewer.map((name) => (
-                            <>
-                              <p>{name.tpcName}</p>
-                            </>
-                          ))
-                        ) : (
-                          <p>No reviewers assigned yet</p>
-                        )}
-                      </td>
-                    </tr>
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
 
-                    <tr>
-                      <td colSpan="5" className="text-monospace">
-                        Paper Chair:{" "}
-                        {item.paperChair.tpcName.length === 0 ? (
-                          <p>No chair assigned yet</p>
-                        ) : (
-                          <p>{item.paperChair.tpcName}</p>
-                        )}
-                      </td>
-                    </tr>
-                  </>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </Table>
-      ) : (
-        <p className="text-muted font-italic">No papers submitted so far...</p>
-      )}
-    </>
-  );
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperStatus)}
+                    </td>
+
+                    <td className="accordion-title align-middle ">
+                      {item.reviewer.length == 0 && (
+                        <Button
+                          className="btn-danger"
+                          type="button"
+                          onClick={() =>
+                            deletePaper(
+                              item.pk,
+                              item.conferenceId,
+                              item.paperHash
+                            )
+                          }
+                        >
+                          DELETE SUBMISSION
+                        </Button>
+                      )}
+                      {item.paperStatus == 2 && (
+                        <>
+                          <Button
+                            className="btn-primary"
+                            type="button"
+                            // onClick={() =>
+                            //   sendProps(
+                            //     "/submit-paper",
+                            //     item.pk.toString(),
+                            //     item.conferenceId.toString(),
+                            //     item.conferenceName
+                            //   )
+                            // }
+                          >
+                            Make payment
+                          </Button>
+                        </>
+                      )}
+                      {(item.paperStatus == 3 || item.paperStatus == 4) && (
+                        <>
+                          <Button
+                            className="btn-info"
+                            type="button"
+                            onClick={() =>
+                              sendPropsWithHash(
+                                "/revise-paper",
+                                item.pk.toString(),
+                                item.conferenceId.toString(),
+                                item.conferenceName,
+                                item.paperHash
+                              )
+                            }
+                          >
+                            Submit a Revised Paper
+                          </Button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                          Authors:{" "}
+                          {item.paperAuthors.map((author) => (
+                            <p key={author.authorEmail}>
+                              {author.authorName} - {author.authorEmail} [
+                              {author.authorAffiliation}]
+                            </p>
+                          ))}
+                          <p>
+                            Reviewers:{" "}
+                            {item.reviewer.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Reviewer</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {item.reviewer.map((name) => (
+                                    <tr>
+                                      <td>Anonymous Reviewer</td>
+                                      {getPaperStatus(name.approval) ==
+                                      "Submitted" ? (
+                                        <td>Pending Review</td>
+                                      ) : (
+                                        <td>{getPaperStatus(name.approval)}</td>
+                                      )}
+                                      <td>{name.feedback}</td>
+                                    </tr>
+                                    // </>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No reviewers assigned yet</p>
+                            )}
+                          </p>
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Anonymous Chair</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );  
+
+      case "reviewerViewPaperReviewedHistory":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Approval</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {/* {getPaperStatus(
+                        item.reviewer.find((r) => r.tpcWallet === walletAddress)
+                          .approval
+                      )} */}
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      {/* {
+                        item.reviewer.find((r) => r.tpcWallet === walletAddress)
+                          .feedback
+                      } */}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+
+      case "chairViewPaperReviewedHistory":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Approval</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperChair.approval)}
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      {item.paperChair.feedback}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+    }
+  };
+
+  return <>{tableToDisplay()}</>;
 }

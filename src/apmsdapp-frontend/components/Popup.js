@@ -29,15 +29,15 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
   };
 
   return (
-    <div>
+    <>
       {tpc ? (
         <div className="d-flex justify-content-center d-grid col-4 mx-auto">
-          <Button
+          {user && <Button
             className="btn btn-block btn-primary mt-0 btn-alignment"
             onClick={tpcToggle}
           >
             Add Committees
-          </Button>
+          </Button>}
           <Modal isOpen={tpcModal} toggle={tpcToggle} size="xl" id="tpc">
             <ModalHeader toggle={tpcToggle}>
               Adding Technical Program Committees
@@ -150,7 +150,7 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
           </Modal>
         </>
       )}
-    </div>
+    </>
   );
 }
 

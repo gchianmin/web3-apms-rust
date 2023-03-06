@@ -1,9 +1,9 @@
 import { RiDownload2Fill } from "react-icons/ri";
 
-export default function DownloadButton({ conference, paperHash, paperName }) {
+export default function DownloadButton({ conferencePDA, conferenceId, paperHash, paperName }) {
   const handleDownload = (event) => {
     event.preventDefault();
-    const fileUrl = `/files/${conference.conferencePDA}/${conference.conferenceId}/${paperHash}/${paperName}`;
+    const fileUrl = `/files/${conferencePDA}/${conferenceId}/${paperHash}/${paperName}`;
     console.log(fileUrl);
     const a = document.createElement("a");
     a.href = fileUrl;

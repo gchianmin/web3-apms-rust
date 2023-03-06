@@ -45,4 +45,12 @@ pub mod apmsdapp {
         instructions::assign_reviewer(ctx, conferenceid, paper_hash, reviewer, chair)
     }
 
+    pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String) -> Result<()> {
+        instructions::review_paper(ctx, conferenceid, paper_hash, reviewer_email, chair, approval, feedback)
+    }
+
+    pub fn revise_paper(ctx: Context<RevisePaper>, conferenceid: Pubkey, prev_paper_hash: String, paper_id: String, paper_hash: String, paper_name:String, paper_title: String, paper_abstract: String, date_submitted: String) -> Result<()> {
+        instructions::revise_paper(ctx, conferenceid, prev_paper_hash, paper_id, paper_hash, paper_name, paper_title, paper_abstract, date_submitted)
+    }
+
 }

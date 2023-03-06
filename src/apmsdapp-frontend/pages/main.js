@@ -52,9 +52,9 @@ export default function Main() {
             <br /> → View Conferences Organised by me ←<br />
           </Link>
         )}
-        {conferences && renderConferencesContainer()}
+        {(conferences.find((c)=> c.account.count != 0)) && renderConferencesContainer()}
       </div>
-      {conferences.length == 0 && renderEmptyContainer()}
+      {(conferences.filter((c)=> c.account.count == 0).length == conferences.length) && renderEmptyContainer()}
     </>
   );
 }

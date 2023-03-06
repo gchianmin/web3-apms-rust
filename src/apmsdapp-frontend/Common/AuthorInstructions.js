@@ -93,3 +93,41 @@ export const deleteFile = async (paperHash, conferencePDA, conferenceId) => {
     console.log(error.message);
   }
 };
+
+export const revisePaper = async (
+  conferencePDA,
+  conferenceId,
+  prevPaperHash,
+  paperId,
+  paperHash,
+  paperName,
+  paperTitle,
+  paperAbstract,
+  dateSubmitted
+) => {
+  try {
+    const provider = getProvider();
+    const program = new Program(IDL, PROGRAM_ID, provider);
+    const id = new PublicKey(conferenceId);
+
+    await program.methods
+      .revisePaper(
+        id,
+        prevPaperHash,
+        paperId,
+        paperHash,
+        paperName,
+        paperTitle,
+        paperAbstract,
+        dateSubmitted
+      )
+      .accounts({
+        conferenceList: new PublicKey(conferencePDA),
+        user: provider.wallet.publicKey,
+      })
+      .rpc();
+    return "ok";
+  } catch (error) {
+    console.log("Error revising a paper : ", error);
+  }
+};

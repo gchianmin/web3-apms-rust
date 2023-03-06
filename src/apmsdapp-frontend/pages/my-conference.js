@@ -51,7 +51,9 @@ function MyConference() {
           <CardComponent props={conference} pk={conferencesPDA} page="main"/>
           <br />
         </>
-      )) ?? <Loading />}
+      )) ?? <div className="pb-3 font-italic text-muted text-mono">
+      <p>You have not organised any conferences before</p>
+    </div>}
     </>
   );
 
