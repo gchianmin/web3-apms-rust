@@ -29,7 +29,7 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
   };
 
   return (
-    <div>
+    <>
       {tpc ? (
         <div className="d-flex justify-content-center d-grid col-4 mx-auto">
           {user && <Button
@@ -150,7 +150,7 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
           </Modal>
         </>
       )}
-    </div>
+    </>
   );
 }
 

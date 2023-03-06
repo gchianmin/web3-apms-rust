@@ -310,6 +310,55 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "revisePaper",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "prevPaperHash",
+          "type": "string"
+        },
+        {
+          "name": "paperId",
+          "type": "string"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "paperName",
+          "type": "string"
+        },
+        {
+          "name": "paperTitle",
+          "type": "string"
+        },
+        {
+          "name": "paperAbstract",
+          "type": "string"
+        },
+        {
+          "name": "dateSubmitted",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [

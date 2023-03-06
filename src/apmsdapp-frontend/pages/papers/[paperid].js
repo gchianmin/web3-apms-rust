@@ -83,7 +83,8 @@ export default function ViewIndividualPaperPage() {
             <p>
               Paper ID: {paper.paperId}{" "}
               <DownloadButton
-                conference={conference}
+                conferencePDA={conference.conferencePDA}
+                conferenceId={conference.conferenceId}
                 paperHash={paper.paperHash}
                 paperName={paper.paperName}
               />
@@ -101,7 +102,7 @@ export default function ViewIndividualPaperPage() {
             </p>
             <p>Paper Status: {getPaperStatus(paper.paperStatus)}</p>
             <p>Date Submitted: {paper.dateSubmitted}</p>
-            <p>Paper Authors:</p>
+            {/* <p>Paper Authors:</p>
             {paper.paperAuthors.map((author) => (
               <li key={author.authorEmail}>
                 {" "}
@@ -131,15 +132,15 @@ export default function ViewIndividualPaperPage() {
                   {paper.paperChair.tpcName} - {paper.paperChair.tpcEmail}
                 </li>
               )}
-            </p>
-            <AssignReviewerModal
+            </p> */}
+            {/* <AssignReviewerModal
               walletAddress={walletAddress}
               connectWallet={connectWallet}
               tpc={tpc}
               conference={conference}
               paperId={paper.paperHash}
-            />
-            <Button
+            /> */}
+            {/* <Button
               className="btn-danger"
               type="button"
               onClick={() =>
@@ -152,7 +153,7 @@ export default function ViewIndividualPaperPage() {
             >
               DELETE SUBMISSION
             </Button>
-            <br />
+            <br /> */}
             {/* {paper.reviewer.length > 0 &&
             paper.reviewer.find((element) => element.tpcEmail == user.email) ? (
               // <Button

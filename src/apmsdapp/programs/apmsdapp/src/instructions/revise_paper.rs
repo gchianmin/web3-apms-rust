@@ -46,7 +46,7 @@ pub fn revise_paper(ctx: Context<RevisePaper>, conferenceid:Pubkey, prev_paper_h
         paper_abstract,
         paper_authors,
         date_submitted,
-        paper_status: 0,
+        paper_status: 1,
         version,
         prev_version,
         fee_paid: 0,

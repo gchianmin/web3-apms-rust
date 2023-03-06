@@ -39,6 +39,32 @@ export const getPaperStatus = (status) => {
   return statusMap[status] || "Unknown status";
 };
 
+export const getPaperWithHash = async (
+  conferencePDA,
+  conferenceId,
+  paperHash
+) => {
+  try {
+    const provider = getProvider();
+    const program = new Program(IDL, PROGRAM_ID, provider);
+    const conferenceListPDA = new PublicKey(conferencePDA);
+    const conferenceInfo =
+      await program.account.conferenceListAccountData.fetch(conferenceListPDA);
+    const conference = conferenceInfo.conferences.find(
+      (element) => element.id.toString() == conferenceId
+    );
+
+    const paper = conference.paperSubmitted.find(
+      (element) => element.paperHash == paperHash
+    );
+    return paper;
+
+    // console.log("ger", papers);
+  } catch (error) {
+    console.log("Error getting a paper : ", error);
+  }
+};
+
 export const getPaperPendingReview = async (role, reviewerEmail) => {
   try {
     const provider = getProvider();
@@ -116,15 +142,15 @@ export const getPapersSubmitted = async (walletAddress) => {
         conferencePDA
       );
       for (const conf in res.conferences) {
-        const paper = res.conferences[conf].paperSubmitted.find(
+        const paper = res.conferences[conf].paperSubmitted.filter(
           (p) => p.paperAdmin.toString() === walletAddress
         );
 
-        if (paper) {
-          paper.pk = conferencePDA;
-          paper.conferenceId = res.conferences[conf].id;
-          paper.conferenceName = res.conferences[conf].name;
-          paperSubmitted.push(paper);
+        for (const p in paper) {
+          paper[p].pk = conferencePDA;
+          paper[p].conferenceId = res.conferences[conf].id;
+          paper[p].conferenceName = res.conferences[conf].name;
+          paperSubmitted.push(paper[p]);
         }
       }
     }
@@ -149,17 +175,17 @@ export const getPapersReviewed = async (role, walletAddress) => {
           conferencePDA
         );
         for (const conf in res.conferences) {
-          const paper = res.conferences[conf].paperSubmitted.find((p) =>
+          const paper = res.conferences[conf].paperSubmitted.filter((p) =>
             p.reviewer.find(
-              (r) => r.tpcWallet === walletAddress && r.approval > 0
+              (r) => (r.tpcWallet === walletAddress && r.approval > 0)
             )
           );
 
-          if (paper) {
-            paper.pk = conferencePDA;
-            paper.conferenceId = res.conferences[conf].id;
-            paper.conferenceName = res.conferences[conf].name;
-            paperReviewed.push(paper);
+          for (const p in paper) {
+            paper[p].pk = conferencePDA;
+            paper[p].conferenceId = res.conferences[conf].id;
+            paper[p].conferenceName = res.conferences[conf].name;
+            paperReviewed.push(paper[p]);
           }
         }
       }
@@ -167,28 +193,29 @@ export const getPapersReviewed = async (role, walletAddress) => {
       return paperReviewed;
 
     } else if (role == "chair") {
+      let paperReviewedChair = [];
       for (const acc in allAccounts) {
         const conferencePDA = allAccounts[acc].publicKey;
         const res = await program.account.conferenceListAccountData.fetch(
           conferencePDA
         );
         for (const conf in res.conferences) {
-          const paper = res.conferences[conf].paperSubmitted.find(
+          const paper = res.conferences[conf].paperSubmitted.filter(
             (p) =>
               p.paperChair.tpcWallet === walletAddress &&
               p.paperChair.approval > 0
           );
 
-          if (paper) {
-            paper.pk = conferencePDA;
-            paper.conferenceId = res.conferences[conf].id;
-            paper.conferenceName = res.conferences[conf].name;
-            paperReviewed.push(paper);
+          for (const p in paper) {
+            paper[p].pk = conferencePDA;
+            paper[p].conferenceId = res.conferences[conf].id;
+            paper[p].conferenceName = res.conferences[conf].name;
+            paperReviewedChair.push(paper[p]);
           }
         }
       }
 
-      return paperReviewed;
+      return paperReviewedChair;
     }
   } catch (error) {
     console.log("Error getting a paper : ", error);
@@ -209,7 +236,45 @@ export const getPaperPendingPayment = async (walletAddress) => {
       );
       for (const conf in res.conferences) {
         const paper = res.conferences[conf].paperSubmitted.find(
-          (p) => (p.paperStatus == 2 && p.feePaid == 0 && p.paperAdmin.toString() === walletAddress)
+          (p) =>
+            p.paperStatus == 2 &&
+            p.feePaid == 0 &&
+            p.paperAdmin.toString() === walletAddress
+        );
+
+        if (paper) {
+          paper.pk = conferencePDA;
+          paper.conferenceId = res.conferences[conf].id;
+          paper.conferenceName = res.conferences[conf].name;
+          paperSubmitted.push(paper);
+        }
+      }
+    }
+
+    return paperSubmitted;
+  } catch (error) {
+    console.log("Error getting a paper : ", error);
+  }
+};
+
+export const getPaperPendingRevision = async (walletAddress) => {
+  try {
+    const provider = getProvider();
+    const program = new Program(IDL, PROGRAM_ID, provider);
+    const allAccounts = await getAllConferences();
+    let paperSubmitted = [];
+
+    for (const acc in allAccounts) {
+      const conferencePDA = allAccounts[acc].publicKey;
+      const res = await program.account.conferenceListAccountData.fetch(
+        conferencePDA
+      );
+      for (const conf in res.conferences) {
+        const paper = res.conferences[conf].paperSubmitted.find(
+          (p) =>
+            (p.paperStatus == 3 || p.paperStatus == 4) &&
+            p.feePaid == 0 &&
+            p.paperAdmin.toString() === walletAddress
         );
 
         if (paper) {

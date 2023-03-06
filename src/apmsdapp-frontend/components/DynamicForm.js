@@ -121,7 +121,8 @@ const DynamicForm = ({ props }) => {
         alert(
           "Paper Submitted Successfully. You may view the status under myHistory."
         );
-        router.back();
+        router.push('/my-history');
+        
       } else console.log("error");
     } catch (error) {
       console.log(error.message);

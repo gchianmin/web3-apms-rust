@@ -65,6 +65,24 @@ export default function AccordionTable({
     });
   };
 
+  const sendPropsWithHash = (
+    href,
+    conferencePDA,
+    conferenceId,
+    conferenceName,
+    paperHash
+  ) => {
+    router.push({
+      pathname: href,
+      query: {
+        conferencePDA,
+        conferenceId,
+        conferenceName,
+        paperHash,
+      },
+    });
+  };
+
   const tableToDisplay = () => {
     switch (action) {
       case "organiserViewAllPapersSubmitted":
@@ -139,7 +157,9 @@ export default function AccordionTable({
                       >
                         DELETE SUBMISSION
                       </Button>
-                      {item.reviewer.find((r) => r.approval > 0) ? null : (
+                      {item.reviewer.find(
+                        (r) => r.approval > 0 || item.version > 1
+                      ) ? null : (
                         <AssignReviewerModal
                           walletAddress={walletAddress}
                           connectWallet={connectWallet}
@@ -168,6 +188,26 @@ export default function AccordionTable({
                           </p>
                           <p>Abstract: {item.paperAbstract}</p>
                           <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    conference.conferencePDA,
+                                    conference.conferenceId,
+                                    conference.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
                           <p>Date Submitted: {item.dateSubmitted}</p>
                           Authors:{" "}
                           {item.paperAuthors.map((author) => (
@@ -319,6 +359,26 @@ export default function AccordionTable({
 
                           <p>Version: {item.version}</p>
 
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+
                           <p>Date Submitted: {item.dateSubmitted}</p>
 
                           <Expander
@@ -408,6 +468,27 @@ export default function AccordionTable({
                           <p>Abstract: {item.paperAbstract}</p>
 
                           <p>Version: {item.version}</p>
+
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
 
                           <p>Date Submitted: {item.dateSubmitted}</p>
 
@@ -608,11 +689,12 @@ export default function AccordionTable({
                             className="btn-info"
                             type="button"
                             onClick={() =>
-                              sendProps(
-                                "/submit-paper",
+                              sendPropsWithHash(
+                                "/revise-paper",
                                 item.pk.toString(),
                                 item.conferenceId.toString(),
-                                item.conferenceName
+                                item.conferenceName,
+                                item.paperHash
                               )
                             }
                           >
@@ -640,6 +722,26 @@ export default function AccordionTable({
                           </p>
                           <p>Abstract: {item.paperAbstract}</p>
                           <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
                           <p>Date Submitted: {item.dateSubmitted}</p>
                           Authors:{" "}
                           {item.paperAuthors.map((author) => (
@@ -855,6 +957,261 @@ export default function AccordionTable({
                           </p>
                           <p>Abstract: {item.paperAbstract}</p>
                           <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
+                          <p>Date Submitted: {item.dateSubmitted}</p>
+                          Authors:{" "}
+                          {item.paperAuthors.map((author) => (
+                            <p key={author.authorEmail}>
+                              {author.authorName} - {author.authorEmail} [
+                              {author.authorAffiliation}]
+                            </p>
+                          ))}
+                          {/* <p> */}
+                            Reviewers:{" "}
+                            {item.reviewer.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Reviewer</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {item.reviewer.map((name) => (
+                                    <tr>
+                                      <td>Anonymous Reviewer</td>
+                                      {getPaperStatus(name.approval) ==
+                                      "Submitted" ? (
+                                        <td>Pending Review</td>
+                                      ) : (
+                                        <td>{getPaperStatus(name.approval)}</td>
+                                      )}
+                                      <td>{name.feedback}</td>
+                                    </tr>
+                                    // </>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No reviewers assigned yet</p>
+                            )}
+                          {/* </p> */}
+                          <p>
+                            Paper Chair:{" "}
+                            {item.paperChair.tpcName.length > 0 ? (
+                              <Table bordered={true}>
+                                <thead>
+                                  <tr>
+                                    <th>Chair</th>
+                                    <th>Approval</th>
+                                    <th>Feedback</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Anonymous Chair</td>
+                                    {getPaperStatus(item.paperChair.approval) ==
+                                    "Submitted" ? (
+                                      <td>Pending Review</td>
+                                    ) : (
+                                      <td>
+                                        {getPaperStatus(
+                                          item.paperChair.approval
+                                        )}
+                                      </td>
+                                    )}
+                                    <td>{item.paperChair.feedback}</td>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                            ) : (
+                              <p>No chair assigned yet</p>
+                            )}
+                          </p>
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        );
+      
+        case "authorViewPaperPendingRevision":
+        return (
+          <Table responsive={true}>
+            <thead>
+              <tr>
+                <th> </th>
+                <th>Conference</th>
+                <th>Paper ID</th>
+                <th>Paper Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filedata.map((item, index) => (
+                <React.Fragment key={item.paperId}>
+                  <tr
+                    className={`accordion-item ${
+                      activeIndexes.includes(index) ? "active" : ""
+                    }`}
+                  >
+                    <td
+                      className="accordion-title align-middle pr-0 mr-0"
+                      onClick={() => toggleActive(index)}
+                    >
+                      <RiArrowDownSLine
+                        className="accordion-arrow "
+                        size={25}
+                      />
+                    </td>
+
+                    <td className="accordion-title align-middle">
+                      <a
+                        className="link-info"
+                        href={`/conferences/${item.pk.toString()}?conferenceId=${item.conferenceId.toString()}`}
+                      >
+                        {item.conferenceName}{" "}
+                      </a>
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperId}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {item.paperTitle}
+                    </td>
+
+                    <td
+                      className="accordion-title align-middle"
+                      onClick={() => toggleActive(index)}
+                    >
+                      {getPaperStatus(item.paperStatus)}
+                    </td>
+
+                    <td className="accordion-title align-middle ">
+                      {item.reviewer.length == 0 && (
+                        <Button
+                          className="btn-danger"
+                          type="button"
+                          onClick={() =>
+                            deletePaper(
+                              item.pk,
+                              item.conferenceId,
+                              item.paperHash
+                            )
+                          }
+                        >
+                          DELETE SUBMISSION
+                        </Button>
+                      )}
+                      {item.paperStatus == 2 && (
+                        <>
+                          <Button
+                            className="btn-primary"
+                            type="button"
+                            // onClick={() =>
+                            //   sendProps(
+                            //     "/submit-paper",
+                            //     item.pk.toString(),
+                            //     item.conferenceId.toString(),
+                            //     item.conferenceName
+                            //   )
+                            // }
+                          >
+                            Make payment
+                          </Button>
+                        </>
+                      )}
+                      {(item.paperStatus == 3 || item.paperStatus == 4) && (
+                        <>
+                          <Button
+                            className="btn-info"
+                            type="button"
+                            onClick={() =>
+                              sendPropsWithHash(
+                                "/revise-paper",
+                                item.pk.toString(),
+                                item.conferenceId.toString(),
+                                item.conferenceName,
+                                item.paperHash
+                              )
+                            }
+                          >
+                            Submit a Revised Paper
+                          </Button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                  {activeIndexes.includes(index) && (
+                    <>
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-monospace accordion-content"
+                        >
+                          <p>
+                            Paper Name: {item.paperName}{" "}
+                            <DownloadButton
+                              conferencePDA={item.pk}
+                              conferenceId={item.conferenceId}
+                              paperHash={item.paperHash}
+                              paperName={item.paperName}
+                            />
+                          </p>
+                          <p>Abstract: {item.paperAbstract}</p>
+                          <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
                           <p>Date Submitted: {item.dateSubmitted}</p>
                           Authors:{" "}
                           {item.paperAuthors.map((author) => (
@@ -934,7 +1291,7 @@ export default function AccordionTable({
               ))}
             </tbody>
           </Table>
-        );
+        );  
 
       case "reviewerViewPaperReviewedHistory":
         return (
@@ -993,17 +1350,17 @@ export default function AccordionTable({
                       className="accordion-title align-middle"
                       onClick={() => toggleActive(index)}
                     >
-                      {getPaperStatus(
+                      {/* {getPaperStatus(
                         item.reviewer.find((r) => r.tpcWallet === walletAddress)
                           .approval
-                      )}
+                      )} */}
                     </td>
 
                     <td className="accordion-title align-middle">
-                      {
+                      {/* {
                         item.reviewer.find((r) => r.tpcWallet === walletAddress)
                           .feedback
-                      }
+                      } */}
                     </td>
                   </tr>
                   {activeIndexes.includes(index) && (
@@ -1024,6 +1381,26 @@ export default function AccordionTable({
                           </p>
                           <p>Abstract: {item.paperAbstract}</p>
                           <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
                           <p>Date Submitted: {item.dateSubmitted}</p>
                         </td>
                       </tr>
@@ -1117,6 +1494,26 @@ export default function AccordionTable({
                           </p>
                           <p>Abstract: {item.paperAbstract}</p>
                           <p>Version: {item.version}</p>
+                          {item.version > 1 && (
+                            <p>
+                              Previous Version:{" "}
+                              <a
+                                className="font-italic text-info"
+                                //   href="/my-conference"
+                                type="button"
+                                onClick={() =>
+                                  sendProps(
+                                    `/papers/${item.prevVersion}`,
+                                    item.pk,
+                                    item.conferenceId,
+                                    item.conferenceName
+                                  )
+                                }
+                              >
+                                View previous version
+                              </a>
+                            </p>
+                          )}
                           <p>Date Submitted: {item.dateSubmitted}</p>
                         </td>
                       </tr>

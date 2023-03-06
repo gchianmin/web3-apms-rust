@@ -1,5 +1,5 @@
 import Header from "../components/Header";
-import { getPaperPendingReview, getPaperPendingPayment} from "../Common/GetPapers";
+import { getPaperPendingReview, getPaperPendingPayment, getPaperPendingRevision} from "../Common/GetPapers";
 import React, { useState, useEffect } from "react";
 import AccordionTable from "../components/AccordionTable";
 import { useRouter } from "next/router";
@@ -39,15 +39,16 @@ function MyTask() {
     }
   };
 
-  // const getPapersToBeRevised = async () => {
-  //   try {
-  //     const res = await getPaperPendingReview("reviewer", user.email);
-  //     console.log(res);
-  //     setPaperToReview(res);
-  //   } catch (error) {
-  //     console.log("error in my-task page", error);
-  //   }
-  // };
+  const getPapersToBeRevised = async () => {
+    try {
+      const res = await getPaperPendingRevision(walletAddress);
+      console.log(res);
+      setPaperToRevise(res);
+    } catch (error) {
+      console.log("error in my-task page", error);
+    }
+  };
+
   const getPapersToBePaid = async () => {
     try {
       const res = await getPaperPendingPayment(walletAddress);
@@ -71,6 +72,7 @@ function MyTask() {
     }
     getPapersToBeReviewed();
     getPapersToBeReviewedChair();
+    getPapersToBeRevised();
     
   }, [walletAddress]);
 

@@ -17,7 +17,7 @@ export default function ViewPaper() {
   } = router;
   const props = { conferencePDA, conferenceId, conferenceName };
   const [walletAddress, setWalletAddress] = useState(null);
-
+  console.log("this paper?", papers);
   useEffect(() => {
     if (!router.isReady) return;
     checkIfWalletIsConnected().then((res) => setWalletAddress(res));
@@ -39,13 +39,21 @@ export default function ViewPaper() {
             </em>
           </p>
         </div>
-        <div className="pt-4"></div>
-        <AccordionTable
-          props={JSON.stringify(papers)}
-          conference={props}
-          walletAddress={walletAddress}
-          action="organiserViewAllPapersSubmitted"
-        />
+
+        {papers.length > 0 ? (
+          <div className="pt-4">
+            <AccordionTable
+              props={JSON.stringify(papers)}
+              conference={props}
+              walletAddress={walletAddress}
+              action="organiserViewAllPapersSubmitted"
+            />
+          </div>
+        ) : (
+          <div className="font-italic text-muted text-mono">
+            <p>No papers submitted yet!</p>
+          </div>
+        )}
       </div>
     </>
   );
