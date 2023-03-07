@@ -1350,17 +1350,17 @@ export default function AccordionTable({
                       className="accordion-title align-middle"
                       onClick={() => toggleActive(index)}
                     >
-                      {/* {getPaperStatus(
+                      {getPaperStatus(
                         item.reviewer.find((r) => r.tpcWallet === walletAddress)
                           .approval
-                      )} */}
+                      )}
                     </td>
 
                     <td className="accordion-title align-middle">
-                      {/* {
+                      {
                         item.reviewer.find((r) => r.tpcWallet === walletAddress)
                           .feedback
-                      } */}
+                      }
                     </td>
                   </tr>
                   {activeIndexes.includes(index) && (

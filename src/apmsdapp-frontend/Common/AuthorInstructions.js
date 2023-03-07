@@ -66,6 +66,32 @@ export const deletePaper = async (conferencePDA, conferenceId, paperHash) => {
     console.log("Error deleting paper: ", error);
   }
 };
+export const deleteFileIfUnsuccess = async (paperHash, conferencePDA, conferenceId) => {
+  try {
+    const formData = new FormData();
+    formData.append("paperHash", paperHash);
+    formData.append("conferenceListPDA", conferencePDA);
+    formData.append("conferenceId", conferenceId);
+
+    const response = await ApiCallers({
+      apiUrl: "/api/filedelete",
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`Error ${response.status}!! ${data.message}`);
+      throw data.message;
+    }
+    // alert("Paper Deleted Successfully.");
+    // window.location.reload();
+    // router.push('/my-history')
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 export const deleteFile = async (paperHash, conferencePDA, conferenceId) => {
   try {
