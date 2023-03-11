@@ -53,4 +53,12 @@ pub mod apmsdapp {
         instructions::revise_paper(ctx, conferenceid, prev_paper_hash, paper_id, paper_hash, paper_name, paper_title, paper_abstract, date_submitted)
     }
 
+    pub fn make_payment(ctx: Context<MakePayment>, conferenceid: Pubkey, paper_hash: String, amount: u64) -> Result<()> {
+        instructions::make_payment(ctx, conferenceid, paper_hash, amount)
+    }
+
+    pub fn payout_reviewer(ctx: Context<PayoutReviewer>, conferenceid: Pubkey) -> Result<()> {
+        instructions::payout_reviewer(ctx, conferenceid)
+    }
+
 }

@@ -27,13 +27,14 @@ pub fn revise_paper(ctx: Context<RevisePaper>, conferenceid:Pubkey, prev_paper_h
     let version = paper.version + 1;
     let paper_authors = paper.paper_authors.clone();
     let conf =  &mut (account.conferences.get_mut(index).expect(""));
+    
     for rev in reviewer.iter_mut() {
-        rev.tpc_wallet = String::new();
+        // rev.tpc_wallet = ;
         rev.approval = 0;
         rev.feedback = String::new();
      }
 
-    paper_chair.tpc_wallet = String::new();
+    // paper_chair.tpc_wallet = String::new();
     paper_chair.approval = 0;
     paper_chair.feedback = String::new();
     

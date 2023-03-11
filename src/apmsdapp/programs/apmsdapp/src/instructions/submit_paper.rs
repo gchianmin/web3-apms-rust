@@ -14,6 +14,7 @@ pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: St
     let index = account.get_conference_index(conferenceid)?;
     let conf =  &mut (account.conferences.get_mut(index).expect(""));
     let paper_admin = *ctx.accounts.user.key;
+
     conf.paper_submitted.push(Paper {
         paper_id,
         paper_hash,
@@ -28,7 +29,7 @@ pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: St
         prev_version,
         fee_paid:0,
         reviewer:Vec::new(),
-        paper_chair: Reviewers::default() ,
+        paper_chair:Reviewers::default(),
     });
     Ok(())
 }

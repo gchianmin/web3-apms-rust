@@ -26,7 +26,6 @@ impl ConferenceListAccountData {
         return Ok(index);
       }
     }
-
     err!(ConferenceError::PaperNotFound)
   }
 
@@ -80,11 +79,11 @@ pub struct Tpc {
   pub tpc_email: String,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, Default)]
 pub struct Reviewers {
   pub tpc_name: String,
   pub tpc_email: String,
-  pub tpc_wallet: String,
+  pub tpc_wallet: Pubkey,
   pub approval: u8,
   pub feedback: String,
 }
@@ -101,8 +100,8 @@ impl Default for Author {
   }
 }
 
-impl Default for Reviewers {
-  fn default () -> Reviewers {
-    Reviewers{tpc_name: String::new(), tpc_email: String::new(), tpc_wallet: String::new(), approval: 0, feedback: String::new()}
-  }
-}
+// impl Default for Reviewers {
+//   fn default () -> Reviewers {
+//     Reviewers{tpc_name: String::new(), tpc_email: String::new(), tpc_wallet: , approval: 0, feedback: String::new()}
+//   }
+// }

@@ -18,7 +18,7 @@ pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash:
     if !chair {
         for rev in paper.reviewer.iter_mut() {
             if rev.tpc_email == reviewer_email {
-                rev.tpc_wallet = ctx.accounts.user.key.to_string();
+                rev.tpc_wallet = ctx.accounts.user.key();
                 rev.approval = approval;
                 rev.feedback = feedback.clone();
             }
@@ -31,7 +31,7 @@ pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash:
                 return err!(ConferenceError::NotReviewedByAll);
             }
          }
-        paper.paper_chair.tpc_wallet = ctx.accounts.user.key.to_string();
+        paper.paper_chair.tpc_wallet = ctx.accounts.user.key();
         paper.paper_chair.approval = approval;
         paper.paper_chair.feedback = feedback;
         paper.paper_status = approval;
