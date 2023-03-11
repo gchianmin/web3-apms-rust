@@ -27,8 +27,8 @@ pub fn payout_reviewer(
     for reviewer in conf.paper_submitted.iter().flat_map(|paper| paper.reviewer.iter()) {
 
         let ix = anchor_lang::solana_program::system_instruction::transfer(
-            &reviewer.tpc_wallet.key(),
             &ctx.accounts.conference_list.key(),
+            &reviewer.tpc_wallet.key(),
             2,
         );
     
