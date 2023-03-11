@@ -25,24 +25,49 @@ pub fn payout_reviewer(
     require!(conf.admin != *user.key, ConferenceError::NotAuthorized);
 
     for reviewer in conf.paper_submitted.iter().flat_map(|paper| paper.reviewer.iter()) {
+        if reviewer.approval != 0 {
 
-        let ix = anchor_lang::solana_program::system_instruction::transfer(
-            &ctx.accounts.conference_list.key(),
-            &reviewer.tpc_wallet.key(),
-            2,
-        );
-    
-        // get solana to invoke this instruction
-        let invoke = anchor_lang::solana_program::program::invoke(
-            &ix,
-            &[
-                ctx.accounts.user.to_account_info(),
-                ctx.accounts.conference_list.to_account_info(),
-            ],
-        );
-    
-        require!(invoke.is_ok(), ConferenceError::TokenTransactionError);
+            let ix = anchor_lang::solana_program::system_instruction::transfer(
+                &ctx.accounts.conference_list.key(),
+                &reviewer.tpc_wallet.key(),
+                2,
+            );
+        
+            // get solana to invoke this instruction
+            let invoke = anchor_lang::solana_program::program::invoke(
+                &ix,
+                &[
+                    ctx.accounts.user.to_account_info(),
+                    ctx.accounts.conference_list.to_account_info(),
+                ],
+            );
+        
+            require!(invoke.is_ok(), ConferenceError::TokenTransactionError);
 
+        }
+    }
+
+    for paper in conf.paper_submitted.iter() {
+        if paper.paper_chair.approval != 0 {
+
+            let ix = anchor_lang::solana_program::system_instruction::transfer(
+                &ctx.accounts.conference_list.key(),
+                &paper.paper_chair.tpc_wallet.key(),
+                2,
+            );
+        
+            // get solana to invoke this instruction
+            let invoke = anchor_lang::solana_program::program::invoke(
+                &ix,
+                &[
+                    ctx.accounts.user.to_account_info(),
+                    ctx.accounts.conference_list.to_account_info(),
+                ],
+            );
+        
+            require!(invoke.is_ok(), ConferenceError::TokenTransactionError);
+
+        }
     }
     
     Ok(())

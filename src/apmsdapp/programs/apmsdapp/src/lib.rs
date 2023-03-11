@@ -6,7 +6,7 @@ mod account_data;
 mod errors;
 mod instructions;
 
-declare_id!("7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ");
+declare_id!("4zCxfMW8gsgWze984eJKv4bYC7yjUGrag9oz8F6da7aV");
 
 #[program]
 pub mod apmsdapp {

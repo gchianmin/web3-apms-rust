@@ -2,13 +2,13 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-apmsdapp = "7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ"
+apmsdapp = "4zCxfMW8gsgWze984eJKv4bYC7yjUGrag9oz8F6da7aV"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "./id.json"
 
 [scripts]

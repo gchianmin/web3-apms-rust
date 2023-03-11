@@ -63,21 +63,10 @@ export default function FormInput({
         router
       );
     } catch (error) {
-      initializeAccount();
-      createConference(
-        email,
-        createdby,
-        name,
-        description,
-        date,
-        venue,
-        deadlines,
-        conferencelink,
-        router
-      );
+      console.log(error)
     }
   };
-  const handleCreateSubmit = (event) => {
+  const handleCreateSubmit = async (event) => {
     try {
       // Stop the form from submitting and refreshing the page.
       event.preventDefault();
@@ -98,7 +87,7 @@ export default function FormInput({
         alert("please make sure the email address match your login email");
         return;
       }
-      createNewConference(
+      await createNewConference(
         data.email,
         data.createdby,
         data.name,

@@ -120,7 +120,7 @@ export const initializeAccount = async () => {
     await program.methods
       .initialize()
       .accounts({
-        systemProgram: SYSTEM_PROGRAM.PROGRAM_ID,
+        systemProgram: program.PROGRAM_ID,
         conferenceList: conferencePDA,
         user: provider.wallet.publicKey,
       })
@@ -151,6 +151,11 @@ export const createConference = async (
       ],
       program.programId
     );
+    const conferenceInfo =
+        await program.account.conferenceListAccountData.all()
+    if (!conferenceInfo.includes (conferencePDA)) {
+      await initializeAccount()
+    }
     await program.methods
       .createConference(
         name,
@@ -169,7 +174,7 @@ export const createConference = async (
       .rpc();
     router.push("/main");
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 
