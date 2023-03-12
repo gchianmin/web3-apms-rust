@@ -10,6 +10,7 @@ pub use review_paper::*;
 pub use revise_paper::*;
 pub use make_payment::*;
 pub use payout_reviewer::*;
+pub use withdraw::*;
 
 mod initialize;
 mod create_conference;
@@ -23,3 +24,4 @@ mod review_paper;
 mod revise_paper;
 mod make_payment;
 mod payout_reviewer;
+mod withdraw;

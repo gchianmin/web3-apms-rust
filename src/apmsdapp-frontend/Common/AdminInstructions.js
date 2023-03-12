@@ -1,6 +1,19 @@
-import { IDL, PROGRAM_ID, getProvider } from "../utils/const";
-import { PublicKey } from "@solana/web3.js";
-import { Program, utils } from "@project-serum/anchor";
+import {
+  IDL,
+  PROGRAM_ID,
+  getProvider,
+  OPTS,
+  SOLANA_NETWORK,
+} from "../utils/const";
+import {
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  Connection,
+  clusterApiUrl,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+import { Program, utils, BN } from "@project-serum/anchor";
 
 export const updateTpc = async (conferencePDA, conferenceDetails, tpc) => {
   try {
@@ -152,9 +165,10 @@ export const createConference = async (
       program.programId
     );
     const conferenceInfo =
-        await program.account.conferenceListAccountData.all()
-    if (!conferenceInfo.includes (conferencePDA)) {
-      await initializeAccount()
+      await program.account.conferenceListAccountData.all();
+    if (!conferenceInfo.find(c=>c.publicKey.toString() == conferencePDA.toString())) {
+      console.log("nah", conferenceInfo)
+      await initializeAccount();
     }
     await program.methods
       .createConference(
@@ -204,5 +218,51 @@ export const assignReviewersandChair = async (
   } catch (error) {
     alert("error assigning reviewers and chair: ", error);
     console.log("error assigning reviewers: ", error);
+  }
+};
+
+
+export const payout = async (recipient) => {
+  try {
+    const provider = getProvider();
+    const program = new Program(IDL, PROGRAM_ID, provider);
+    const res = await program.methods.payoutReviewer(new BN(1*LAMPORTS_PER_SOL))
+    .accounts({
+      payer: program.provider.wallet.publicKey,
+      recipient: recipient,
+      systemProgram: program.PROGRAM_ID,
+    })
+    .rpc();
+
+    return res;
+  } catch (error) {
+    console.log("Error paying: ", error);
+  }
+};
+
+export const payoutReviewers = async (conferenceId, conferencePDA, recipient) => {
+  try {
+    const provider = getProvider();
+    const program = new Program(IDL, PROGRAM_ID, provider);
+    
+    const res = await program.methods.withdraw(conferenceId, new BN(1*LAMPORTS_PER_SOL))
+    .accounts({
+      user: provider.wallet.publicKey,
+      systemProgram: program.PROGRAM_ID,
+      conferenceList: new PublicKey(conferencePDA),
+    })
+    .rpc();
+
+    const result = await program.methods.payoutReviewer(new BN(1*LAMPORTS_PER_SOL))
+    .accounts({
+      payer: program.provider.wallet.publicKey,
+      recipient: recipient,
+      systemProgram: program.PROGRAM_ID,
+    })
+
+    .rpc();
+    return result;
+  } catch (error) {
+    console.log("Error paying: ", error);
   }
 };

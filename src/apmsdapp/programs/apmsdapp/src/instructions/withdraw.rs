@@ -1,50 +1,26 @@
 use crate::account_data::*;
 use crate::errors::*;
 use anchor_lang::prelude::*;
-use anchor_lang::system_program;
-
-// #[derive(Accounts)]
-// pub struct PayoutReviewer<'info> {
-//     #[account(mut)]
-//     pub conference_list: Account<'info, ConferenceListAccountData>,
-//     #[account(mut)]
-//     pub user: Signer<'info>,
-//     pub system_program: Program<'info, System>,
-// }
 
 #[derive(Accounts)]
-pub struct TransferSolWithCpi<'info> {
-    /// CHECK: This is just an example, not checking data
+pub struct Withdraw<'info> {
     #[account(mut)]
-    recipient: UncheckedAccount<'info>,
+    pub conference_list: Account<'info, ConferenceListAccountData>,
     #[account(mut)]
-    payer: Signer<'info>,
-    system_program: Program<'info, System>,
+    pub user: Signer<'info>,
 }
 
-// #[derive(Accounts)]
-// pub struct TransferSolWithProgram<'info> {
-//     /// CHECK: This is just an example, not checking data
-//     #[account(mut)]
-//     recipient: UncheckedAccount<'info>,
-//     /// CHECK: This is just an example, not checking data
-//     #[account(mut)]
-//     payer: UncheckedAccount<'info>,
-//     system_program: Program<'info, System>,
-// }
+pub fn withdraw(ctx: Context<Withdraw>, conferenceid:Pubkey, amount: u64) -> Result<()> {
 
-pub fn payout_reviewer(ctx: Context<TransferSolWithCpi>, amount: u64) -> Result<()> {
+    let account = &mut ctx.accounts.conference_list;
+    let index = account.get_conference_index(conferenceid)?;
+    let conf = account.conferences.get(index).expect("");
+    let user = &mut ctx.accounts.user;
 
-    system_program::transfer(
-        CpiContext::new(
-            ctx.accounts.system_program.to_account_info(),
-            system_program::Transfer {
-                from: ctx.accounts.payer.to_account_info(),
-                to: ctx.accounts.recipient.to_account_info(),
-            },
-        ),
-        amount,
-    )?;
+    require!(conf.admin == *user.key, ConferenceError::NotAuthorized);
+
+    **account.to_account_info().try_borrow_mut_lamports()? -= amount;
+    **user.to_account_info().try_borrow_mut_lamports()? += amount;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-import { AnchorError } from "@project-serum/anchor";
+import { AnchorError, web3 } from "@project-serum/anchor";
 
 const assert = require('assert')
 const anchor = require('@project-serum/anchor')
@@ -154,9 +154,12 @@ describe("apmsdapp", async () => {
     }
   }
 
-  const payoutReviewer = async (conferenceId) => {
+  const payoutReviewer = async (conferenceId, destination) => {
     try {
-      const res = await program.rpc.payoutReviewer(conferenceId, {
+      console.log("pay from:", user.publicKey)
+      console.log("PDA", conferencePDA)
+
+      const res = await program.rpc.payoutReviewer(conferenceId, destination, {
         accounts: {
           conferenceList: conferencePDA,
           user: user.publicKey,
@@ -660,7 +663,7 @@ describe("apmsdapp", async () => {
   it("Make a payment", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     let conferenceId = data.conferences[0].id
-
+    
     await makePayment(conferenceId, "example hash2", new anchor.BN(2))
 
     const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
@@ -688,14 +691,42 @@ describe("apmsdapp", async () => {
     assert.equal(paper.feePaid, 2);
     assert.equal(updatedData.conferences[0].feeReceived, 2)
   })
-  
+
+  it("withdraw", async () => {
+    const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    let conferenceId = data.conferences[0].id
+    const updatedData1 = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    let paper1 = updatedData1.conferences[0].paperSubmitted.find((p) => p.paperHash ==="example hash2")
+    const keyPair = web3.Keypair.generate();
+    console.log(keyPair)
+    // const res = await payoutReviewer(conferenceId, keyPair.publicKey)
+    // console.log(res)
+    await program.methods.withdraw(conferenceId, new anchor.BN(1))
+    .accounts({
+      user: user.publicKey,
+      conferenceList: conferencePDA,
+    })
+
+  })
+
   it("Make a payout", async () => {
     const data = await program.account.conferenceListAccountData.fetch(conferencePDA);
     let conferenceId = data.conferences[0].id
-
-    const res = await payoutReviewer(conferenceId)
-    console.log(res)
-
+    const updatedData1 = await program.account.conferenceListAccountData.fetch(conferencePDA);
+    let paper1 = updatedData1.conferences[0].paperSubmitted.find((p) => p.paperHash ==="example hash2")
+    const keyPair = web3.Keypair.generate();
+    console.log(keyPair)
+    // const res = await payoutReviewer(conferenceId, keyPair.publicKey)
+    // console.log(res)
+    await program.methods.payoutReviewer(new anchor.BN(1))
+    .accounts({
+      payer: user.publicKey,
+      recipient: keyPair.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      conferenceList: conferencePDA,
+    })
+    .signers([user.payer])
+    .rpc();
     // const updatedData = await program.account.conferenceListAccountData.fetch(conferencePDA);
     // // console.log(updatedData)
     // console.log(user.balance)

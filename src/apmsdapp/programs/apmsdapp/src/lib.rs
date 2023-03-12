@@ -57,8 +57,11 @@ pub mod apmsdapp {
         instructions::make_payment(ctx, conferenceid, paper_hash, amount)
     }
 
-    pub fn payout_reviewer(ctx: Context<PayoutReviewer>, conferenceid: Pubkey) -> Result<()> {
-        instructions::payout_reviewer(ctx, conferenceid)
+    pub fn payout_reviewer(ctx: Context<TransferSolWithCpi>, amount: u64) -> Result<()> {
+        instructions::payout_reviewer(ctx, amount)
     }
 
+    pub fn withdraw(ctx: Context<Withdraw>, conferenceid: Pubkey, amount: u64) -> Result<()> {
+        instructions::withdraw(ctx, conferenceid, amount)
+    }
 }

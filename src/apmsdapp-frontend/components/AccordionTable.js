@@ -15,6 +15,7 @@ import { getPaperStatus } from "../Common/GetPapers";
 import { getConference } from "../Common/GetConferences";
 import DownloadButton from "./DownloadButton";
 import Expander from "./Expander";
+import PaymentExpander from "./PaymentExpander";
 
 export default function AccordionTable({
   props,
@@ -144,7 +145,7 @@ export default function AccordionTable({
                     </td>
 
                     <td className="accordion-title align-middle">
-                      <Button
+                     { item.paperStatus == 0 ? <Button
                         className="btn-danger mb-3"
                         type="button"
                         onClick={() =>
@@ -156,7 +157,7 @@ export default function AccordionTable({
                         }
                       >
                         DELETE SUBMISSION
-                      </Button>
+                      </Button>:null}
                       {item.reviewer.find(
                         (r) => r.approval > 0 || item.version > 1
                       ) ? null : (
@@ -174,7 +175,7 @@ export default function AccordionTable({
                     <>
                       <tr>
                         <td
-                          colSpan="5"
+                          colSpan="6"
                           className="text-monospace accordion-content"
                         >
                           <p>
@@ -670,14 +671,7 @@ export default function AccordionTable({
                           <Button
                             className="btn-primary"
                             type="button"
-                            // onClick={() =>
-                            //   sendProps(
-                            //     "/submit-paper",
-                            //     item.pk.toString(),
-                            //     item.conferenceId.toString(),
-                            //     item.conferenceName
-                            //   )
-                            // }
+                            onClick={() => toggleActive(index)}
                           >
                             Make payment
                           </Button>
@@ -708,7 +702,7 @@ export default function AccordionTable({
                     <>
                       <tr>
                         <td
-                          colSpan="5"
+                          colSpan="6"
                           className="text-monospace accordion-content"
                         >
                           <p>
@@ -813,6 +807,13 @@ export default function AccordionTable({
                               <p>No chair assigned yet</p>
                             )}
                           </p>
+                        { item.paperStatus == 2 ?<PaymentExpander
+                            role="reviewer"
+                            conferencePDA={item.pk}
+                            conferenceId={item.conferenceId}
+                            paperHash={item.paperHash}
+                          /> : null}
+                          
                         </td>
                       </tr>
                     </>
@@ -1351,14 +1352,14 @@ export default function AccordionTable({
                       onClick={() => toggleActive(index)}
                     >
                       {getPaperStatus(
-                        item.reviewer.find((r) => r.tpcWallet === walletAddress)
+                        item.reviewer.find((r) => r.tpcWallet.toString() === walletAddress)
                           .approval
                       )}
                     </td>
 
                     <td className="accordion-title align-middle">
                       {
-                        item.reviewer.find((r) => r.tpcWallet === walletAddress)
+                        item.reviewer.find((r) => r.tpcWallet.toString() === walletAddress)
                           .feedback
                       }
                     </td>
@@ -1367,7 +1368,7 @@ export default function AccordionTable({
                     <>
                       <tr>
                         <td
-                          colSpan="5"
+                          colSpan="6"
                           className="text-monospace accordion-content"
                         >
                           <p>

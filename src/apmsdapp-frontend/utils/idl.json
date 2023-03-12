@@ -398,12 +398,12 @@
       "name": "payoutReviewer",
       "accounts": [
         {
-          "name": "conferenceList",
+          "name": "recipient",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "user",
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -415,8 +415,33 @@
       ],
       "args": [
         {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
           "name": "conferenceid",
           "type": "publicKey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     }

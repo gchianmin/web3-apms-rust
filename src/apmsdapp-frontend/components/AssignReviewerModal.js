@@ -24,13 +24,13 @@ function AssignReviewerModal({
   const reviewerToggle = () => setReviewerModal(!reviewerModal);
 
   const onSelectReviewers = (selectedList, selectedItem) => {
-    selectedItem.tpcWallet = "";
+    // selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
     setSelectedReviewers(selectedList);
   };
   const onSelectChair = (selectedList, selectedItem) => {
-    selectedItem.tpcWallet = "";
+    // selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
     setSelectedChair(selectedItem);
