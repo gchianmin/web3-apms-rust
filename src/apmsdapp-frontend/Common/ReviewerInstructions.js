@@ -9,7 +9,8 @@ export const reviewPaper = async (
   reviewerEmail,
   chair,
   approval,
-  feedback
+  feedback,
+  feedbackSubmittedDatetime,
 ) => {
   try {
     const provider = getProvider();
@@ -23,7 +24,8 @@ export const reviewPaper = async (
         reviewerEmail,
         chair,
         approval,
-        feedback
+        feedback, 
+        feedbackSubmittedDatetime,
       )
       .accounts({
         conferenceList: new PublicKey(conferencePDA),

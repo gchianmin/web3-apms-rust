@@ -34,8 +34,11 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
 
   const payout = async() => {
     try {
-        
-      const res = await payoutReviewers(existingDetails.id, conferencePDA, existingDetails.paperSubmitted[0].reviewer[0].tpcWallet)
+      let wa = []
+      wa.push(existingDetails.paperSubmitted[0].reviewer[0].tpcWallet)
+      wa.push(existingDetails.paperSubmitted[0].paperChair.tpcWallet)
+      console.log(wa)
+      const res = await payoutReviewers(existingDetails.id, conferencePDA, wa)
 
       console.log("res", res)
       if (res) {
@@ -121,7 +124,15 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
 
                 <Button
                   className="btn btn-block btn-warning  mt-0 btn-alignment"
-                  onClick={payoutToggle}
+                  // onClick={payoutToggle}
+                  onClick={() =>
+                    sendProps(
+                      "/reviewers-payout",
+                      conferencePDA,
+                      existingDetails.id.toString(),
+                      existingDetails.name
+                    )
+                  }
                 >
                   Payout to Reviewers
                 </Button>

@@ -22,17 +22,25 @@ function AssignReviewerModal({
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [selectedChair, setSelectedChair] = useState(null);
   const reviewerToggle = () => setReviewerModal(!reviewerModal);
+  const d = new Date();
+  d.setDate(d.getDate()+14);
 
   const onSelectReviewers = (selectedList, selectedItem) => {
     // selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
+    selectedItem.feedbackSubmittedDatetime = "";
+    selectedItem.transactionDatetime = "";
+    selectedItem.reviewDeadline = d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone;
     setSelectedReviewers(selectedList);
   };
   const onSelectChair = (selectedList, selectedItem) => {
     // selectedItem.tpcWallet = "";
     selectedItem.approval = new BN(0);
     selectedItem.feedback = "";
+    selectedItem.feedbackSubmittedDatetime = "";
+    selectedItem.transactionDatetime = "";
+    selectedItem.reviewDeadline = d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone;
     setSelectedChair(selectedItem);
   };
 

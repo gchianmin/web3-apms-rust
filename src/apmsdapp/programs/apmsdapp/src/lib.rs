@@ -6,7 +6,7 @@ mod account_data;
 mod errors;
 mod instructions;
 
-declare_id!("4zCxfMW8gsgWze984eJKv4bYC7yjUGrag9oz8F6da7aV");
+declare_id!("BM3EhSJkrjWfzeWEiVAyjRTndaWUUjgjAWBJpWtQhemb");
 
 #[program]
 pub mod apmsdapp {
@@ -45,23 +45,28 @@ pub mod apmsdapp {
         instructions::assign_reviewer(ctx, conferenceid, paper_hash, reviewer, chair)
     }
 
-    pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String) -> Result<()> {
-        instructions::review_paper(ctx, conferenceid, paper_hash, reviewer_email, chair, approval, feedback)
+    pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String, feedback_submitted_datetime: String) -> Result<()> {
+        instructions::review_paper(ctx, conferenceid, paper_hash, reviewer_email, chair, approval, feedback, feedback_submitted_datetime)
     }
 
-    pub fn revise_paper(ctx: Context<RevisePaper>, conferenceid: Pubkey, prev_paper_hash: String, paper_id: String, paper_hash: String, paper_name:String, paper_title: String, paper_abstract: String, date_submitted: String) -> Result<()> {
-        instructions::revise_paper(ctx, conferenceid, prev_paper_hash, paper_id, paper_hash, paper_name, paper_title, paper_abstract, date_submitted)
+    pub fn revise_paper(ctx: Context<RevisePaper>, conferenceid: Pubkey, prev_paper_hash: String, paper_id: String, paper_hash: String, paper_name:String, paper_title: String, paper_abstract: String, date_submitted: String, response_letter_hash: String, response_letter_name: String) -> Result<()> {
+        instructions::revise_paper(ctx, conferenceid, prev_paper_hash, paper_id, paper_hash, paper_name, paper_title, paper_abstract, date_submitted, response_letter_hash, response_letter_name)
     }
 
-    pub fn make_payment(ctx: Context<MakePayment>, conferenceid: Pubkey, paper_hash: String, amount: u64) -> Result<()> {
-        instructions::make_payment(ctx, conferenceid, paper_hash, amount)
+    pub fn make_payment(ctx: Context<MakePayment>, conferenceid: Pubkey, paper_hash: String, amount: u64, payment_date:String, presenter: Registration,) -> Result<()> {
+        instructions::make_payment(ctx, conferenceid, paper_hash, amount, payment_date, presenter)
     }
 
-    pub fn payout_reviewer(ctx: Context<TransferSolWithCpi>, amount: u64) -> Result<()> {
-        instructions::payout_reviewer(ctx, amount)
+    pub fn payout_reviewer(ctx: Context<TransferSolWithCpi>, conferenceid: Pubkey, recepient_wallet: Pubkey, amount: u64) -> Result<()> {
+        instructions::payout_reviewer(ctx, conferenceid, recepient_wallet, amount)
     }
 
     pub fn withdraw(ctx: Context<Withdraw>, conferenceid: Pubkey, amount: u64) -> Result<()> {
         instructions::withdraw(ctx, conferenceid, amount)
     }
+
+    pub fn register_conference(ctx: Context<RegisterConference>, conferenceid:Pubkey, paper_hash: String, presenter: Registration, payment_transaction: String) -> Result<()> {
+        instructions::register_conference(ctx, conferenceid, paper_hash, presenter, payment_transaction)
+    }
+
 }

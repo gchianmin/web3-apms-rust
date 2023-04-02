@@ -16,6 +16,8 @@ pub fn make_payment(
     conferenceid: Pubkey,
     paper_hash: String,
     amount: u64,
+    payment_date:String,
+    presenter: Registration,
 ) -> Result<()> {
     let ix = anchor_lang::solana_program::system_instruction::transfer(
         &ctx.accounts.user.key(),
@@ -43,6 +45,9 @@ pub fn make_payment(
 
     paper.fee_paid = amount;
     paper.paper_status = 8;
+    paper.fee_paid_datetime = payment_date;
+    paper.registration_details = presenter;
+    
 
     Ok(())
 }

@@ -119,7 +119,7 @@ const DynamicForm = ({ props }) => {
         paper.title,
         paper.abstract,
         authors,
-        d.toLocaleDateString() + " " + d.toLocaleTimeString(),
+        d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         new BN(1),
         ""
       );

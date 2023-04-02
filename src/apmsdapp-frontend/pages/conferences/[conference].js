@@ -15,6 +15,7 @@ import Popup from "../../components/Popup";
 import { getConference } from "../../Common/GetConferences";
 import { checkIfWalletIsConnected } from "../../Common/WalletConnection";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 export default function ViewIndividualConferencePage() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function ViewIndividualConferencePage() {
   } = router;
   const queryProps = { conferenceId, conference };
   const { user } = useUser();
-
+  console.log(queryProps)
   const getDetails = () => {
     try {
       if (conferenceDetails) {
@@ -43,6 +44,7 @@ export default function ViewIndividualConferencePage() {
                 <CardText>
                   <small className="text-muted font-italic">
                     Organised By: {conferenceDetails.createdBy}
+                    {/* fee : {conferenceDetails.feeReceived/LAMPORTS_PER_SOL} */}
                   </small>
                 </CardText>
                 <CardText className="lead">

@@ -27,9 +27,14 @@ pub fn submit_paper(ctx: Context<SubmitPaper>, conferenceid:Pubkey, paper_id: St
         paper_status:0,
         version,
         prev_version,
+        response_letter_hash: String::new(),
+        response_letter_name: String::new(),
         fee_paid:0,
+        fee_paid_datetime: String::new(),
+        fee_paid_transaction: String::new(),
         reviewer:Vec::new(),
         paper_chair:Reviewers::default(),
+        registration_details: Registration::default(),
     });
     Ok(())
 }

@@ -70,15 +70,16 @@ export default function FormInput({
     try {
       // Stop the form from submitting and refreshing the page.
       event.preventDefault();
+      const d = new Date();
       // Get data from the form.
       const data = {
         email: event.target.email.value,
         createdby: event.target.createdby.value,
         name: event.target.name.value,
         description: event.target.description.value,
-        date: event.target.date.value,
+        date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         venue: event.target.venue.value,
-        deadlines: event.target.deadlines.value,
+        deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         conferencelink: event.target.conferencelink.value,
         // image: event.target.image.value,
       };
@@ -146,6 +147,7 @@ export default function FormInput({
                 name="email"
                 placeholder="email address of the organiser"
                 type="email"
+                defaultValue={user.email}
                 required
               />
             </Col>

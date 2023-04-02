@@ -2,6 +2,7 @@ import { IDL, PROGRAM_ID, getProvider } from "../utils/const";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Program, BN, utils } from "@project-serum/anchor";
 import ApiCallers from "./ApiCallers";
+import { getConference } from "./GetConferences";
 
 export const submitPaper = async (
   conferencePDA,
@@ -66,7 +67,11 @@ export const deletePaper = async (conferencePDA, conferenceId, paperHash) => {
     console.log("Error deleting paper: ", error);
   }
 };
-export const deleteFileIfUnsuccess = async (paperHash, conferencePDA, conferenceId) => {
+export const deleteFileIfUnsuccess = async (
+  paperHash,
+  conferencePDA,
+  conferenceId
+) => {
   try {
     const formData = new FormData();
     formData.append("paperHash", paperHash);
@@ -129,7 +134,9 @@ export const revisePaper = async (
   paperName,
   paperTitle,
   paperAbstract,
-  dateSubmitted
+  dateSubmitted,
+  responseLetterHash,
+  responseLetterName,
 ) => {
   try {
     const provider = getProvider();
@@ -145,7 +152,9 @@ export const revisePaper = async (
         paperName,
         paperTitle,
         paperAbstract,
-        dateSubmitted
+        dateSubmitted,
+        responseLetterHash,
+        responseLetterName,
       )
       .accounts({
         conferenceList: new PublicKey(conferencePDA),
@@ -158,23 +167,16 @@ export const revisePaper = async (
   }
 };
 
-export const makePayment = async (
-  conferencePDA,
-  conferenceId,
-  paperHash
-) => {
+export const makePayment = async (conferencePDA, conferenceId, paperHash, paymentDate, presenter) => {
   try {
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
     const id = new PublicKey(conferenceId);
-    console.log("money from: ", provider.wallet.publicKey.toString())
+    console.log("money from: ", provider.wallet.publicKey.toString());
     console.log("paying money to: ", conferencePDA.toString());
+
     await program.methods
-      .makePayment(
-        id,
-        paperHash,
-        new BN(2 * LAMPORTS_PER_SOL),
-      )
+      .makePayment(id, paperHash, new BN(2 * LAMPORTS_PER_SOL), paymentDate, presenter)
       .accounts({
         conferenceList: new PublicKey(conferencePDA),
         user: provider.wallet.publicKey,
@@ -187,3 +189,77 @@ export const makePayment = async (
     console.log("Error paying for a paper : ", error);
   }
 };
+
+export const getReviewedPapers = async (conferencePDA, conferenceId) => {
+  const conference = await getConference(conferencePDA, conferenceId);
+console.log(conferencePDA, conferenceId)
+  let reviewerMap = new Map();
+
+  for (const paper in conference.paperSubmitted) {
+    let p = conference.paperSubmitted[paper];
+    for (const rev in p.reviewer) {
+      const r = conference.paperSubmitted[paper].reviewer[rev];
+      if (
+        !reviewerMap.get(
+          r.tpcWallet.toString() + "^" + r.tpcName + "^" + r.tpcEmail + "^" + r.paidout
+        ) &&
+        r.approval != 0
+      ) {
+        reviewerMap.set(
+          r.tpcWallet.toString() + "^" + r.tpcName + "^" + r.tpcEmail + "^" + r.paidout,
+          [p.paperTitle]
+        );
+      } else if (
+        reviewerMap.get(
+          r.tpcWallet.toString() + "^" + r.tpcName + "^" + r.tpcEmail + "^" + r.paidout
+        ) &&
+        r.approval != 0
+      ) {
+        console.log("exe this")
+        let temp = reviewerMap.get(
+          r.tpcWallet.toString() + "^" + r.tpcName + "^" + r.tpcEmail +  "^" + r.paidout
+        );
+        console.log(reviewerMap)
+        temp.push(p.paperTitle);
+        reviewerMap.set(
+          r.tpcWallet.toString() + "^" + r.tpcName + "^" + r.tpcEmail +  "^" + r.paidout,
+          temp
+        );
+      }
+    }
+  }
+
+  for (const paper in conference.paperSubmitted) {
+    let p = conference.paperSubmitted[paper];
+    let c = conference.paperSubmitted[paper].paperChair;
+    if (
+      !reviewerMap.get(
+        c.tpcWallet.toString() + "^" + c.tpcName + "^" + c.tpcEmail + "^" + c.paidout
+      ) &&
+      c.approval != 0
+    ) {
+      reviewerMap.set(
+        c.tpcWallet.toString() + "^" + c.tpcName + "^" + c.tpcEmail + "^" + c.paidout,
+        [p.paperTitle]
+      );
+    } else if (
+      reviewerMap.get(
+        c.tpcWallet.toString() + "^" + c.tpcName + "^" + c.tpcEmail + "^" + c.paidout
+      ) &&
+      c.approval != 0
+    ) {
+      let temp = reviewerMap.get(
+        c.tpcWallet.toString() + "^" + c.tpcName + "^" + c.tpcEmail + "^" + c.paidout
+      );
+      temp.push(p.paperTitle);
+      reviewerMap.set(
+        c.tpcWallet.toString() + "^" + c.tpcName + "^" + c.tpcEmail + "^" + c.paidout,
+        temp
+      );
+    }
+  }
+
+  console.log(reviewerMap);
+  return reviewerMap;
+};
+

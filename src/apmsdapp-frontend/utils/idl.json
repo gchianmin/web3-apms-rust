@@ -308,6 +308,10 @@
         {
           "name": "feedback",
           "type": "string"
+        },
+        {
+          "name": "feedbackSubmittedDatetime",
+          "type": "string"
         }
       ]
     },
@@ -357,6 +361,14 @@
         {
           "name": "dateSubmitted",
           "type": "string"
+        },
+        {
+          "name": "responseLetterHash",
+          "type": "string"
+        },
+        {
+          "name": "responseLetterName",
+          "type": "string"
         }
       ]
     },
@@ -391,6 +403,16 @@
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "paymentDate",
+          "type": "string"
+        },
+        {
+          "name": "presenter",
+          "type": {
+            "defined": "Registration"
+          }
         }
       ]
     },
@@ -398,14 +420,14 @@
       "name": "payoutReviewer",
       "accounts": [
         {
-          "name": "recipient",
+          "name": "conferenceList",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "payer",
+          "name": "recepient",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -414,6 +436,14 @@
         }
       ],
       "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "recepientWallet",
+          "type": "publicKey"
+        },
         {
           "name": "amount",
           "type": "u64"
@@ -444,9 +474,62 @@
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "registerConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "presenter",
+          "type": {
+            "defined": "Registration"
+          }
+        },
+        {
+          "name": "paymentTransaction",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "RecepientListData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u8"
+          },
+          {
+            "name": "recepient",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "ConferenceListAccountData",
       "type": {
@@ -595,8 +678,24 @@
             "type": "string"
           },
           {
+            "name": "responseLetterHash",
+            "type": "string"
+          },
+          {
+            "name": "responseLetterName",
+            "type": "string"
+          },
+          {
             "name": "feePaid",
             "type": "u64"
+          },
+          {
+            "name": "feePaidDatetime",
+            "type": "string"
+          },
+          {
+            "name": "feePaidTransaction",
+            "type": "string"
           },
           {
             "name": "reviewer",
@@ -611,6 +710,32 @@
             "type": {
               "defined": "Reviewers"
             }
+          },
+          {
+            "name": "registrationDetails",
+            "type": {
+              "defined": "Registration"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Registration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "presenterName",
+            "type": "string"
+          },
+          {
+            "name": "presenterEmail",
+            "type": "string"
+          },
+          {
+            "name": "presenterAffiliation",
+            "type": "string"
           }
         ]
       }
@@ -675,6 +800,18 @@
           {
             "name": "feedback",
             "type": "string"
+          },
+          {
+            "name": "feedbackSubmittedDatetime",
+            "type": "string"
+          },
+          {
+            "name": "paidout",
+            "type": "u8"
+          },
+          {
+            "name": "reviewDeadline",
+            "type": "string"
           }
         ]
       }
@@ -708,6 +845,6 @@
     }
   ],
   "metadata": {
-    "address": "4zCxfMW8gsgWze984eJKv4bYC7yjUGrag9oz8F6da7aV"
+    "address": "BM3EhSJkrjWfzeWEiVAyjRTndaWUUjgjAWBJpWtQhemb"
   }
 }

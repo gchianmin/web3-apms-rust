@@ -9,7 +9,7 @@ pub struct ReviewPaper<'info> {
   pub user: Signer<'info>,
 }
 
-pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String) -> Result<()> {
+pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash: String, reviewer_email: String, chair: bool, approval: u8, feedback: String, feedback_submitted_datetime: String) -> Result<()> {
     let account = &mut ctx.accounts.conference_list;
     let index = account.get_conference_index(conferenceid)?;
     let paper_index = account.get_paper_index(index, paper_hash)?;
@@ -21,6 +21,7 @@ pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash:
                 rev.tpc_wallet = ctx.accounts.user.key();
                 rev.approval = approval;
                 rev.feedback = feedback.clone();
+                rev.feedback_submitted_datetime = feedback_submitted_datetime.clone();
             }
          }
     }
@@ -34,6 +35,7 @@ pub fn review_paper(ctx: Context<ReviewPaper>, conferenceid: Pubkey, paper_hash:
         paper.paper_chair.tpc_wallet = ctx.accounts.user.key();
         paper.paper_chair.approval = approval;
         paper.paper_chair.feedback = feedback;
+        paper.paper_chair.feedback_submitted_datetime = feedback_submitted_datetime;
         paper.paper_status = approval;
     }
     

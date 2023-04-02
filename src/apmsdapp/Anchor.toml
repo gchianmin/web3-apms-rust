@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-apmsdapp = "4zCxfMW8gsgWze984eJKv4bYC7yjUGrag9oz8F6da7aV"
+apmsdapp = "BM3EhSJkrjWfzeWEiVAyjRTndaWUUjgjAWBJpWtQhemb"
 
 [registry]
 url = "https://api.apr.dev"
