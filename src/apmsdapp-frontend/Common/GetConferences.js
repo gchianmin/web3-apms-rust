@@ -20,7 +20,7 @@ export const getConference = async (conferenceListPDA, conferenceId) => {
       const provider = getProvider();
       const program = new Program(IDL, PROGRAM_ID, provider);
       const conferencePDA = new PublicKey(conferenceListPDA)
-      console.log("this", conferencePDA)
+      console.log("this", conferencePDA.toString())
       const conferenceInfo =
         await program.account.conferenceListAccountData.fetch(conferencePDA);
       const conference = conferenceInfo.conferences.find(

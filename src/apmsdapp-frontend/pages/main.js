@@ -28,6 +28,7 @@ export default function Main() {
       )}
     </>
   );
+   
   // if conferences list == null
   const renderEmptyContainer = () => (
     <>

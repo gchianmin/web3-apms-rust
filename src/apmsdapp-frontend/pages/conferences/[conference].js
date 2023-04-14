@@ -26,7 +26,8 @@ export default function ViewIndividualConferencePage() {
   } = router;
   const queryProps = { conferenceId, conference };
   const { user } = useUser();
-  console.log(queryProps)
+  console.log(queryProps.conferenceId)
+  
   const getDetails = () => {
     try {
       if (conferenceDetails) {

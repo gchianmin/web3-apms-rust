@@ -110,9 +110,9 @@ export default function FormInput({
     const data = {
       name: event.target.name.value,
       description: event.target.description.value,
-      date: event.target.date.value,
+      date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
       venue: event.target.venue.value,
-      deadlines: event.target.deadlines.value,
+      deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
       conferencelink: event.target.conferencelink.value,
       technicalProgramsCommittees: formData,
     };
