@@ -82,7 +82,7 @@ export default function Expander({
 
   return (
     <div>
-      <Button
+      {/* <Button
         color="primary"
         id="toggler"
         style={{
@@ -91,7 +91,7 @@ export default function Expander({
       >
         Review
       </Button>
-      <UncontrolledCollapse toggler="#toggler">
+      <UncontrolledCollapse toggler="#toggler"> */}
         <Card>
           <CardBody>
             <Form
@@ -161,7 +161,7 @@ export default function Expander({
             </Form>
           </CardBody>
         </Card>
-      </UncontrolledCollapse>
+      {/* </UncontrolledCollapse> */}
       {/* <Button type="button" onClick={getFeedback}>
         get all feedback
       </Button>

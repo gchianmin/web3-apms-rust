@@ -34,6 +34,7 @@ export const getPaperStatus = (status) => {
     5: "Under Revision",
     6: "Rejected (Passed Deadline)",
     7: "Paper Rejected",
+    8: "Payment Completed",
   };
 
   return statusMap[status] || "Unknown status";
@@ -177,7 +178,7 @@ export const getPapersReviewed = async (role, walletAddress) => {
         for (const conf in res.conferences) {
           const paper = res.conferences[conf].paperSubmitted.filter((p) =>
             p.reviewer.find(
-              (r) => (r.tpcWallet === walletAddress && r.approval > 0)
+              (r) => (r.tpcWallet.toString() === walletAddress && r.approval > 0)
             )
           );
 
@@ -202,7 +203,7 @@ export const getPapersReviewed = async (role, walletAddress) => {
         for (const conf in res.conferences) {
           const paper = res.conferences[conf].paperSubmitted.filter(
             (p) =>
-              p.paperChair.tpcWallet === walletAddress &&
+              p.paperChair.tpcWallet.toString() === walletAddress &&
               p.paperChair.approval > 0
           );
 

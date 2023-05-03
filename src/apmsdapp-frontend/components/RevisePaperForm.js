@@ -16,6 +16,7 @@ import { MAX_FILE_SIZE } from "../utils/const";
 
 const RevisePaperForm = ({ props, prevPaper }) => {
   const [file, setFile] = useState(null);
+  const [responseLetter, setResponseLetter] = useState(null);
   const router = useRouter();
 
   const sendProps = (href, conferencePDA, conferenceId, conferenceName) => {
@@ -36,13 +37,20 @@ const RevisePaperForm = ({ props, prevPaper }) => {
     }
   };
 
+  const changeHandlerForResponseLetter = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const i = event.target.files[0];
+      setResponseLetter(i);
+    }
+  };
+
   const inputValidaton = () => {
-    if (file.type != "application/pdf") {
+    if (file.type != "application/pdf" || responseLetter.type != "application/pdf") {
       alert("Only PDF is accepted");
       return false;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_FILE_SIZE || responseLetter.size > MAX_FILE_SIZE) {
       alert("File size too big");
       return false;
     }
@@ -65,6 +73,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
     const d = new Date();
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("responseLetter", responseLetter);
     formData.append("props", JSON.stringify(props));
 
     try {
@@ -74,7 +83,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         body: formData,
       });
       const data = await response.json();
-
+      // console.log("0989908",data)
       if (!response.ok) {
         alert(`Error ${response.status}!! ${data.message}`);
         throw data.message;
@@ -89,7 +98,9 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         data.fileName,
         paper.title,
         paper.abstract,
-        d.toLocaleDateString() + " " + d.toLocaleTimeString()
+        d.toLocaleDateString() + " " + d.toLocaleTimeString(),
+        data.responseLetterHash,
+        data.responseLetterName,
       );
 
       if (submitted == "ok" && response.ok) {
@@ -99,7 +110,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         router.push("/my-history");
       } else console.log("error");
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   };
 
@@ -168,7 +179,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         </FormGroup>
 
         <FormGroup row>
-          <Label className="text-monospace" for="email" sm={2}>
+          <Label className="text-monospace" for="paper" sm={2}>
             Paper
           </Label>
           <Col>
@@ -185,6 +196,26 @@ const RevisePaperForm = ({ props, prevPaper }) => {
             </FormText>
           </Col>
         </FormGroup>
+
+        <FormGroup row>
+          <Label className="text-monospace" for="letter" sm={2}>
+            Response Letter <small className="font-italic">[to address reviewers' feedback]</small>
+          </Label>
+          <Col>
+            <Input
+              className="form-control"
+              id="responseletter"
+              name="responseletter"
+              type="file"
+              onChange={changeHandlerForResponseLetter}
+              accept=".pdf"
+            />
+            <FormText>
+              Max file size accepted: 5MB. Only PDF is accepted.
+            </FormText>
+          </Col>
+        </FormGroup>
+
         <div className="d-flex justify-content-center align-items-center">
           <Button color="primary">Submit</Button>
         </div>

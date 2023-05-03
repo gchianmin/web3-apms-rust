@@ -1,7 +1,7 @@
 import { IncomingForm } from "formidable";
 const fs = require("fs-extra");
 const CryptoJS = require("crypto-js");
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 export const config = {
   api: {
@@ -9,11 +9,11 @@ export const config = {
   },
 };
 
-
 const generateEntropy = () => {
-  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const bytes = crypto.randomBytes(5);
-  let result = '';
+  let result = "";
 
   for (let i = 0; i < 5; i++) {
     const index = bytes[i] % characters.length;
@@ -21,8 +21,7 @@ const generateEntropy = () => {
   }
 
   return result;
-}
-
+};
 
 export default async (req, res) => {
   if (req.method === "POST") {
@@ -34,26 +33,68 @@ export default async (req, res) => {
         resolve({ fields, files });
       });
     });
+    console.log("greger", data.files.file);
+
     try {
-      const props = JSON.parse(data.fields.props)
+      const props = JSON.parse(data.fields.props);
+      var letterHash = "";
+      var letterName = "";
+      if (data.files.responseLetter) {
+        try {
+          const letter = data.files.responseLetter;
+          letterName = letter.originalFilename
+          const letterPath = letter.filepath;
+          const file = await fs.readFile(letterPath);
+          letterHash = CryptoJS.MD5(file.toString()).toString();
+          const entropy = generateEntropy();
+          console.log(entropy);
+          console.log("isit ths for letter", letterHash);
+          const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${letterHash}/`;
+
+          if (fs.pathExistsSync(pathToWritePaper)) {
+            res
+              .status(409)
+              .json({ message: "Same file already exists in the system!" });
+            return;
+          }
+          fs.mkdirsSync(pathToWritePaper);
+          const fullPathToWritePaper =
+            pathToWritePaper + `${letter.originalFilename}`;
+          await fs.writeFile(fullPathToWritePaper, file);
+        } catch (error) {
+          console.error("error from response letter", error);
+          res.status(500).json({ message: error.message });
+          return;
+        }
+      }
+
       const paper = data.files.file;
       const paperPath = paper.filepath;
       const file = await fs.readFile(paperPath);
       const hash = CryptoJS.MD5(file.toString()).toString();
-      const entropy = generateEntropy()
-      console.log(entropy)
-      console.log("isit ths",hash);
+      const entropy = generateEntropy();
+      console.log(entropy);
+      console.log("isit ths", hash);
       const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
-      
+
       if (fs.pathExistsSync(pathToWritePaper)) {
-        res.status(409).json({ message: "Same file already exists in the system!" });
+        res
+          .status(409)
+          .json({ message: "Same file already exists in the system!" });
         return;
       }
       fs.mkdirsSync(pathToWritePaper);
       const fullPathToWritePaper =
         pathToWritePaper + `${paper.originalFilename}`;
       await fs.writeFile(fullPathToWritePaper, file);
-      res.status(200).json({ message: "file uploaded!", hash: hash, fileName: paper.originalFilename, entropy: entropy});
+      res.status(200).json({
+        message: "file uploaded!",
+        hash: hash,
+        responseLetterHash: letterHash,
+        fileName: paper.originalFilename,
+        responseLetterName: letterName,
+        entropy: entropy,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
       return;

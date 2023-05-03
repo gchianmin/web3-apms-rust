@@ -11,7 +11,10 @@ import {
 } from "reactstrap";
 import { BN } from "@project-serum/anchor";
 import { useRouter } from "next/router";
-import { submitPaper } from "../Common/AuthorInstructions";
+import {
+  deleteFileIfUnsuccess,
+  submitPaper,
+} from "../Common/AuthorInstructions";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import ApiCallers from "../Common/ApiCallers";
 import { MAX_FILE_SIZE } from "../utils/const";
@@ -95,7 +98,11 @@ const DynamicForm = ({ props }) => {
     formData.append("props", JSON.stringify(props));
 
     try {
-      const response = await ApiCallers({ apiUrl: "/api/fileupload", method: "POST", body: formData });
+      const response = await ApiCallers({
+        apiUrl: "/api/fileupload",
+        method: "POST",
+        body: formData,
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -112,7 +119,7 @@ const DynamicForm = ({ props }) => {
         paper.title,
         paper.abstract,
         authors,
-        d.toLocaleDateString() + " " + d.toLocaleTimeString(),
+        d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         new BN(1),
         ""
       );
@@ -121,9 +128,15 @@ const DynamicForm = ({ props }) => {
         alert(
           "Paper Submitted Successfully. You may view the status under myHistory."
         );
-        router.push('/my-history');
-        
-      } else console.log("error");
+        router.push("/my-history");
+      } else {
+        console.log("error");
+        deleteFileIfUnsuccess(
+          data.hash,
+          props.conferencePDA,
+          props.conferenceId
+        );
+      }
     } catch (error) {
       console.log(error.message);
     }

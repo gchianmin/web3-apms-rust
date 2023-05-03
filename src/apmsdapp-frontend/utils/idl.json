@@ -308,6 +308,10 @@
         {
           "name": "feedback",
           "type": "string"
+        },
+        {
+          "name": "feedbackSubmittedDatetime",
+          "type": "string"
         }
       ]
     },
@@ -357,11 +361,175 @@
         {
           "name": "dateSubmitted",
           "type": "string"
+        },
+        {
+          "name": "responseLetterHash",
+          "type": "string"
+        },
+        {
+          "name": "responseLetterName",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "makePayment",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "paymentDate",
+          "type": "string"
+        },
+        {
+          "name": "presenter",
+          "type": {
+            "defined": "Registration"
+          }
+        }
+      ]
+    },
+    {
+      "name": "payoutReviewer",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recepient",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "recepientWallet",
+          "type": "publicKey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "registerConference",
+      "accounts": [
+        {
+          "name": "conferenceList",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "conferenceid",
+          "type": "publicKey"
+        },
+        {
+          "name": "paperHash",
+          "type": "string"
+        },
+        {
+          "name": "presenter",
+          "type": {
+            "defined": "Registration"
+          }
+        },
+        {
+          "name": "paymentTransaction",
+          "type": "string"
         }
       ]
     }
   ],
   "accounts": [
+    {
+      "name": "RecepientListData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u8"
+          },
+          {
+            "name": "recepient",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "ConferenceListAccountData",
       "type": {
@@ -510,8 +678,24 @@
             "type": "string"
           },
           {
+            "name": "responseLetterHash",
+            "type": "string"
+          },
+          {
+            "name": "responseLetterName",
+            "type": "string"
+          },
+          {
             "name": "feePaid",
             "type": "u64"
+          },
+          {
+            "name": "feePaidDatetime",
+            "type": "string"
+          },
+          {
+            "name": "feePaidTransaction",
+            "type": "string"
           },
           {
             "name": "reviewer",
@@ -526,6 +710,32 @@
             "type": {
               "defined": "Reviewers"
             }
+          },
+          {
+            "name": "registrationDetails",
+            "type": {
+              "defined": "Registration"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Registration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "presenterName",
+            "type": "string"
+          },
+          {
+            "name": "presenterEmail",
+            "type": "string"
+          },
+          {
+            "name": "presenterAffiliation",
+            "type": "string"
           }
         ]
       }
@@ -581,7 +791,7 @@
           },
           {
             "name": "tpcWallet",
-            "type": "string"
+            "type": "publicKey"
           },
           {
             "name": "approval",
@@ -589,6 +799,18 @@
           },
           {
             "name": "feedback",
+            "type": "string"
+          },
+          {
+            "name": "feedbackSubmittedDatetime",
+            "type": "string"
+          },
+          {
+            "name": "paidout",
+            "type": "u8"
+          },
+          {
+            "name": "reviewDeadline",
             "type": "string"
           }
         ]
@@ -615,9 +837,14 @@
       "code": 6003,
       "name": "NotReviewedByAll",
       "msg": "All the reviewers must finish reviewing before the chair can make the final review"
+    },
+    {
+      "code": 6004,
+      "name": "TokenTransactionError",
+      "msg": "Error in token transaction"
     }
   ],
   "metadata": {
-    "address": "7VcDbEGMS6hvjMPMVhDzEncpxQ8LnDjLDXEMDXZD5nBJ"
+    "address": "BM3EhSJkrjWfzeWEiVAyjRTndaWUUjgjAWBJpWtQhemb"
   }
 }

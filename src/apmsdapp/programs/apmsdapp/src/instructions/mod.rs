@@ -8,6 +8,10 @@ pub use update_tpc::*;
 pub use assign_reviewer::*;
 pub use review_paper::*;
 pub use revise_paper::*;
+pub use make_payment::*;
+pub use payout_reviewer::*;
+pub use withdraw::*;
+pub use register_conference::*;
 
 mod initialize;
 mod create_conference;
@@ -19,3 +23,7 @@ mod update_tpc;
 mod assign_reviewer;
 mod review_paper;
 mod revise_paper;
+mod make_payment;
+mod payout_reviewer;
+mod withdraw;
+mod register_conference;

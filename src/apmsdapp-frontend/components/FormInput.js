@@ -63,33 +63,23 @@ export default function FormInput({
         router
       );
     } catch (error) {
-      initializeAccount();
-      createConference(
-        email,
-        createdby,
-        name,
-        description,
-        date,
-        venue,
-        deadlines,
-        conferencelink,
-        router
-      );
+      console.log(error)
     }
   };
-  const handleCreateSubmit = (event) => {
+  const handleCreateSubmit = async (event) => {
     try {
       // Stop the form from submitting and refreshing the page.
       event.preventDefault();
+      const d = new Date();
       // Get data from the form.
       const data = {
         email: event.target.email.value,
         createdby: event.target.createdby.value,
         name: event.target.name.value,
         description: event.target.description.value,
-        date: event.target.date.value,
+        date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         venue: event.target.venue.value,
-        deadlines: event.target.deadlines.value,
+        deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
         conferencelink: event.target.conferencelink.value,
         // image: event.target.image.value,
       };
@@ -98,7 +88,7 @@ export default function FormInput({
         alert("please make sure the email address match your login email");
         return;
       }
-      createNewConference(
+      await createNewConference(
         data.email,
         data.createdby,
         data.name,
@@ -120,9 +110,9 @@ export default function FormInput({
     const data = {
       name: event.target.name.value,
       description: event.target.description.value,
-      date: event.target.date.value,
+      date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
       venue: event.target.venue.value,
-      deadlines: event.target.deadlines.value,
+      deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
       conferencelink: event.target.conferencelink.value,
       technicalProgramsCommittees: formData,
     };
@@ -157,6 +147,7 @@ export default function FormInput({
                 name="email"
                 placeholder="email address of the organiser"
                 type="email"
+                defaultValue={user.email}
                 required
               />
             </Col>

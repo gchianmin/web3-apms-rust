@@ -1,22 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { useRouter } from "next/router";
 import FormInput from "./FormInput";
 import TpcForm from "./TpcForm";
-import { cancelConference } from "../Common/AdminInstructions";
+import { cancelConference, payoutReviewers } from "../Common/AdminInstructions";
 import { connectWallet } from "../Common/WalletConnection";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
+
 function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
   const [editModal, setEditModal] = useState(false);
+  const [payoutModal, setPayoutModal] = useState(false);
   const [tpcModal, setTpcModal] = useState(false);
   const editToggle = () => setEditModal(!editModal);
+  const payoutToggle = () => setPayoutModal(!payoutModal);
   const tpcToggle = () => setTpcModal(!tpcModal);
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
   const router = useRouter();
   const { user } = useUser();
-
+ 
   const sendProps = (href, conferencePDA, conferenceId, conferenceName) => {
     router.push({
       pathname: href,
@@ -27,6 +30,25 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
       },
     });
   };
+   
+
+  const payout = async() => {
+    try {
+      let wa = []
+      wa.push(existingDetails.paperSubmitted[0].reviewer[0].tpcWallet)
+      wa.push(existingDetails.paperSubmitted[0].paperChair.tpcWallet)
+      console.log(wa)
+      const res = await payoutReviewers(existingDetails.id, conferencePDA, wa)
+
+      console.log("res", res)
+      if (res) {
+        alert("payout success");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
@@ -56,7 +78,7 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
         </div>
       ) : (
         <>
-          <div className="d-flex justify-content-center d-grid col-7 mx-auto">
+          <div className="d-flex justify-content-center d-grid col-9 mx-auto">
             <Button
               className="btn btn-block btn-info mr-4 btn-alignment"
               onClick={() =>
@@ -94,12 +116,28 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
                   Edit
                 </Button>
                 <Button
-                  className="btn btn-block btn-danger mt-0 btn-alignment"
+                  className="btn btn-block btn-danger mt-0 mr-4 btn-alignment"
                   onClick={toggle}
                 >
                   Cancel
                 </Button>
+
+                <Button
+                  className="btn btn-block btn-warning  mt-0 btn-alignment"
+                  // onClick={payoutToggle}
+                  onClick={() =>
+                    sendProps(
+                      "/reviewers-payout",
+                      conferencePDA,
+                      existingDetails.id.toString(),
+                      existingDetails.name
+                    )
+                  }
+                >
+                  Payout to Reviewers
+                </Button>
               </>
+
             )}
           </div>
 
@@ -144,6 +182,32 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
                 </Button>
               )}{" "}
               <Button color="secondary" onClick={toggle}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+
+          <Modal isOpen={payoutModal} toggle={payoutToggle} id="payout">
+            <ModalHeader toggle={payoutToggle}>Payout to Reviewers</ModalHeader>
+            <ModalBody>
+              Confirm paying out to reviewers? Each reviewer will get 1 SOL for every paper reviewed. Please note that this action is
+              irreversible. (Note that you will receive SOL from the conference before paying out to the reviewers)
+            </ModalBody>
+            <ModalFooter>
+              {!walletAddress && (
+                <Button color="success" onClick={connectWallet}>
+                  Connect wallet to proceed
+                </Button>
+              )}
+              {walletAddress && (
+                <Button
+                  color="warning"
+                  onClick={payout}
+                >
+                  Confirm
+                </Button>
+              )}{" "}
+              <Button color="secondary" onClick={payoutToggle}>
                 Cancel
               </Button>
             </ModalFooter>

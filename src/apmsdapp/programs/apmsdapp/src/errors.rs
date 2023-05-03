@@ -10,4 +10,6 @@ pub enum ConferenceError {
   PaperNotFound,
   #[msg("All the reviewers must finish reviewing before the chair can make the final review")]
   NotReviewedByAll,
+  #[msg("Error in token transaction")]
+  TokenTransactionError,
 }

@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/router";
 
 const sendProps = (href, conferenceId, router) => {
+  console.log("vfvdff", conferenceId)
   router.push({
     pathname: href,
     query: {
@@ -21,7 +22,7 @@ const sendProps = (href, conferenceId, router) => {
 // if page == main
 const renderMainContainer = (props, pk, router) => (
   <>
-    <div className="my-2">
+    <div className="my-2" >
       <a
         className="text-decoration-none"
         onClick={() =>
@@ -70,7 +71,6 @@ export default function CardComponent({
   pk,
   page,
 }) {
-  console.log(props)
   const router = useRouter();
   return page == "main"
     ? renderMainContainer(props, pk, router)

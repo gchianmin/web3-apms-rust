@@ -66,6 +66,7 @@ function MyHistory() {
   return (
     <>
       <Header props={`History`} />
+      <div className="pl-5 pt-4 pb-3">
       <h2>History </h2>
       <p>
         This page shows the history of your action done in each conference. You
@@ -108,6 +109,7 @@ function MyHistory() {
       ) : (
         <p className="text-muted font-italic"> No papers Reviewed</p>
       )}
+      </div>
     </>
   );
 }

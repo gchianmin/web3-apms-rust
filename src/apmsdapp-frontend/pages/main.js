@@ -28,7 +28,7 @@ export default function Main() {
       )}
     </>
   );
-
+   
   // if conferences list == null
   const renderEmptyContainer = () => (
     <>
@@ -40,6 +40,7 @@ export default function Main() {
 
   useEffect(() => {
     getAllConferences().then((res) => setConferences(res));
+    
   }, []);
 
   return (

@@ -79,13 +79,14 @@ function MyTask() {
   return (
     <>
       <Header props={`Pending Tasks`} />
-      <div className="pl-5 pt-4 pb-3"></div>
+      <div className="pl-5 pt-4 pb-3">
       <h2>Tasks pending your action</h2>
       <p>
         This page shows the tasks assigned to you eg pending payment or papers
         pending for your reviews
       </p>
-      <h4 className="pt-3">Paper To Revise</h4>
+  
+      <h4 className="pt-3 ">Paper To Revise</h4>
       {paperToRevise.length > 0 ? (
         <AccordionTable
           props={JSON.stringify(paperToRevise)}
@@ -136,6 +137,7 @@ function MyTask() {
           No papers pending for your review
         </p>
       )}
+      </div>
     </>
   );
 }
