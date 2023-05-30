@@ -209,7 +209,7 @@ export const assignReviewersandChair = async (
     const conferenceListPDA = new PublicKey(conferencePDA);
     let id = new PublicKey(conferenceId);
 
-    await program.methods
+    const res =  await program.methods
       .assignReviewer(id, paperId, reviewers, chair)
       .accounts({
         conferenceList: conferenceListPDA,
@@ -218,7 +218,9 @@ export const assignReviewersandChair = async (
       .rpc();
 
     alert("added successfully");
-    window.location.reload();
+    return res;
+    
+    
   } catch (error) {
     alert("error assigning reviewers and chair: ", error);
     console.log("error assigning reviewers: ", error);
