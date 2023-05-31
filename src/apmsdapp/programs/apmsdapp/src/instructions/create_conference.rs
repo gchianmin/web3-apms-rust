@@ -16,7 +16,7 @@ pub fn create_conference(ctx: Context<CreateConference>, name: String, descripti
     None => account.count,
   };
   let admin = *ctx.accounts.user.key;
-  let (id, _) = Pubkey::find_program_address(&[b"conference", &[index]], ctx.program_id);
+  let (id, _) = Pubkey::find_program_address(&[name.as_bytes().as_ref(), &[index]], ctx.program_id);
   account.count += 1;
   account.conferences.push(Conference {
     id,
