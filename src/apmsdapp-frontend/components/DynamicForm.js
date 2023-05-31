@@ -1,3 +1,4 @@
+// dynamic form for paper submission
 import React, { useState } from "react";
 import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
 import {
@@ -119,7 +120,11 @@ const DynamicForm = ({ props }) => {
         paper.title,
         paper.abstract,
         authors,
-        d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
+        d.toLocaleDateString() +
+          " " +
+          d.toLocaleTimeString() +
+          " " +
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
         new BN(1),
         ""
       );
@@ -128,6 +133,28 @@ const DynamicForm = ({ props }) => {
         alert(
           "Paper Submitted Successfully. You may view the status under myHistory."
         );
+
+        const res = await fetch("/api/submissionack", {
+          body: JSON.stringify({
+            name: user.name,
+            email: user.email,
+            conferenceName: props.conferenceName,
+            id: data.entropy,
+            title: paper.title,
+            authors: authors.map((author) => author.authorName).join(", "),
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        const { error } = await res.json();
+        if (error) {
+          console.error(error);
+          return;
+        }
+
         router.push("/my-history");
       } else {
         console.log("error");

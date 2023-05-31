@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Reviewer {
+  id String @id
+  conference_pda String
+  conference_id String
+  conference_name String
+  paper_id String
+  paper_title String
+  reviewer_email String  
+  reviewer_name String
+  invitation_sent Int
+  invitation_sent_date DateTime  @default(now())
+  invitation_exp DateTime 
+  acceptance Int
+  role String
+  organiser_email String  
+}

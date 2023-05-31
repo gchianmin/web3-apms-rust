@@ -17,7 +17,7 @@ export default function ViewPaper() {
   } = router;
   const props = { conferencePDA, conferenceId, conferenceName };
   const [walletAddress, setWalletAddress] = useState(null);
-  console.log("this paper?", papers);
+
   useEffect(() => {
     if (!router.isReady) return;
     checkIfWalletIsConnected().then((res) => setWalletAddress(res));

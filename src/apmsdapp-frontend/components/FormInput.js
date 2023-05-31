@@ -88,6 +88,7 @@ export default function FormInput({
         alert("please make sure the email address match your login email");
         return;
       }
+
       await createNewConference(
         data.email,
         data.createdby,
@@ -99,6 +100,26 @@ export default function FormInput({
         data.conferencelink,
         router
       );
+
+      const res = await fetch("/api/createconferenceack", {
+        body: JSON.stringify({
+          organiserName: data.createdby,
+          organiserEmail: data.email,
+          conferenceName: data.name, 
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+  
+      const { error } = await res.json();
+      if (error) {
+        console.error(error);
+        return;
+      }
+      
+     
     } catch (error) {
       console.error(error);
     }

@@ -10,10 +10,7 @@ import {
 import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 
 function MyHistory() {
-  console.log("myhistory page");
   const router = useRouter();
-  //   const { user } = useUser();
-  console.log("mytask page");
   const [paperSubmitted, setPaperSubmitted] = useState([]);
   const [paperReviewed, setPaperReviewed] = useState([]);
   const [paperReviewedChair, setPaperReviewedChair] = useState([]);

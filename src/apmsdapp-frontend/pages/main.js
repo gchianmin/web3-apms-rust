@@ -28,7 +28,7 @@ export default function Main() {
       )}
     </>
   );
-   
+
   // if conferences list == null
   const renderEmptyContainer = () => (
     <>
@@ -40,7 +40,7 @@ export default function Main() {
 
   useEffect(() => {
     getAllConferences().then((res) => setConferences(res));
-    
+    console.log(JSON.stringify(conferences))
   }, []);
 
   return (
@@ -53,9 +53,11 @@ export default function Main() {
             <br /> → View Conferences Organised by me ←<br />
           </Link>
         )}
-        {(conferences.find((c)=> c.account.count != 0)) && renderConferencesContainer()}
+        {conferences.find((c) => c.account.count != 0) &&
+          renderConferencesContainer()}
       </div>
-      {(conferences.filter((c)=> c.account.count == 0).length == conferences.length) && renderEmptyContainer()}
+      {conferences.filter((c) => c.account.count == 0).length ==
+        conferences.length && renderEmptyContainer()}
     </>
   );
 }

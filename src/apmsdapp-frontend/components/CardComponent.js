@@ -71,6 +71,10 @@ export default function CardComponent({
   pk,
   page,
 }) {
+  console.log("-=-=OFHDUVHIFD1", props)
+  console.log("-=-=OFHDUVHIFD2", JSON.stringify(pk))
+  console.log("-=-=OFHDUVHIFD3", page)
+
   const router = useRouter();
   return page == "main"
     ? renderMainContainer(props, pk, router)

@@ -48,9 +48,9 @@ export default function AccordionTable({
   }, [props]);
 
   const getPaidOutStatus = (status) => {
-    if (status == 1) return "Completed"
-    return "Pending Payout"
-  }
+    if (status == 1) return "Completed";
+    return "Pending Payout";
+  };
   const getTpcList = async () => {
     try {
       const getConf = await getConference(
@@ -185,6 +185,7 @@ export default function AccordionTable({
                           tpc={tpc}
                           conference={conference}
                           paperId={item.paperHash}
+                          paper={item}
                         />
                       )}
                     </td>
@@ -379,7 +380,7 @@ export default function AccordionTable({
           <Table responsive={true}>
             <thead className="text-center">
               <tr>
-              <th style={{ width: "1%" }}> </th>
+                <th style={{ width: "1%" }}> </th>
                 <th style={{ width: "25%" }}>Conference</th>
                 <th style={{ width: "25%" }}>Paper Title</th>
                 <th style={{ width: "25%" }}>Abstract</th>
@@ -447,6 +448,7 @@ export default function AccordionTable({
                         conferenceId={item.conferenceId}
                         paperHash={item.paperHash}
                         walletAddress={walletAddress}
+                        paper = {item}
                       />
                     </td>
                   </tr>
@@ -596,6 +598,7 @@ export default function AccordionTable({
                           conferenceId={item.conferenceId}
                           paperHash={item.paperHash}
                           walletAddress={walletAddress}
+                          paper = {item}
                         />
                       )}
                     </td>
@@ -661,7 +664,7 @@ export default function AccordionTable({
                               <Table bordered={true}>
                                 <thead>
                                   <tr>
-                                  <th
+                                    <th
                                       style={{
                                         width: "15%",
                                       }}
@@ -703,7 +706,6 @@ export default function AccordionTable({
                                       )}
                                       <td>{name.feedback}</td>
                                       <td>{name.feedbackSubmittedDatetime}</td>
-
                                     </tr>
                                   ))}
                                 </tbody>
@@ -719,7 +721,7 @@ export default function AccordionTable({
                               <Table bordered={true}>
                                 <thead>
                                   <tr>
-                                  <th
+                                    <th
                                       style={{
                                         width: "15%",
                                       }}
@@ -763,8 +765,12 @@ export default function AccordionTable({
                                       </td>
                                     )}
                                     <td>{item.paperChair.feedback}</td>
-                                    <td>{item.paperChair.feedbackSubmittedDatetime}</td>
-
+                                    <td>
+                                      {
+                                        item.paperChair
+                                          .feedbackSubmittedDatetime
+                                      }
+                                    </td>
                                   </tr>
                                 </tbody>
                               </Table>
@@ -1395,7 +1401,7 @@ export default function AccordionTable({
           <Table responsive={true}>
             <thead className="text-center">
               <tr>
-              <th style={{ width: "1%" }}> </th>
+                <th style={{ width: "1%" }}> </th>
                 <th style={{ width: "25%" }}>Conference</th>
                 <th style={{ width: "10%" }}>Paper ID</th>
                 <th style={{ width: "25%" }}>Paper Title</th>
@@ -1560,34 +1566,34 @@ export default function AccordionTable({
                               <Table bordered={true}>
                                 <thead className="text-center">
                                   <tr>
-                                  <th
-                                    style={{
-                                      width: "15%",
-                                    }}
-                                  >
-                                    Reviewer
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "25%",
-                                    }}
-                                  >
-                                    Approval
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "35%",
-                                    }}
-                                  >
-                                    Feedback
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "25%",
-                                    }}
-                                  >
-                                    Submitted On
-                                  </th>
+                                    <th
+                                      style={{
+                                        width: "15%",
+                                      }}
+                                    >
+                                      Reviewer
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25%",
+                                      }}
+                                    >
+                                      Approval
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "35%",
+                                      }}
+                                    >
+                                      Feedback
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25%",
+                                      }}
+                                    >
+                                      Submitted On
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1617,34 +1623,34 @@ export default function AccordionTable({
                               <Table bordered={true}>
                                 <thead className="text-center">
                                   <tr>
-                                  <th
-                                    style={{
-                                      width: "15%",
-                                    }}
-                                  >
-                                    Chair
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "25%",
-                                    }}
-                                  >
-                                    Approval
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "35%",
-                                    }}
-                                  >
-                                    Feedback
-                                  </th>
-                                  <th
-                                    style={{
-                                      width: "25%",
-                                    }}
-                                  >
-                                    Submitted On
-                                  </th>
+                                    <th
+                                      style={{
+                                        width: "15%",
+                                      }}
+                                    >
+                                      Chair
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25%",
+                                      }}
+                                    >
+                                      Approval
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "35%",
+                                      }}
+                                    >
+                                      Feedback
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25%",
+                                      }}
+                                    >
+                                      Submitted On
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1661,7 +1667,12 @@ export default function AccordionTable({
                                       </td>
                                     )}
                                     <td>{item.paperChair.feedback}</td>
-                                    <td>{item.paperChair.feedbackSubmittedDatetime}</td>
+                                    <td>
+                                      {
+                                        item.paperChair
+                                          .feedbackSubmittedDatetime
+                                      }
+                                    </td>
                                   </tr>
                                 </tbody>
                               </Table>
@@ -1840,11 +1851,11 @@ export default function AccordionTable({
 
                           <p>
                             Payout by the Organiser :{" "}
-                            {
-                              getPaidOutStatus(item.reviewer.find(
+                            {getPaidOutStatus(
+                              item.reviewer.find(
                                 (r) => r.tpcWallet.toString() === walletAddress
-                              ).paidout)
-                            }
+                              ).paidout
+                            )}
                           </p>
                         </td>
                       </tr>
@@ -1992,11 +2003,8 @@ export default function AccordionTable({
 
                           <p>
                             Payout by the Organiser :{" "}
-                            {
-                              getPaidOutStatus(item.paperChair.paidout)
-                            }
+                            {getPaidOutStatus(item.paperChair.paidout)}
                           </p>
-
                         </td>
                       </tr>
                     </>

@@ -30,6 +30,7 @@ export default function ReviewPaper() {
   const { user } = useUser();
   const [walletAddress, setWalletAddress] = useState(null);
   const [review, setReview] = useState(null);
+  const [paper, setPaper] = useState(null);
   const [radioSelected, setRadioSelected] = useState(null);
   const router = useRouter();
   const {
@@ -77,7 +78,37 @@ export default function ReviewPaper() {
         data.feedback
       );
       console.log("res", res)
-      if (res == "ok") {
+      if (res == "ok" ) {
+        switch (data.approval) {
+          case 2:
+            const res = await fetch("/api/paperacceptance", {
+              body: JSON.stringify({
+                name: 'Author',
+                conferenceName: props.conferenceName,
+                id: paper.id,
+                title: paper.title,
+                abstract: paper.abstract,
+                feedback: data.feedback,
+                authors: authors.map((author) => author.authorName).join(", "),
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+              method: "POST",
+            });
+    
+            const { error } = await res.json();
+            if (error) {
+              console.error(error);
+              return;
+            }
+            break;
+        
+          default:
+            break;
+        }
+        
+
         alert("reviewed success")
     };
     } catch (error) {
@@ -88,6 +119,7 @@ export default function ReviewPaper() {
   const getFeedback = async () => {
     const paps = await getPaper(props.conferencePDA, props.conferenceId)
     const pap = paps.find(element => element.paperHash == props.paperHash)
+    setPaper(pap)
     setReview(pap.reviewer)
     // return (<p>{JSON.stringify(pap.reviewer)}</p>)
   }

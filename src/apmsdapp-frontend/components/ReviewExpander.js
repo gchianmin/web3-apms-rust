@@ -26,6 +26,7 @@ export default function ReviewExpander({
   conferenceId,
   paperHash,
   walletAddress,
+  paper,
 }) {
   const { user } = useUser();
   const [review, setReview] = useState(null);
@@ -43,7 +44,7 @@ export default function ReviewExpander({
       feedback: event.target.feedback.value,
       approval: radioSelected,
     };
-    console.log("data", data);
+
     try {
       const d = new Date();
       const feedbackSubmittedDatetime =
@@ -81,6 +82,114 @@ export default function ReviewExpander({
         );
         console.log("res", res);
         if (res == "ok") {
+          switch (data.approval) {
+            case 2:
+              const res = await fetch("/api/paperacceptance", {
+                body: JSON.stringify({
+                  name: paper.paperAuthors[0].authorName,
+                  email: paper.paperAuthors[0].authorEmail,
+                  conferenceName: paper.conferenceName,
+                  id: paper.paperId,
+                  title: paper.paperTitle,
+                  abstract: paper.paperAbstract,
+                  authors: paper.paperAuthors
+                    .map((author) => author.authorName)
+                    .join(", "),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+              });
+
+              const { error } = await res.json();
+              if (error) {
+                console.error(error);
+                return;
+              }
+
+              break;
+            case 3:
+              const res_rev_minor = await fetch("/api/paperrevision", {
+                body: JSON.stringify({
+                  name: paper.paperAuthors[0].authorName,
+                  email: paper.paperAuthors[0].authorEmail,
+                  conferenceName: paper.conferenceName,
+                  id: paper.paperId,
+                  title: paper.paperTitle,
+                  abstract: paper.paperAbstract,
+                  revision: "minor",
+                  authors: paper.paperAuthors
+                    .map((author) => author.authorName)
+                    .join(", "),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+              });
+
+              const { error_rev_minor } = await res_rev_minor.json();
+              if (error_rej) {
+                console.error(error_rev_minor);
+                return;
+              }
+              break;
+            case 4:
+              const res_rev_mojor = await fetch("/api/paperrevision", {
+                body: JSON.stringify({
+                  // email: paper.paperAuthors[0].authorEmail,
+                  conferenceName: paper.conferenceName,
+                  id: paper.paperId,
+                  title: paper.paperTitle,
+                  abstract: paper.paperAbstract,
+                  revision: "major",
+                  authors: paper.authors
+                    .map((author) => author.authorName)
+                    .join(", "),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+              });
+
+              const { error_rev_major } = await res_rev_mojor.json();
+              if (error_rev_major) {
+                console.error(error_rev_major);
+                return;
+              }
+              break;
+            case 7:
+              const res_rej = await fetch("/api/paperrejection", {
+                body: JSON.stringify({
+                  name: paper.paperAuthors[0].authorName,
+                  email: paper.paperAuthors[0].authorEmail,
+                  conferenceName: paper.conferenceName,
+                  id: paper.paperId,
+                  title: paper.paperTitle,
+                  abstract: paper.paperAbstract,
+
+                  authors: paper.paperAuthors
+                    .map((author) => author.authorName)
+                    .join(", "),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+              });
+
+              const { error_rej } = await res_rej.json();
+              if (error_rev_minor) {
+                console.error(error_rej);
+                return;
+              }
+              break;
+
+            default:
+              break;
+          }
           alert("reviewed success");
           window.location.reload();
         }
@@ -94,7 +203,6 @@ export default function ReviewExpander({
     const paps = await getPaper(conferencePDA, conferenceId);
     const pap = paps.find((element) => element.paperHash == paperHash);
     setReview(pap.reviewer);
-    // return (<p>{JSON.stringify(pap.reviewer)}</p>)
   };
 
   return (
@@ -104,7 +212,7 @@ export default function ReviewExpander({
         Review
       </Button>
       <Modal isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Payment</ModalHeader>
+        <ModalHeader toggle={toggle}>Review</ModalHeader>
         <ModalBody>
           <Form
             className="align-items-center justify-contents-center "
@@ -112,7 +220,7 @@ export default function ReviewExpander({
           >
             <FormGroup>
               <Label className="text-monospace" for="feedback" sm={6}>
-                Feedback:
+                Feedback
               </Label>
               <Col sm={10}>
                 <Input
