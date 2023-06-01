@@ -31,10 +31,12 @@ export default function NavBar() {
               <Image
                 alt="logo"
                 src="/logo.ico"
-                style={{
-                  height: 40,
-                  width: 40,
-                }}
+                width={40}
+                height={40}
+                // style={{
+                //   height: 40,
+                //   width: 40,
+                // }}
               />{" "}
               APMS
             </NavbarBrand>

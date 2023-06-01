@@ -10,7 +10,6 @@ export default async (req, res) => {
         },
       })
       return res.status(200).json(JSON.stringify(reviewerList));
-    // res.end(`Post1: ${JSON.stringify(reviewerList)}`);
   } catch (error) {
     console.log(error);
     return res.status(error.statusCode || 500).json({ error: error.message });
