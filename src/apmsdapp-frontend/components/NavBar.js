@@ -14,6 +14,7 @@ import {
 } from "reactstrap";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import AnchorLink from "./AnchorLink";
+import Image from "next/image";
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function NavBar() {
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
             <NavbarBrand href="/">
-              <img
+              <Image
                 alt="logo"
                 src="/logo.ico"
                 style={{
@@ -91,7 +92,7 @@ export default function NavBar() {
               {user && (
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret id="profileDropDown">
-                    <img
+                    <Image
                       src={user.picture}
                       alt="Profile"
                       className="nav-user-profile rounded-circle"
@@ -135,7 +136,7 @@ export default function NavBar() {
               >
                 <NavItem>
                   <span className="user-info">
-                    <img
+                    <Image
                       src={user.picture}
                       alt="Profile"
                       className="nav-user-profile d-inline-block rounded-circle mr-3"
