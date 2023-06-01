@@ -22,7 +22,7 @@ export const getServerSideProps = async (context) => {
   return { props: { reviewerList: JSON.stringify(reviewerList) } };
 };
 
-export default function viewReviewerDetails({ reviewerList }) {
+export default function ViewReviewerDetails({ reviewerList }) {
   const router = useRouter();
   const {
     query: { pid },

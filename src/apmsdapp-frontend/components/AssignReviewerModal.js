@@ -17,6 +17,16 @@ import Loading from "../components/Loading"
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
+function GetReviewerList(pid) {
+  const { data, error, isLoading } = useSWR(`/api/papers/${pid}`, fetcher);
+
+  return {
+    reviewerList: data,
+    isLoading,
+    isError: error,
+  };
+}
+
 function AssignReviewerModal({
   paper,
   paperId,
@@ -25,24 +35,13 @@ function AssignReviewerModal({
   walletAddress,
   connectWallet,
 }) {
-
-  function getReviewerList(pid) {
-    const { data, error, isLoading } = useSWR(`/api/papers/${pid}`, fetcher);
-  
-    return {
-      reviewerList: data,
-      isLoading,
-      isError: error,
-    };
-  }
   
   const [reviewerModal, setReviewerModal] = useState(false);
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [selectedChair, setSelectedChair] = useState(null);
   const reviewerToggle = () => setReviewerModal(!reviewerModal);
-  const { reviewerList, isLoading, isError } = getReviewerList(paper.paperId)
+  const { reviewerList, isLoading, isError } = GetReviewerList(paper.paperId)
   if (isLoading) return <Loading />
-  if (isError) return <Error />
   if (reviewerList) console.log("this is reiv", reviewerList)
 
   const acceptedReviewer = tpc.filter((tpc) => {
@@ -173,7 +172,7 @@ function AssignReviewerModal({
             here {''}
           </Link>to view the review invitation status first.</p>
 
-          <p><i>* Note that you can't remove reviewers/paper chair that have agreed to review.</i></p>
+          <p><i>* Note that you can&apos;t remove reviewers/paper chair that have agreed to review.</i></p>
 
           <p>Select reviewers:</p>
 
