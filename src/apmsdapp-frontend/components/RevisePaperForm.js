@@ -199,7 +199,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
 
         <FormGroup row>
           <Label className="text-monospace" for="letter" sm={2}>
-            Response Letter <small className="font-italic">[to address reviewers' feedback]</small>
+            Response Letter <small className="font-italic">[to address reviewers&apos; feedback]</small>
           </Label>
           <Col>
             <Input

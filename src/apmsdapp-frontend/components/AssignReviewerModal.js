@@ -17,17 +17,6 @@ import Loading from "../components/Loading"
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-function getReviewerList(pid) {
-  const { data, error, isLoading } = useSWR(`/api/papers/${pid}`, fetcher);
-
-  return {
-    reviewerList: data,
-    isLoading,
-    isError: error,
-  };
-}
-
-
 function AssignReviewerModal({
   paper,
   paperId,
@@ -36,6 +25,17 @@ function AssignReviewerModal({
   walletAddress,
   connectWallet,
 }) {
+
+  function getReviewerList(pid) {
+    const { data, error, isLoading } = useSWR(`/api/papers/${pid}`, fetcher);
+  
+    return {
+      reviewerList: data,
+      isLoading,
+      isError: error,
+    };
+  }
+  
   const [reviewerModal, setReviewerModal] = useState(false);
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [selectedChair, setSelectedChair] = useState(null);

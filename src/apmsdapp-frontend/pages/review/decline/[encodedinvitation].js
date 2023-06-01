@@ -107,7 +107,7 @@ export default function DeclineInvitationPage({ invitation, paperDetails }) {
           <p className="lead hero pb-5 pt-4">
             Hi {paper.reviewer_name}, you are invited to review paper #{paper.paper_id} -{" "}
             {paper.paper_title}. To <em>decline</em> the invitation, please click
-            'Confirm' below. We look forward to your next contribution!
+            &apos;Confirm&apos; below. We look forward to your next contribution!
           </p>
         )}
 

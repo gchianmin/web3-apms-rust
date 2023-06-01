@@ -18,9 +18,7 @@ export const getServerSideProps = async (context) => {
       paper_id: pid,
     },
   });
-  // console.log("server side teehee")
-  // const res = await fetch('https://api.github.com/repos/vercel/next.js');
-  // const repo = await res.json();
+ 
   return { props: { reviewerList: JSON.stringify(reviewerList) } };
 };
 
@@ -29,11 +27,9 @@ export default function viewReviewerDetails({ reviewerList }) {
   const {
     query: { pid },
   } = router;
-  //   const reviewerList = getReviewerList(pid).reviewerList;
-  console.log("vfdoivifhvidhfv", reviewerList);
   useEffect(() => {
     if (!router.isReady) return;
-    // decodeInvitation();
+
   }, [router.isReady]);
 
   //   const notify = async () => {

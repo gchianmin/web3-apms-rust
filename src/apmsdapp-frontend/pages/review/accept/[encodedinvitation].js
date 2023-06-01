@@ -108,7 +108,7 @@ export default function AcceptInvitationPage({ invitation, paperDetails }) {
           <p className="lead hero pb-5 pt-4">
             Hi {paper.reviewer_name}, you are invited to review paper #{paper.paper_id} -{" "}
             {paper.paper_title}. To <em>accept</em> the invitation, please click
-            'Confirm' below and login to the system to start reviewing!
+            &apos;Confirm&apos; below and login to the system to start reviewing!
           </p>
         )}
 
