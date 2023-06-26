@@ -171,10 +171,9 @@ export const createConference = async (
     const conferenceInfo =
       await program.account.conferenceListAccountData.all();
     if (!conferenceInfo.find(c=>c.publicKey.toString() == conferencePDA.toString())) {
-      console.log("nah", conferenceInfo)
       await initializeAccount();
     }
-    await program.methods
+    const res = await program.methods
       .createConference(
         name,
         description,
@@ -190,9 +189,12 @@ export const createConference = async (
         user: provider.wallet.publicKey,
       })
       .rpc();
-    router.push("/main");
+  
+    return (200)
   } catch (error) {
     console.log(error);
+    return (error.statusCode || 500)
+    // return res.status(error.statusCode || 500).json({ error: error.message });
   }
 };
 
