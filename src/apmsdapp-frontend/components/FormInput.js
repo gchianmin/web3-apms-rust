@@ -333,7 +333,7 @@ export default function FormInput({
                 name="date"
                 type="date"
                 required
-                defaultValue={existingDetails.date}
+                defaultValue={existingDetails.date.split(' ')[0]}
               />
             </Col>
           </FormGroup>
@@ -364,7 +364,7 @@ export default function FormInput({
                 name="deadlines"
                 type="date"
                 required
-                defaultValue={existingDetails.submissionDeadline}
+                defaultValue={existingDetails.submissionDeadline.split(' ')[0]}
               />
             </Col>
           </FormGroup>
