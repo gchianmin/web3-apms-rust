@@ -51,7 +51,7 @@ export default function FormInput({
     router
   ) => {
     try {
-      createConference(
+      const res = await createConference(
         email,
         createdby,
         name,
@@ -62,8 +62,11 @@ export default function FormInput({
         conferencelink,
         router
       );
+  
+    return res
     } catch (error) {
-      console.log(error)
+      console.log(error);
+     
     }
   };
   const handleCreateSubmit = async (event) => {
@@ -77,19 +80,25 @@ export default function FormInput({
         createdby: event.target.createdby.value,
         name: event.target.name.value,
         description: event.target.description.value,
-        date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
+        date:
+          event.target.date.value +
+          " " +
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
         venue: event.target.venue.value,
-        deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
+        deadlines:
+          event.target.deadlines.value +
+          " " +
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
         conferencelink: event.target.conferencelink.value,
         // image: event.target.image.value,
       };
-      console.log(data);
+     
       if (data.email != user.email) {
         alert("please make sure the email address match your login email");
         return;
       }
 
-      await createNewConference(
+      const createSuccess = await createNewConference(
         data.email,
         data.createdby,
         data.name,
@@ -100,26 +109,28 @@ export default function FormInput({
         data.conferencelink,
         router
       );
+       
 
-      const res = await fetch("/api/createconferenceack", {
-        body: JSON.stringify({
-          organiserName: data.createdby,
-          organiserEmail: data.email,
-          conferenceName: data.name, 
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      });
-  
-      const { error } = await res.json();
-      if (error) {
-        console.error(error);
-        return;
+      if (createSuccess == 200) {
+        const res = await fetch("/api/createconferenceack", {
+          body: JSON.stringify({
+            organiserName: data.createdby,
+            organiserEmail: data.email,
+            conferenceName: data.name,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        const { error } = await res.json();
+        if (error) {
+          console.error(error);
+          return;
+        }
+        router.push("/main");
       }
-      
-     
     } catch (error) {
       console.error(error);
     }
@@ -131,9 +142,15 @@ export default function FormInput({
     const data = {
       name: event.target.name.value,
       description: event.target.description.value,
-      date: event.target.date.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
+      date:
+        event.target.date.value +
+        " " +
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
       venue: event.target.venue.value,
-      deadlines: event.target.deadlines.value + " " + Intl.DateTimeFormat().resolvedOptions().timeZone,
+      deadlines:
+        event.target.deadlines.value +
+        " " +
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
       conferencelink: event.target.conferencelink.value,
       technicalProgramsCommittees: formData,
     };
