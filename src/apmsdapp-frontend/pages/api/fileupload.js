@@ -2,14 +2,6 @@ import { IncomingForm } from "formidable";
 const fs = require("fs-extra");
 const CryptoJS = require("crypto-js");
 const crypto = require("crypto");
-import path from "path";
-import {
-  S3Client,
-  PutObjectCommand,
-  HeadObjectCommand,
-  HeadObjectCommandInput,
-} from "@aws-sdk/client-s3";
-import { createReadStream } from "fs";
 
 export const config = {
   api: {
