@@ -2,7 +2,14 @@ import { IncomingForm } from "formidable";
 const fs = require("fs-extra");
 const CryptoJS = require("crypto-js");
 const crypto = require("crypto");
-import path from 'path';
+import path from "path";
+import {
+  S3Client,
+  PutObjectCommand,
+  HeadObjectCommand,
+  HeadObjectCommandInput,
+} from "@aws-sdk/client-s3";
+import { createReadStream } from "fs";
 
 export const config = {
   api: {
@@ -24,6 +31,26 @@ const generateEntropy = () => {
   return result;
 };
 
+const checkIfFileExist = async (
+  conferencePDA,
+  conferenceId,
+  hash,
+  fileName
+) => {
+  try {
+    console.log(conferencePDA, conferenceId, hash, fileName);
+    const s3Client = new S3Client({});
+    const response = await s3Client.send(
+      new HeadObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `${conferencePDA}/${conferenceId}/${hash}/${fileName}`,
+      })
+    );
+    return true;
+  } catch (error) {
+    if (error.$metadata.httpStatusCode === 404) return false;
+  }
+};
 export default async (req, res) => {
   if (req.method === "POST") {
     // parse form with a Promise wrapper
@@ -37,13 +64,14 @@ export default async (req, res) => {
     // console.log("greger", data.files.file);
 
     try {
+      const s3Client = new S3Client({});
       const props = JSON.parse(data.fields.props);
       var letterHash = "";
       var letterName = "";
       if (data.files.responseLetter) {
         try {
           const letter = data.files.responseLetter;
-          letterName = letter.originalFilename
+          letterName = letter.originalFilename;
           const letterPath = letter.filepath;
           const file = await fs.readFile(letterPath);
           letterHash = CryptoJS.MD5(file.toString()).toString();
@@ -74,23 +102,48 @@ export default async (req, res) => {
       const file = await fs.readFile(paperPath);
       const hash = CryptoJS.MD5(file.toString()).toString();
       const entropy = generateEntropy();
-      // console.log(entropy);
-      // console.log("isit ths", hash);
-      console.log("vsdvsdvhey")
 
-      const pathToWritePaper = path.join(process.cwd(), `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/` )
-      // const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
-      console.log("vsdvsdv", pathToWritePaper)
-      if (fs.pathExistsSync(pathToWritePaper)) {
+      const uploadCommand = new PutObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `${props.conferencePDA}/${props.conferenceId}/${hash}/${paper.originalFilename}`,
+        Body: createReadStream(paperPath),
+      });
+
+      const checkExistCommand = new HeadObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `${props.conferencePDA}/${props.conferenceId}/${hash}/${paper.originalFilename}`,
+      });
+
+      // const pathToWritePaper = path.join(process.cwd(), `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/` )
+      // // const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
+      // console.log("vsdvsdv", pathToWritePaper)
+      // if (fs.pathExistsSync(pathToWritePaper)) {
+      //   res
+      //     .status(409)
+      //     .json({ message: "Same file already exists in the system!" });
+      //   return;
+      // }
+      // fs.mkdirsSync(pathToWritePaper);
+      // const fullPathToWritePaper =
+      //   pathToWritePaper + `${paper.originalFilename}`;
+      // await fs.writeFile(fullPathToWritePaper, file);
+
+      const response = await checkIfFileExist(
+        props.conferencePDA,
+        props.conferenceId,
+        hash,
+        paper.originalFilename
+      );
+      console.log("yeww", response);
+
+      if (response === true) {
         res
           .status(409)
           .json({ message: "Same file already exists in the system!" });
         return;
       }
-      fs.mkdirsSync(pathToWritePaper);
-      const fullPathToWritePaper =
-        pathToWritePaper + `${paper.originalFilename}`;
-      await fs.writeFile(fullPathToWritePaper, file);
+      
+      await s3Client.send(uploadCommand);
       res.status(200).json({
         message: "file uploaded!",
         hash: hash,

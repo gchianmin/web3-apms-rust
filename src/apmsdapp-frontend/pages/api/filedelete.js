@@ -1,5 +1,7 @@
 const fs = require("fs-extra");
 import { IncomingForm } from "formidable";
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+
 
 export const config = {
   api: {
@@ -16,15 +18,25 @@ export default async (req, res) => {
     });
   });
   try {
-    console.log(data)
+    // console.log(data)
+    const s3Client = new S3Client({});
     const paperHash = data.fields.paperHash
+    const paperName = data.fields.paperName
     const conferenceListPDA = data.fields.conferenceListPDA
     const conferenceId = data.fields.conferenceId
-    const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperHash}/`;
-    fs.remove(pathToDeletePaper, (err) => {
-      if (err) return console.error(err);
-      console.log("success!"); 
+
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: process.env.BUCKET_NAME,
+      Key: `${conferenceListPDA}/${conferenceId}/${paperHash}/${paperName}`,
     });
+    // const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperHash}/`;
+    // fs.remove(pathToDeletePaper, (err) => {
+    //   if (err) return console.error(err);
+    //   console.log("success!"); 
+    // });
+    // console.log(deleteCommand)
+    const response = await s3Client.send(deleteCommand);
+
     res.status(200).json({ message: "file deleted!" });
   } catch (error) {
     res.status(500).json({ message: error.message });

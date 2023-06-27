@@ -159,6 +159,7 @@ const DynamicForm = ({ props }) => {
       } else {
         console.log("error");
         deleteFileIfUnsuccess(
+          data.fileName,
           data.hash,
           props.conferencePDA,
           props.conferenceId
