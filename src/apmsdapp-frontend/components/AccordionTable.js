@@ -169,7 +169,8 @@ export default function AccordionTable({
                             deletePaper(
                               conference.conferencePDA,
                               conference.conferenceId,
-                              item.paperHash
+                              item.paperHash,
+                              item.paperName
                             )
                           }
                         >
@@ -866,7 +867,8 @@ export default function AccordionTable({
                             deletePaper(
                               item.pk,
                               item.conferenceId,
-                              item.paperHash
+                              item.paperHash,
+                              item.paperName
                             )
                           }
                         >
@@ -1173,7 +1175,8 @@ export default function AccordionTable({
                             deletePaper(
                               item.pk,
                               item.conferenceId,
-                              item.paperHash
+                              item.paperHash,
+                              item.paperName
                             )
                           }
                         >
@@ -1466,7 +1469,8 @@ export default function AccordionTable({
                             deletePaper(
                               item.pk,
                               item.conferenceId,
-                              item.paperHash
+                              item.paperHash,
+                              item.paperName
                             )
                           }
                         >

@@ -46,7 +46,7 @@ export const submitPaper = async (
   }
 };
 
-export const deletePaper = async (conferencePDA, conferenceId, paperHash) => {
+export const deletePaper = async (conferencePDA, conferenceId, paperHash, paperName) => {
   try {
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
@@ -54,7 +54,7 @@ export const deletePaper = async (conferencePDA, conferenceId, paperHash) => {
 
     let id = new PublicKey(conferenceId);
 
-    await program.methods
+    const response = await program.methods
       .deletePaper(id, paperHash)
       .accounts({
         conferenceList: conferenceListPDA,
@@ -62,18 +62,23 @@ export const deletePaper = async (conferencePDA, conferenceId, paperHash) => {
       })
       .rpc();
 
-    await deleteFile(paperHash, conferenceListPDA, conferenceId);
+    // if (response) {
+    await deleteFile(paperName, paperHash, conferenceListPDA, conferenceId);
+    // }
+    
   } catch (error) {
     console.log("Error deleting paper: ", error);
   }
 };
 export const deleteFileIfUnsuccess = async (
+  paperName,
   paperHash,
   conferencePDA,
   conferenceId
 ) => {
   try {
     const formData = new FormData();
+    formData.append("paperName", paperName);
     formData.append("paperHash", paperHash);
     formData.append("conferenceListPDA", conferencePDA);
     formData.append("conferenceId", conferenceId);
@@ -98,9 +103,10 @@ export const deleteFileIfUnsuccess = async (
   }
 };
 
-export const deleteFile = async (paperHash, conferencePDA, conferenceId) => {
+export const deleteFile = async (paperName, paperHash, conferencePDA, conferenceId) => {
   try {
     const formData = new FormData();
+    formData.append("paperName", paperName);
     formData.append("paperHash", paperHash);
     formData.append("conferenceListPDA", conferencePDA);
     formData.append("conferenceId", conferenceId);
