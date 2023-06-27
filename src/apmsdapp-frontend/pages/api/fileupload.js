@@ -39,10 +39,11 @@ const checkIfFileExist = async (
 ) => {
   try {
     console.log(conferencePDA, conferenceId, hash, fileName);
+    console.log("buc", process.env.S3_BUCKET_NAME)
     const s3Client = new S3Client({});
     const response = await s3Client.send(
       new HeadObjectCommand({
-        Bucket: process.env.BUCKET_NAME,
+        Bucket: process.env.S3_BUCKET_NAME,
         Key: `${conferencePDA}/${conferenceId}/${hash}/${fileName}`,
       })
     );
@@ -107,11 +108,6 @@ export default async (req, res) => {
         Bucket: process.env.BUCKET_NAME,
         Key: `${props.conferencePDA}/${props.conferenceId}/${hash}/${paper.originalFilename}`,
         Body: createReadStream(paperPath),
-      });
-
-      const checkExistCommand = new HeadObjectCommand({
-        Bucket: process.env.BUCKET_NAME,
-        Key: `${props.conferencePDA}/${props.conferenceId}/${hash}/${paper.originalFilename}`,
       });
 
       // const pathToWritePaper = path.join(process.cwd(), `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/` )
