@@ -2,6 +2,7 @@ import { IncomingForm } from "formidable";
 const fs = require("fs-extra");
 const CryptoJS = require("crypto-js");
 const crypto = require("crypto");
+import path from 'path';
 
 export const config = {
   api: {
@@ -33,7 +34,7 @@ export default async (req, res) => {
         resolve({ fields, files });
       });
     });
-    console.log("greger", data.files.file);
+    // console.log("greger", data.files.file);
 
     try {
       const props = JSON.parse(data.fields.props);
@@ -47,8 +48,8 @@ export default async (req, res) => {
           const file = await fs.readFile(letterPath);
           letterHash = CryptoJS.MD5(file.toString()).toString();
           const entropy = generateEntropy();
-          console.log(entropy);
-          console.log("isit ths for letter", letterHash);
+          // console.log(entropy);
+          // console.log("isit ths for letter", letterHash);
           const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${letterHash}/`;
 
           if (fs.pathExistsSync(pathToWritePaper)) {
@@ -73,10 +74,13 @@ export default async (req, res) => {
       const file = await fs.readFile(paperPath);
       const hash = CryptoJS.MD5(file.toString()).toString();
       const entropy = generateEntropy();
-      console.log(entropy);
-      console.log("isit ths", hash);
-      const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
+      // console.log(entropy);
+      // console.log("isit ths", hash);
+      console.log("vsdvsdvhey")
 
+      const pathToWritePaper = path.join(process.cwd(), `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/` )
+      // const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
+      console.log("vsdvsdv", pathToWritePaper)
       if (fs.pathExistsSync(pathToWritePaper)) {
         res
           .status(409)
