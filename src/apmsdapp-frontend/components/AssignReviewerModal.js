@@ -13,7 +13,7 @@ import { assignReviewersandChair } from "../Common/AdminInstructions";
 import { getConference } from "../Common/GetConferences";
 import Link from "next/link";
 import useSWR from "swr";
-import Loading from "../components/Loading"
+import Loading from "../components/Loading";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -35,19 +35,20 @@ function AssignReviewerModal({
   walletAddress,
   connectWallet,
 }) {
-  
   const [reviewerModal, setReviewerModal] = useState(false);
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [selectedChair, setSelectedChair] = useState(null);
   const reviewerToggle = () => setReviewerModal(!reviewerModal);
-  const { reviewerList, isLoading, isError } = GetReviewerList(paper.paperId)
-  if (isLoading) return <Loading />
-  if (reviewerList) console.log("this is reiv", reviewerList)
+  const { reviewerList, isLoading, isError } = GetReviewerList(paper.paperId);
+  if (isLoading) return <Loading />;
+  if (reviewerList) console.log("this is reiv", reviewerList);
 
   const acceptedReviewer = tpc.filter((tpc) => {
     const matchingReviewer = JSON.parse(reviewerList).find(
       (reviewer) =>
-        reviewer.reviewer_email === tpc.tpcEmail && reviewer.acceptance == 1 && reviewer.role == 'reviewer'
+        reviewer.reviewer_email === tpc.tpcEmail &&
+        reviewer.acceptance == 1 &&
+        reviewer.role == "reviewer"
     );
     return matchingReviewer !== undefined;
   });
@@ -55,7 +56,9 @@ function AssignReviewerModal({
   const acceptedChair = tpc.filter((tpc) => {
     const matchingChair = JSON.parse(reviewerList).find(
       (reviewer) =>
-        reviewer.reviewer_email === tpc.tpcEmail && reviewer.acceptance == 1 && reviewer.role == 'chair'
+        reviewer.reviewer_email === tpc.tpcEmail &&
+        reviewer.acceptance == 1 &&
+        reviewer.role == "chair"
     );
     return matchingChair !== undefined;
   });
@@ -63,31 +66,51 @@ function AssignReviewerModal({
   const d = new Date();
   d.setDate(d.getDate() + 5);
   const onSelectReviewers = (selectedList, selectedItem) => {
-    selectedItem.approval = new BN(0);
-    selectedItem.feedback = "";
-    selectedItem.feedbackSubmittedDatetime = "";
-    selectedItem.transactionDatetime = "";
-    selectedItem.reviewDeadline =
-      d.toLocaleDateString() +
-      " " +
-      d.toLocaleTimeString() +
-      " " +
-      Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setSelectedReviewers(selectedList);
+    if (
+      paper.paperAuthors.some(
+        (author) => author.authorEmail === selectedItem.tpcEmail
+      )
+    ) {
+      alert("A paper reviewer cannot be one of the authors!!");
+      reviewerToggle();
+      return;
+    } else {
+      selectedItem.approval = new BN(0);
+      selectedItem.feedback = "";
+      selectedItem.feedbackSubmittedDatetime = "";
+      selectedItem.transactionDatetime = "";
+      selectedItem.reviewDeadline =
+        d.toLocaleDateString() +
+        " " +
+        d.toLocaleTimeString() +
+        " " +
+        Intl.DateTimeFormat().resolvedOptions().timeZone;
+      setSelectedReviewers(selectedList);
+    }
   };
 
   const onSelectChair = (selectedList, selectedItem) => {
-    selectedItem.approval = new BN(0);
-    selectedItem.feedback = "";
-    selectedItem.feedbackSubmittedDatetime = "";
-    selectedItem.transactionDatetime = "";
-    selectedItem.reviewDeadline =
-      d.toLocaleDateString() +
-      " " +
-      d.toLocaleTimeString() +
-      " " +
-      Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setSelectedChair(selectedItem);
+    if (
+      paper.paperAuthors.some(
+        (author) => author.authorEmail === selectedItem.tpcEmail
+      )
+    ) {
+      alert("A paper chair cannot be one of the authors!!");
+      reviewerToggle();
+      return;
+    } else {
+      selectedItem.approval = new BN(0);
+      selectedItem.feedback = "";
+      selectedItem.feedbackSubmittedDatetime = "";
+      selectedItem.transactionDatetime = "";
+      selectedItem.reviewDeadline =
+        d.toLocaleDateString() +
+        " " +
+        d.toLocaleTimeString() +
+        " " +
+        Intl.DateTimeFormat().resolvedOptions().timeZone;
+      setSelectedChair(selectedItem);
+    }
   };
 
   const handleSubmit = async () => {
@@ -99,6 +122,7 @@ function AssignReviewerModal({
       alert("A paper chair cannot be one of the reviewers!!");
       return;
     }
+
     try {
       const assign = await assignReviewersandChair(
         conference.conferencePDA,
@@ -107,7 +131,7 @@ function AssignReviewerModal({
         selectedReviewers,
         selectedChair
       );
-// const assign = 1
+      // const assign = 1
       if (assign) {
         const res = await fetch("/api/assignreviewer", {
           body: JSON.stringify({
@@ -167,12 +191,18 @@ function AssignReviewerModal({
           Adding Reviewers to The Paper
         </ModalHeader>
         <ModalBody>
-          <p>Click {''}
-           <Link href={ `/reviewer/${paper.paperId}`}>
-            here {''}
-          </Link>to view the review invitation status first.</p>
+          <p>
+            Click {""}
+            <Link href={`/reviewer/${paper.paperId}`}>here {""}</Link>to view
+            the review invitation status first.
+          </p>
 
-          <p><i>* Note that you can&apos;t remove reviewers/paper chair that have agreed to review.</i></p>
+          <p>
+            <i>
+              * Note that you can&apos;t remove reviewers/paper chair that have
+              agreed to review.
+            </i>
+          </p>
 
           <p>Select reviewers:</p>
 
