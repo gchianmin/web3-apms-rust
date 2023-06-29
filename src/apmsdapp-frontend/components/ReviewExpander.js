@@ -64,7 +64,7 @@ export default function ReviewExpander({
           data.feedback,
           feedbackSubmittedDatetime
         );
-        console.log("res", res);
+  
         if (res == "ok") {
           alert("reviewed success");
           window.location.reload();
@@ -80,7 +80,7 @@ export default function ReviewExpander({
           data.feedback,
           feedbackSubmittedDatetime
         );
-        console.log("res", res);
+       
         if (res == "ok") {
           switch (data.approval) {
             case 2:

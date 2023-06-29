@@ -12,7 +12,6 @@ import { withPageAuthRequired, useUser } from "@auth0/nextjs-auth0/client";
 function MyTask() {
   const router = useRouter();
   const { user } = useUser();
-  console.log("mytask page");
   const [paperToReview, setPaperToReview] = useState([]);
   const [walletAddress, setWalletAddress] = useState(null);
   const [paperToReviewChair, setPaperToReviewChair] = useState([]);
@@ -22,7 +21,6 @@ function MyTask() {
   const getPapersToBeReviewed = async () => {
     try {
       const res = await getPaperPendingReview("reviewer", user.email);
-      console.log(res);
       setPaperToReview(res);
     } catch (error) {
       console.log("error in my-task page", error);
@@ -32,7 +30,6 @@ function MyTask() {
   const getPapersToBeReviewedChair = async () => {
     try {
       const res = await getPaperPendingReview("chair", user.email);
-      console.log(res);
       setPaperToReviewChair(res);
     } catch (error) {
       console.log("error in my-task page", error);
@@ -42,7 +39,6 @@ function MyTask() {
   const getPapersToBeRevised = async () => {
     try {
       const res = await getPaperPendingRevision(walletAddress);
-      console.log(res);
       setPaperToRevise(res);
     } catch (error) {
       console.log("error in my-task page", error);
@@ -52,7 +48,6 @@ function MyTask() {
   const getPapersToBePaid = async () => {
     try {
       const res = await getPaperPendingPayment(walletAddress);
-      console.log(res);
       setPaperToPay(res);
     } catch (error) {
       console.log("error in my-task page", error);

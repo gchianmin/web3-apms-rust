@@ -18,7 +18,7 @@ export const getPaper = async (conferencePDA, conferenceId) => {
         // break;
       }
     }
-    console.log("ger", papers);
+   
   } catch (error) {
     console.log("Error getting a paper : ", error);
   }
@@ -60,7 +60,6 @@ export const getPaperWithHash = async (
     );
     return paper;
 
-    // console.log("ger", papers);
   } catch (error) {
     console.log("Error getting a paper : ", error);
   }
@@ -68,6 +67,7 @@ export const getPaperWithHash = async (
 
 export const getPaperPendingReview = async (role, reviewerEmail) => {
   try {
+
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
     const allAccounts = await getAllConferences();
@@ -105,8 +105,24 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
           paperWithReviewer.push(paper);
         }
       }
+      
+      const res = await fetch("/api/getpaperpendingreview", {
+        body: JSON.stringify({
+          reviewerEmail: reviewerEmail,
+          role: "reviewer"
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
 
-      return paperWithReviewer;
+      const response = await res.json()
+      const matchedPapers = paperWithReviewer.filter((paper) => {
+        return response.some((item) => item.paper_id === paper.paperId);
+      });
+      return matchedPapers;
+
     } else if (role == "chair") {
       for (const conference in conferences) {
         const paper = conferences[conference].paperSubmitted.find(
@@ -123,7 +139,26 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
         }
       }
 
-      return paperWithReviewer;
+      const res = await fetch("/api/getpaperpendingreview", {
+        body: JSON.stringify({
+          reviewerEmail: reviewerEmail,
+          role: "chair"
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const response = await res.json()
+      console.log("Res1", response)
+      const matchedPapers = paperWithReviewer.filter((paper) => {
+        return response.some((item) => item.paper_id === paper.paperId);
+      });
+
+      console.log("matchedPapersC", matchedPapers)
+      console.log("paperWithReviewer", paperWithReviewer)
+      return matchedPapers;
     }
   } catch (error) {
     console.log("Error getting a paper : ", error);

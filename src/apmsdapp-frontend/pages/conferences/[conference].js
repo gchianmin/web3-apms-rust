@@ -15,7 +15,6 @@ import Popup from "../../components/Popup";
 import { getConference } from "../../Common/GetConferences";
 import { checkIfWalletIsConnected } from "../../Common/WalletConnection";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 export default function ViewIndividualConferencePage() {
   const router = useRouter();
@@ -25,8 +24,6 @@ export default function ViewIndividualConferencePage() {
     query: { conferenceId, conference },
   } = router;
   const queryProps = { conferenceId, conference };
-  const { user } = useUser();
-  console.log(queryProps.conferenceId)
   
   const getDetails = () => {
     try {
@@ -45,7 +42,7 @@ export default function ViewIndividualConferencePage() {
                 <CardText>
                   <small className="text-muted font-italic">
                     Organised By: {conferenceDetails.createdBy}
-                    {/* fee : {conferenceDetails.feeReceived/LAMPORTS_PER_SOL} */}
+
                   </small>
                 </CardText>
                 <CardText className="lead">
@@ -100,14 +97,14 @@ export default function ViewIndividualConferencePage() {
                 </CardText>
               </CardBody>
               <CardFooter>
-                {/* {( */}
+           
                   <Popup
                     walletAddress={walletAddress}
                     existingDetails={conferenceDetails}
                     conferencePDA={queryProps.conference}
                     tpc={false}
                   />
-                {/* )} */}
+            
               </CardFooter>
             </Card>
           </>

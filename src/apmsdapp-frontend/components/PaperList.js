@@ -16,13 +16,12 @@ export default function PaperList({ props, conference, deletePaper }) {
 //   const [sc, setSc] = useState(null);
 //   const toggle = () => setModal(!modal);
   const [filedata, setFileData] = useState(JSON.parse(props));
-  console.log(conference);
 
   const DownloadButton = (paperId, paperName) => {
     const handleDownload = (event) => {
       event.preventDefault();
       const fileUrl = `/files/${conference.conferenceList}/${conference.conferencePDA}/${paperId}/${paperName}`;
-      console.log(fileUrl)
+   
       const a = document.createElement('a');
       a.href = fileUrl;
       a.download = paperName;

@@ -38,8 +38,6 @@ const checkIfFileExist = async (
   fileName
 ) => {
   try {
-    console.log(conferencePDA, conferenceId, hash, fileName);
-    console.log("buc", process.env.S3_BUCKET_NAME)
     const s3Client = new S3Client({});
     const response = await s3Client.send(
       new HeadObjectCommand({
@@ -49,6 +47,7 @@ const checkIfFileExist = async (
     );
     return true;
   } catch (error) {
+    console.log(error)
     if (error.$metadata.httpStatusCode === 404) return false;
   }
 };
@@ -62,7 +61,7 @@ export default async (req, res) => {
         resolve({ fields, files });
       });
     });
-    // console.log("greger", data.files.file);
+
 
     try {
       const s3Client = new S3Client({});
@@ -77,8 +76,7 @@ export default async (req, res) => {
           const file = await fs.readFile(letterPath);
           letterHash = CryptoJS.MD5(file.toString()).toString();
           const entropy = generateEntropy();
-          // console.log(entropy);
-          // console.log("isit ths for letter", letterHash);
+
           const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${letterHash}/`;
 
           if (fs.pathExistsSync(pathToWritePaper)) {
@@ -105,24 +103,10 @@ export default async (req, res) => {
       const entropy = generateEntropy();
 
       const uploadCommand = new PutObjectCommand({
-        Bucket: process.env.BUCKET_NAME,
+        Bucket: process.env.S3_BUCKET_NAME,
         Key: `${props.conferencePDA}/${props.conferenceId}/${hash}/${paper.originalFilename}`,
         Body: createReadStream(paperPath),
       });
-
-      // const pathToWritePaper = path.join(process.cwd(), `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/` )
-      // // const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${hash}/`;
-      // console.log("vsdvsdv", pathToWritePaper)
-      // if (fs.pathExistsSync(pathToWritePaper)) {
-      //   res
-      //     .status(409)
-      //     .json({ message: "Same file already exists in the system!" });
-      //   return;
-      // }
-      // fs.mkdirsSync(pathToWritePaper);
-      // const fullPathToWritePaper =
-      //   pathToWritePaper + `${paper.originalFilename}`;
-      // await fs.writeFile(fullPathToWritePaper, file);
 
       const response = await checkIfFileExist(
         props.conferencePDA,
@@ -130,7 +114,6 @@ export default async (req, res) => {
         hash,
         paper.originalFilename
       );
-      console.log("yeww", response);
 
       if (response === true) {
         res

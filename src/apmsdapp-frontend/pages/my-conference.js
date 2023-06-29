@@ -18,7 +18,6 @@ function MyConference() {
   const [conferencesPDA, setConferencesPDA] = useState([]);
   const [walletAddress, setWalletAddress] = useState(null);
   const router = useRouter();
-  console.log(conferences)
 
   // get all conferences organised by a specific user according to wallet address
   const getConferencesList = async () => {

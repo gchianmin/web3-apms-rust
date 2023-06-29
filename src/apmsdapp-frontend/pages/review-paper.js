@@ -26,7 +26,6 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { getPaper } from "../Common/GetPapers";
 
 export default function ReviewPaper() {
-  console.log("review paper page");
   const { user } = useUser();
   const [walletAddress, setWalletAddress] = useState(null);
   const [review, setReview] = useState(null);
@@ -49,7 +48,6 @@ export default function ReviewPaper() {
     paperTitle,
     paperHash,
   };
-  console.log(props);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -66,7 +64,6 @@ export default function ReviewPaper() {
       feedback: event.target.feedback.value,
       approval: radioSelected,
     };
-    console.log("data", data);
     try {
       const res = await reviewPaper(
         props.conferencePDA,
@@ -77,7 +74,7 @@ export default function ReviewPaper() {
         data.approval,
         data.feedback
       );
-      console.log("res", res)
+
       if (res == "ok" ) {
         switch (data.approval) {
           case 2:

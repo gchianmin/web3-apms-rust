@@ -67,9 +67,7 @@ export const deletePaper = async (
       })
       .rpc();
 
-    // if (response) {
     await deleteFile(paperName, paperHash, conferenceListPDA, conferenceId);
-    // }
   } catch (error) {
     console.log("Error deleting paper: ", error);
   }
@@ -99,9 +97,7 @@ export const deleteFileIfUnsuccess = async (
       alert(`Error ${response.status}!! ${data.message}`);
       throw data.message;
     }
-    // alert("Paper Deleted Successfully.");
-    // window.location.reload();
-    // router.push('/my-history')
+
   } catch (error) {
     console.log(error.message);
   }
@@ -134,7 +130,7 @@ export const deleteFile = async (
     }
     alert("Paper Deleted Successfully.");
     window.location.reload();
-    // router.push('/my-history')
+
   } catch (error) {
     console.log(error.message);
   }
@@ -193,8 +189,8 @@ export const makePayment = async (
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
     const id = new PublicKey(conferenceId);
-    console.log("money from: ", provider.wallet.publicKey.toString());
-    console.log("paying money to: ", conferencePDA.toString());
+    // console.log("money from: ", provider.wallet.publicKey.toString());
+    // console.log("paying money to: ", conferencePDA.toString());
 
     await program.methods
       .makePayment(
@@ -219,7 +215,7 @@ export const makePayment = async (
 
 export const getReviewedPapers = async (conferencePDA, conferenceId) => {
   const conference = await getConference(conferencePDA, conferenceId);
-  console.log(conferencePDA, conferenceId);
+
   let reviewerMap = new Map();
 
   for (const paper in conference.paperSubmitted) {
@@ -260,7 +256,7 @@ export const getReviewedPapers = async (conferencePDA, conferenceId) => {
         ) &&
         r.approval != 0
       ) {
-        console.log("exe this");
+
         let temp = reviewerMap.get(
           r.tpcWallet.toString() +
             "^" +
@@ -346,6 +342,5 @@ export const getReviewedPapers = async (conferencePDA, conferenceId) => {
     }
   }
 
-  console.log(reviewerMap);
   return reviewerMap;
 };

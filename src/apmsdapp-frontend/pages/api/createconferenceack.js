@@ -3,9 +3,7 @@ import sendgrid from "@sendgrid/mail";
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async (req, res) => {
-  try {
-    console.log(req.body);
-    
+  try { 
     await sendgrid.send({
       to: req.body.organiserEmail,
       from: "apms.organiser@gmail.com",

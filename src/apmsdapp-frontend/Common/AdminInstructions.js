@@ -224,7 +224,7 @@ export const assignReviewersandChair = async (
     
     
   } catch (error) {
-    alert("error assigning reviewers and chair: ", error);
+    // alert("error assigning reviewers and chair: ", error);
     console.log("error assigning reviewers: ", error);
   }
 };
@@ -278,7 +278,7 @@ export const payoutReviewers = async (conferenceId, conferencePDA, recipient, am
   try {
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
-    console.log(recipient.toString())
+    // console.log(recipient.toString())
     
     // const res = await program.methods.withdraw(conferenceId, new BN(1*LAMPORTS_PER_SOL))
     // .accounts({

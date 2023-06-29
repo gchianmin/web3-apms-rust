@@ -42,7 +42,7 @@ export default function RegistrationModal({
       feedback: event.target.feedback.value,
       approval: radioSelected,
     };
-    console.log("data", data);
+
     try {
       const d = new Date();
       const feedbackSubmittedDatetime =
@@ -62,7 +62,7 @@ export default function RegistrationModal({
           data.feedback,
           feedbackSubmittedDatetime
         );
-        console.log("res", res);
+ 
         if (res == "ok") {
           alert("reviewed success");
           window.location.reload();
@@ -78,7 +78,7 @@ export default function RegistrationModal({
           data.feedback,
           feedbackSubmittedDatetime
         );
-        console.log("res", res);
+        
         if (res == "ok") {
           alert("reviewed success");
           window.location.reload();

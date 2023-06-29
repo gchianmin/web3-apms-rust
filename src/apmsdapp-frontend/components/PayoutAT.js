@@ -41,7 +41,6 @@ export default function PayoutAT({ props, conference, walletAddress }) {
 
   const payout = async(conferenceId, conferencePDA, reviewerWalletAddress, amount) => {
     try {
-      console.log(conferenceId, conferencePDA, reviewerWalletAddress, amount)
       const res = await payoutReviewers(conferenceId, conferencePDA, reviewerWalletAddress, amount)
 
       if (res) {

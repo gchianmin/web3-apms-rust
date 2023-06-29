@@ -36,12 +36,12 @@ function PaymentExpander({
       presenterEmail: radioSelected,
       presenterAffiliation: getAffiliation(radioSelected),
     };
-    console.log(presenter)
+   
     const d = new Date();
     const paymentDate = d.toLocaleDateString() + " " + d.toLocaleTimeString() + " " + Intl.DateTimeFormat().resolvedOptions().timeZone
    
     try {
-      console.log("ok");
+      
       const res = await makePayment(
         conferencePDA,
         conferenceId,
@@ -49,7 +49,6 @@ function PaymentExpander({
         paymentDate, 
         presenter,
       );
-      console.log("res", res);
 
       if (res == "ok") {
         alert("payment success");
@@ -63,7 +62,6 @@ function PaymentExpander({
   const authors = [];
   for (const [key, value] of Object.entries(paper.paperAuthors)) {
     authors.push(value.authorEmail);
-    console.log(authors);
   }
 
   const getName = (email) => {

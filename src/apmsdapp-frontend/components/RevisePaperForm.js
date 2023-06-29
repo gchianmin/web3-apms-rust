@@ -83,7 +83,7 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         body: formData,
       });
       const data = await response.json();
-      // console.log("0989908",data)
+      
       if (!response.ok) {
         alert(`Error ${response.status}!! ${data.message}`);
         throw data.message;

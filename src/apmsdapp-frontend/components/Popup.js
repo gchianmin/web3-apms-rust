@@ -37,10 +37,8 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
       let wa = []
       wa.push(existingDetails.paperSubmitted[0].reviewer[0].tpcWallet)
       wa.push(existingDetails.paperSubmitted[0].paperChair.tpcWallet)
-      console.log(wa)
       const res = await payoutReviewers(existingDetails.id, conferencePDA, wa)
 
-      console.log("res", res)
       if (res) {
         alert("payout success");
         window.location.reload();
