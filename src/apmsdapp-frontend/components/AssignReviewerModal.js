@@ -104,7 +104,7 @@ function AssignReviewerModal({
       reviewerToggle();
       return;
     } else if (
-      acceptedChair &&
+      acceptedChair.length > 0 &&
       acceptedChair[0].tpcEmail != selectedItem.tpcEmail
     ) {
       alert(
