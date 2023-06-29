@@ -29,7 +29,6 @@ export default function Main() {
     </>
   );
 
-  // if conferences list == null
   const renderEmptyContainer = () => (
     <>
       <div className="pl-5 pb-3 font-italic text-muted text-mono">
@@ -40,7 +39,6 @@ export default function Main() {
 
   useEffect(() => {
     getAllConferences().then((res) => setConferences(res));
-    console.log(JSON.stringify(conferences))
   }, []);
 
   return (

@@ -1,18 +1,11 @@
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
-import React from "react";
-import { useEffect, useState } from "react";
-// import { useUser } from "@auth0/nextjs-auth0/client";
-import Link from "next/link";
-import Image from "next/image";
-import { PrismaClient } from "@prisma/client";
+import { useEffect, useState, React } from "react";
 import { Table, Button } from "reactstrap";
-
+import { prisma } from "../../lib/prisma";
 
 export const getServerSideProps = async (context) => {
-  const prisma = new PrismaClient();
   const { pid } = context.query;
-  // const router = useRouter();
   const reviewerList = await prisma.Reviewer.findMany({
     where: {
       paper_id: pid,
@@ -32,36 +25,7 @@ export default function ViewReviewerDetails({ reviewerList }) {
 
   }, [router.isReady]);
 
-  //   const notify = async () => {
-  //     try {
-  //       const res = await fetch("/api/acceptanceack", {
-  //         body: JSON.stringify({
-  //           name: "Ben",
-  //           reviewerEmail: invitation.reviewer_email,
-  //           organiserEmail: invitation.organiser_email,
-  //           conferenceId: invitation.conferenceID,
-  //           conferencePDA: invitation.conferencePDA,
-  //           conferenceName: invitation.conferenceName,
-  //           id: invitation.paper_id,
-  //           title: invitation.paper_title,
-  //           //   authors: authors.map(author => author.authorName).join(', ')
-  //         }),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         method: "POST",
-  //       });
-
-  //       const { error } = await res.json();
-  //       if (error) {
-  //         console.error(error);
-  //         return;
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //       return;
-  //     }
-  //   };
+  
   const acceptanceEnum = (acceptance) => {
     const acceptanceMap = {
       0: "Pending",

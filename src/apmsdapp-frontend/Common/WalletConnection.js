@@ -3,11 +3,11 @@ export const checkIfWalletIsConnected = async () => {
     const { solana } = window;
     if (solana) {
       if (solana.isPhantom) {
-        console.log("Phantom wallet found");
+
         const response = await solana.connect({
           onlyIfTruested: true,
         });
-        console.log("Connected with public key", response.publicKey.toString());
+     
         return response.publicKey.toString();
       }
     } else {
@@ -22,7 +22,6 @@ export const connectWallet = async () => {
   const { solana } = window;
   if (solana) {
     const response = await solana.connect();
-    console.log("Connected with public key: ", response.publicKey.toString());
     return response.publicKey.toString();
   }
 };

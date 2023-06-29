@@ -30,7 +30,7 @@ export default function AccordionTable({
   const [filedata, setFileData] = useState(JSON.parse(props));
   const [activeIndexes, setActiveIndexes] = useState([]);
   const [tpc, setTpc] = useState([]);
-  // console.log(filedata);
+
   let num = 0;
   function toggleActive(index) {
     if (activeIndexes.includes(index)) {
@@ -143,7 +143,7 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                      <small>{item.paperAbstract}</small>
+                     <div className = "paragraph-container">{item.paperAbstract}</div> 
                     </td>
 
                     <td
@@ -426,7 +426,7 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                      <small>{item.paperAbstract}</small>
+                      <div className = "paragraph-container">{item.paperAbstract}</div> 
                     </td>
 
                     <td
@@ -567,7 +567,7 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                      <small>{item.paperAbstract}</small>
+                      <div className = "paragraph-container">{item.paperAbstract}</div> 
                     </td>
 
                     <td

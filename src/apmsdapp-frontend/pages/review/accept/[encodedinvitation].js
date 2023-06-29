@@ -6,17 +6,15 @@ import { Button } from "reactstrap";
 // import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 import Image from "next/image";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../../lib/prisma";
 
 export const getServerSideProps = async (context) => {
-  const prisma = new PrismaClient();
 
   const { encodedinvitation } = context.query;
-  // const router = useRouter();
   const invitation = Buffer.from(encodedinvitation, "base64").toString("utf-8");
   const parsedInv = JSON.parse(invitation);
 
-  const id = Buffer.from(parsedInv.paperid + parsedInv.email).toString(
+  const id = Buffer.from(parsedInv.paperid + parsedInv.email + parsedInv.role).toString(
     "base64"
   );
   const paperDetails = await prisma.Reviewer.findFirst({
@@ -34,36 +32,13 @@ export const getServerSideProps = async (context) => {
 };
 
 export default function AcceptInvitationPage({ invitation, paperDetails }) {
-  console.log("enter accept invite page");
-  //   const { user } = useUser();
-  // const [invitation, setInvitation] = useState(null);
   const router = useRouter();
   const paper = JSON.parse(paperDetails);
-  console.log("paper", paper);
   const d = new Date();
   d.setDate(d.getDate() + 14);
-  // const {
-  //   query: { encodedinvitation },
-  // } = router;
-
-  // const decodeInvitation = async () => {
-  //   const res = await fetch("/api/decodeinvitation", {
-  //     body: JSON.stringify({
-  //       encodedinvitation: encodedinvitation,
-  //     }),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     method: "POST",
-  //   });
-  //   const data = await res.json();
-  //   setInvitation(JSON.parse(data));
-  //   // console.log("this is res", JSON.parse(data));
-  // };
 
   useEffect(() => {
     if (!router.isReady) return;
-    // decodeInvitation();
   }, [router.isReady]);
 
   const notify = async () => {
@@ -80,6 +55,7 @@ export default function AcceptInvitationPage({ invitation, paperDetails }) {
           title: paper.paper_title,
           organiserEmail: paper.organiser_email,
           deadline: d,
+          role: paper.role
         }),
         headers: {
           "Content-Type": "application/json",

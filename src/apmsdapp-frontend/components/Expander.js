@@ -35,7 +35,7 @@ export default function Expander({
       feedback: event.target.feedback.value,
       approval: radioSelected,
     };
-    console.log("data", data);
+    
     try {
       if (role == "reviewer") {
         const res = await reviewPaper(
@@ -47,7 +47,7 @@ export default function Expander({
           data.approval,
           data.feedback
         );
-        console.log("res", res);
+  
         if (res == "ok") {
           alert("reviewed success");
           window.location.reload();
@@ -62,7 +62,7 @@ export default function Expander({
           data.approval,
           data.feedback
         );
-        console.log("res", res);
+   
         if (res == "ok") {
           alert("reviewed success");
           window.location.reload();
@@ -77,7 +77,6 @@ export default function Expander({
     const paps = await getPaper(conferencePDA, conferenceId);
     const pap = paps.find((element) => element.paperHash == paperHash);
     setReview(pap.reviewer);
-    // return (<p>{JSON.stringify(pap.reviewer)}</p>)
   };
 
   return (

@@ -210,4 +210,16 @@ a {
   
 }
 
+.paragraph-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Number of lines to show */
+  -webkit-box-orient: vertical;
+}
 
+.custom-link {
+  color: blue;
+  font-style: italic;
+  text-decoration: underline;
+}

@@ -1,12 +1,5 @@
 import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
-  RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
-} from "react-icons/ri";
 import Multiselect from "multiselect-react-dropdown";
 import { BN } from "@project-serum/anchor";
 import { assignReviewersandChair } from "../Common/AdminInstructions";
@@ -39,9 +32,8 @@ function AssignReviewerModal({
   const [selectedReviewers, setSelectedReviewers] = useState([]);
   const [selectedChair, setSelectedChair] = useState(null);
   const reviewerToggle = () => setReviewerModal(!reviewerModal);
-  const { reviewerList, isLoading, isError } = GetReviewerList(paper.paperId);
+  const { reviewerList, isLoading } = GetReviewerList(paper.paperId);
   if (isLoading) return <Loading />;
-  if (reviewerList) console.log("this is reiv", reviewerList);
 
   const acceptedReviewer = tpc.filter((tpc) => {
     const matchingReviewer = JSON.parse(reviewerList).find(
@@ -85,6 +77,19 @@ function AssignReviewerModal({
         d.toLocaleTimeString() +
         " " +
         Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const isAcceptedReviewerSelected = acceptedReviewer.some((accepted) => {
+        return selectedList.some((selectedReviewer) => {
+          return accepted.tpcEmail === selectedReviewer.tpcEmail;
+        });
+      });
+  
+      if (acceptedReviewer.length > 0 && !isAcceptedReviewerSelected) {
+        alert(
+          "You can't remove a reviewer that has agreed to review! Please select the correct reviewers."
+        );
+        reviewerToggle();
+        return;
+      }
       setSelectedReviewers(selectedList);
     }
   };
@@ -96,6 +101,15 @@ function AssignReviewerModal({
       )
     ) {
       alert("A paper chair cannot be one of the authors!!");
+      reviewerToggle();
+      return;
+    } else if (
+      acceptedChair &&
+      acceptedChair[0].tpcEmail != selectedItem.tpcEmail
+    ) {
+      alert(
+        "You can't select other chair as a chair has agreed to review! Please select the correct chair."
+      );
       reviewerToggle();
       return;
     } else {
@@ -172,7 +186,7 @@ function AssignReviewerModal({
       }
       window.location.reload();
     } catch (error) {
-      console.error("error assigning: ", error);
+      console.log("error assigning: ", error);
     }
   };
   return (
@@ -193,8 +207,11 @@ function AssignReviewerModal({
         <ModalBody>
           <p>
             Click {""}
-            <Link href={`/reviewer/${paper.paperId}`}>here {""}</Link>to view
-            the review invitation status first.
+            <Link href={`/reviewer/${paper.paperId}`} className="custom-link ">
+              {" "}
+              here
+            </Link>{" "}
+            {""} to view the review invitation status first.
           </p>
 
           <p>
@@ -216,8 +233,8 @@ function AssignReviewerModal({
             selectionLimit={3}
             emptyRecordMsg="Not found"
             displayValue="tpcName"
-            selectedValues={acceptedReviewer}
-            disablePreSelectedValues
+            // selectedValues={acceptedReviewer}
+            // disablePreSelectedValues
           />
           <p className="pt-5">Select a paper chair:</p>
           <Multiselect
@@ -228,8 +245,8 @@ function AssignReviewerModal({
             onSelect={onSelectChair}
             emptyRecordMsg="Not found"
             displayValue="tpcName"
-            selectedValues={acceptedChair}
-            disablePreSelectedValues
+            // selectedValues={acceptedChair}
+            // disablePreSelectedValues
           />
         </ModalBody>
         <ModalFooter>

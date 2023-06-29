@@ -2,7 +2,6 @@ const fs = require("fs-extra");
 import { IncomingForm } from "formidable";
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
-
 export const config = {
   api: {
     bodyParser: false,
@@ -18,7 +17,6 @@ export default async (req, res) => {
     });
   });
   try {
-    // console.log(data)
     const s3Client = new S3Client({});
     const paperHash = data.fields.paperHash
     const paperName = data.fields.paperName
@@ -26,15 +24,10 @@ export default async (req, res) => {
     const conferenceId = data.fields.conferenceId
 
     const deleteCommand = new DeleteObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
+      Bucket: process.env.S3_BUCKET_NAME,
       Key: `${conferenceListPDA}/${conferenceId}/${paperHash}/${paperName}`,
     });
-    // const pathToDeletePaper = `public/files/${conferenceListPDA}/${conferenceId}/${paperHash}/`;
-    // fs.remove(pathToDeletePaper, (err) => {
-    //   if (err) return console.error(err);
-    //   console.log("success!"); 
-    // });
-    // console.log(deleteCommand)
+   
     const response = await s3Client.send(deleteCommand);
 
     res.status(200).json({ message: "file deleted!" });

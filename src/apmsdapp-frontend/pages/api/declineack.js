@@ -1,14 +1,13 @@
 import sendgrid from "@sendgrid/mail";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async (req, res) => {
-  const prisma = new PrismaClient();
   try {
     const reviewer = await prisma.Reviewer.update({
       where: {
-        id: Buffer.from(req.body.id + req.body.reviewerEmail).toString(
+        id: Buffer.from(req.body.id + req.body.reviewerEmail + req.body.role).toString(
           "base64"
         ),
       },

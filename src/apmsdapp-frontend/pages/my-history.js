@@ -19,8 +19,6 @@ function MyHistory() {
   const getPapers = async () => {
     try {
       const res = await getPapersSubmitted(walletAddress);
-      //   return res
-      console.log(res);
       setPaperSubmitted(res);
     } catch (error) {
       console.log("error in my-history page", error);
@@ -30,7 +28,6 @@ function MyHistory() {
   const getPapersReviewer = async () => {
     try {
       const res = await getPapersReviewed("reviewer", walletAddress);
-      console.log(res);
       setPaperReviewed(res);
     } catch (error) {
       console.log("error in my-history page", error);
@@ -40,7 +37,6 @@ function MyHistory() {
   const getPapersChair = async () => {
     try {
       const res = await getPapersReviewed("chair", walletAddress);
-      console.log(res);
       setPaperReviewedChair(res);
     } catch (error) {
       console.log("error in my-history page", error);

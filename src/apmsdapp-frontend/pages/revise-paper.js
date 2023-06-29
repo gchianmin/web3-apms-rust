@@ -45,7 +45,7 @@ function RevisePaper() {
         props.paperHash
       );
       setPrevPaper(res)
-      console.log("paper", res);
+
     } catch (error) {
       console.log(error);
     }
