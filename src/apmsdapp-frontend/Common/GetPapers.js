@@ -92,7 +92,7 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
     }
     if (role == "reviewer") {
       for (const conference in conferences) {
-        const paper = conferences[conference].paperSubmitted.find((p) =>
+        const paper = conferences[conference].paperSubmitted.filter((p) =>
           p.reviewer.find(
             (r) => r.tpcEmail === reviewerEmail && r.feedback == ""
           )
@@ -125,7 +125,7 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
 
     } else if (role == "chair") {
       for (const conference in conferences) {
-        const paper = conferences[conference].paperSubmitted.find(
+        const paper = conferences[conference].paperSubmitted.filter(
           (p) =>
             p.paperChair.tpcEmail === reviewerEmail &&
             p.paperChair.feedback == ""
