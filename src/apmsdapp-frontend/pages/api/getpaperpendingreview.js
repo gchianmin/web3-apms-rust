@@ -10,8 +10,9 @@ export default async (req, res) => {
           acceptance: 1,
           role: "reviewer",
         },
-      });
 
+      });
+  
       return res.status(200).json(paperWithAcceptedInvitation);
     } else if (req.body.role == "chair") {
       const paperWithAcceptedInvitation = await prisma.Reviewer.findMany({

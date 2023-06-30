@@ -18,7 +18,6 @@ export const getPaper = async (conferencePDA, conferenceId) => {
         // break;
       }
     }
-   
   } catch (error) {
     console.log("Error getting a paper : ", error);
   }
@@ -59,7 +58,6 @@ export const getPaperWithHash = async (
       (element) => element.paperHash == paperHash
     );
     return paper;
-
   } catch (error) {
     console.log("Error getting a paper : ", error);
   }
@@ -67,7 +65,6 @@ export const getPaperWithHash = async (
 
 export const getPaperPendingReview = async (role, reviewerEmail) => {
   try {
-
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
     const allAccounts = await getAllConferences();
@@ -92,24 +89,29 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
     }
     if (role == "reviewer") {
       for (const conference in conferences) {
-        const paper = conferences[conference].paperSubmitted.filter((p) =>
-          p.reviewer.find(
-            (r) => r.tpcEmail === reviewerEmail && r.feedback == ""
+        const paper = conferences[conference].paperSubmitted
+          .filter((p) =>
+            p.reviewer.find(
+              (r) => r.tpcEmail === reviewerEmail && r.feedback === ""
+            )
           )
-        );
+          .map((p) => ({
+            ...p,
+            pk : conferences[conference].pk,
+            conferenceId : conferences[conference].id,
+            conferenceName : conferences[conference].name
+          }));
+     
+        if (paper.length > 0) {
 
-        if (paper) {
-          paper.pk = conferences[conference].pk;
-          paper.conferenceId = conferences[conference].id;
-          paper.conferenceName = conferences[conference].name;
           paperWithReviewer.push(paper);
         }
       }
-      
+
       const res = await fetch("/api/getpaperpendingreview", {
         body: JSON.stringify({
           reviewerEmail: reviewerEmail,
-          role: "reviewer"
+          role: "reviewer",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -117,10 +119,13 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
         method: "POST",
       });
 
-      const response = await res.json()
-      const matchedPapers = paperWithReviewer.filter((paper) => {
+      const papersWithReviewer = [].concat(...paperWithReviewer);
+      
+      const response = await res.json();
+      const matchedPapers = papersWithReviewer.filter((paper) => {
         return response.some((item) => item.paper_id === paper.paperId);
       });
+      
       return matchedPapers;
 
     } else if (role == "chair") {
@@ -129,12 +134,17 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
           (p) =>
             p.paperChair.tpcEmail === reviewerEmail &&
             p.paperChair.feedback == ""
-        );
+        ).map((p) => ({
+          ...p,
+          pk : conferences[conference].pk,
+          conferenceId : conferences[conference].id,
+          conferenceName : conferences[conference].name
+        }));;
 
-        if (paper) {
-          paper.pk = conferences[conference].pk;
-          paper.conferenceId = conferences[conference].id;
-          paper.conferenceName = conferences[conference].name;
+        if (paper.length > 0) {
+          // paper.pk = conferences[conference].pk;
+          // paper.conferenceId = conferences[conference].id;
+          // paper.conferenceName = conferences[conference].name;
           paperWithReviewer.push(paper);
         }
       }
@@ -142,7 +152,7 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
       const res = await fetch("/api/getpaperpendingreview", {
         body: JSON.stringify({
           reviewerEmail: reviewerEmail,
-          role: "chair"
+          role: "chair",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -150,15 +160,15 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
         method: "POST",
       });
 
-      const response = await res.json()
-      console.log("Res1", response)
-      const matchedPapers = paperWithReviewer.filter((paper) => {
+      const response = await res.json();
+      const papersWithReviewer = [].concat(...paperWithReviewer);
+
+      const matchedPapers = papersWithReviewer.filter((paper) => {
         return response.some((item) => item.paper_id === paper.paperId);
       });
 
-      console.log("matchedPapersC", matchedPapers)
-      console.log("paperWithReviewer", paperWithReviewer)
       return matchedPapers;
+
     }
   } catch (error) {
     console.log("Error getting a paper : ", error);
@@ -213,7 +223,7 @@ export const getPapersReviewed = async (role, walletAddress) => {
         for (const conf in res.conferences) {
           const paper = res.conferences[conf].paperSubmitted.filter((p) =>
             p.reviewer.find(
-              (r) => (r.tpcWallet.toString() === walletAddress && r.approval > 0)
+              (r) => r.tpcWallet.toString() === walletAddress && r.approval > 0
             )
           );
 
@@ -227,7 +237,6 @@ export const getPapersReviewed = async (role, walletAddress) => {
       }
 
       return paperReviewed;
-
     } else if (role == "chair") {
       let paperReviewedChair = [];
       for (const acc in allAccounts) {
