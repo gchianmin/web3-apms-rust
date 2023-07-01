@@ -10,9 +10,11 @@ module.exports = {
       {
         protocol: 'https',
         hostname: 's.gravatar.com',
-        // port: '',
-        // pathname: '/account123/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      }
     ],
   },
 }
