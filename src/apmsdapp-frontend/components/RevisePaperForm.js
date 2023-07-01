@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
 import {
   FormGroup,
   Form,
@@ -13,11 +12,14 @@ import { useRouter } from "next/router";
 import { revisePaper } from "../Common/AuthorInstructions";
 import ApiCallers from "../Common/ApiCallers";
 import { MAX_FILE_SIZE } from "../utils/const";
+import { deleteRevisedFileIfUnsuccess } from "../Common/AuthorInstructions";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const RevisePaperForm = ({ props, prevPaper }) => {
   const [file, setFile] = useState(null);
   const [responseLetter, setResponseLetter] = useState(null);
   const router = useRouter();
+  const { user } = useUser();
 
   const sendProps = (href, conferencePDA, conferenceId, conferenceName) => {
     router.push({
@@ -107,8 +109,68 @@ const RevisePaperForm = ({ props, prevPaper }) => {
         alert(
           "Paper Submitted Successfully. You may view the status under myHistory."
         );
+
+        const res = await fetch("/api/revisedpapersubmissionnack", {
+          body: JSON.stringify({
+            name: user.name,
+            email: user.email,
+            conferenceName: props.conferenceName,
+            id: data.entropy,
+            title: paper.title,
+            authors: prevPaper.paperAuthors.map((author) => author.authorName).join(", "),
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        const reassignreviewer = await fetch("/api/assignbackreviewer", {
+          body: JSON.stringify({
+            // name: user.name,
+            // email: user.email,
+            conferencePda: props.conferencePDA,
+            conferenceId: props.conferenceId,
+            conferenceName: props.conferenceName,
+            prevPaperId: prevPaper.paperId,
+            paperId: data.entropy,
+            title: paper.title,
+            reviewer: prevPaper.reviewer,
+            chair: prevPaper.paperChair,
+            abstract: paper.abstract,
+            authors: prevPaper.paperAuthors.map((author) => author.authorName).join(", "),
+            // organiserEmail: prevPaper.organiserEmail
+            // authors: prevPaper.paperAuthors.map((author) => author.authorName).join(", "),
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+
+        const { error } = await res.json();
+        const { reassignError } = await reassignreviewer.json();
+        if (error) {
+          console.error(error);
+          return;
+        }
+        if (reassignError) {
+          console.error(error);
+          return;
+        }
         router.push("/my-history");
-      } else console.log("error");
+      } else {
+        console.log("error");
+        deleteRevisedFileIfUnsuccess(
+          data.fileName,
+          data.hash,
+          props.conferencePDA,
+          props.conferenceId,
+          data.responseLetterName,
+          data.responseLetterHash,
+        );
+      }
+
     } catch (error) {
       console.log(error);
     }

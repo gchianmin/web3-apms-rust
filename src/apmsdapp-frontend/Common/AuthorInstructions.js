@@ -72,6 +72,7 @@ export const deletePaper = async (
     console.log("Error deleting paper: ", error);
   }
 };
+
 export const deleteFileIfUnsuccess = async (
   paperName,
   paperHash,
@@ -85,6 +86,41 @@ export const deleteFileIfUnsuccess = async (
     formData.append("conferenceListPDA", conferencePDA);
     formData.append("conferenceId", conferenceId);
 
+    const response = await ApiCallers({
+      apiUrl: "/api/filedelete",
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`Error ${response.status}!! ${data.message}`);
+      throw data.message;
+    }
+
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export const deleteRevisedFileIfUnsuccess = async (
+  paperName,
+  paperHash,
+  conferencePDA,
+  conferenceId,
+  responseLetterName,
+  responseLetterHash
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("paperName", paperName);
+    formData.append("paperHash", paperHash);
+    formData.append("responseLetterName", responseLetterName);
+    formData.append("responseLetterHash", responseLetterHash);
+    formData.append("conferenceListPDA", conferencePDA);
+    formData.append("conferenceId", conferenceId);
+    
     const response = await ApiCallers({
       apiUrl: "/api/filedelete",
       method: "POST",
@@ -191,8 +227,8 @@ export const makePayment = async (
     const id = new PublicKey(conferenceId);
     // console.log("money from: ", provider.wallet.publicKey.toString());
     // console.log("paying money to: ", conferencePDA.toString());
-
-    await program.methods
+    
+    const pay = await program.methods
       .makePayment(
         id,
         paperHash,
@@ -206,7 +242,7 @@ export const makePayment = async (
         systemProgram: program.PROGRAM_ID,
       })
       .rpc();
-
+      console.log(JSON.stringify(pay))
     return "ok";
   } catch (error) {
     console.log("Error paying for a paper : ", error);

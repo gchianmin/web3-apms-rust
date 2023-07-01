@@ -63,6 +63,7 @@ export default function AccordionTable({
   };
 
   const sendProps = (href, conferencePDA, conferenceId, conferenceName) => {
+    
     router.push({
       pathname: href,
       query: {
@@ -955,8 +956,8 @@ export default function AccordionTable({
                               Previous Version:{" "}
                               <a
                                 className="font-italic text-info"
-                                //   href="/my-conference"
                                 type="button"
+                                href=""
                                 onClick={() =>
                                   sendProps(
                                     `/papers/${item.prevVersion}`,
