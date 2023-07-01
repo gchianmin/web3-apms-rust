@@ -38,7 +38,7 @@ export default function NavBar() {
                 //   width: 40,
                 // }}
               />{" "}
-              APMS
+              ConfMan
             </NavbarBrand>
 
             <Nav className="mr-auto" navbar>

@@ -6,12 +6,12 @@ import Header from "../components/Header";
 export default function PreLogin() {
   return (
     <>
-      <Header props={`APMS - What's it?`} />
+      <Header props={`ConfMan - What's it?`} />
       <div className="text-center pt-5">
         <Image src="/logo.png" alt="Logo" width={400} height={300} priority />
 
         <p className="lead hero pb-5 pt-4">
-          APMS - academic paper management system is a web3 dApp built on Solana
+          ConfMan - an academic conference management system is a web3 dApp built on Solana
           blockchain.
         </p>
 

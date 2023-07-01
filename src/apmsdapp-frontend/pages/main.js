@@ -43,7 +43,7 @@ export default function Main() {
 
   return (
     <>
-      <Header props={`APMS - Home`} />
+      <Header props={`ConfMan - Home`} />
       <div className="pl-5 pt-4 pb-3">
         <h2>Upcoming Conferences</h2>
         {user && (
