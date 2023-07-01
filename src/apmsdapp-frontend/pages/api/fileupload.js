@@ -2,12 +2,10 @@ import { IncomingForm } from "formidable";
 const fs = require("fs-extra");
 const CryptoJS = require("crypto-js");
 const crypto = require("crypto");
-import path from "path";
 import {
   S3Client,
   PutObjectCommand,
   HeadObjectCommand,
-  HeadObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { createReadStream } from "fs";
 
@@ -75,20 +73,29 @@ export default async (req, res) => {
           const letterPath = letter.filepath;
           const file = await fs.readFile(letterPath);
           letterHash = CryptoJS.MD5(file.toString()).toString();
-          const entropy = generateEntropy();
 
-          const pathToWritePaper = `public/files/${props.conferencePDA}/${props.conferenceId}/${letterHash}/`;
-
-          if (fs.pathExistsSync(pathToWritePaper)) {
+          const uploadCommand = new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: `${props.conferencePDA}/${props.conferenceId}/${letterHash}/${letter.originalFilename}`,
+            Body: createReadStream(letterPath),
+          });
+    
+          const response = await checkIfFileExist(
+            props.conferencePDA,
+            props.conferenceId,
+            letterHash,
+            letter.originalFilename
+          );
+    
+          if (response === true) {
             res
               .status(409)
               .json({ message: "Same file already exists in the system!" });
             return;
           }
-          fs.mkdirsSync(pathToWritePaper);
-          const fullPathToWritePaper =
-            pathToWritePaper + `${letter.originalFilename}`;
-          await fs.writeFile(fullPathToWritePaper, file);
+          
+          await s3Client.send(uploadCommand);
+
         } catch (error) {
           console.error("error from response letter", error);
           res.status(500).json({ message: error.message });
