@@ -71,7 +71,7 @@ export default function DeclineInvitationPage({ invitation, paperDetails }) {
     <>
       <Header props={`Paper Review Invitation`} />
       <div className="text-center pt-5">
-        <Image src="/logo.png" alt="Logo" width={400} height={300} priority />
+        <Image src="/confman.png" alt="Logo" width={400} height={300} priority />
 
         {invitation && (
           <p className="lead hero pb-5 pt-4">

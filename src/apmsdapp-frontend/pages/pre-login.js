@@ -8,7 +8,7 @@ export default function PreLogin() {
     <>
       <Header props={`ConfMan - What's it?`} />
       <div className="text-center pt-5">
-        <Image src="/logo.png" alt="Logo" width={400} height={300} priority />
+        <Image src="/confman.png" alt="Logo" width={400} height={300} priority />
 
         <p className="lead hero pb-5 pt-4">
           ConfMan - an academic conference management system is a web3 dApp built on Solana
