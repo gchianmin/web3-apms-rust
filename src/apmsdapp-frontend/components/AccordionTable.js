@@ -15,7 +15,6 @@ import { deletePaper } from "../Common/AuthorInstructions";
 import { getPaperStatus } from "../Common/GetPapers";
 import { getConference } from "../Common/GetConferences";
 import DownloadButton from "./DownloadButton";
-import Expander from "./Expander";
 import PaymentExpander from "./PaymentExpander";
 import ReviewExpander from "./ReviewExpander";
 
@@ -143,7 +142,9 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                     <div className = "paragraph-container">{item.paperAbstract}</div> 
+                      <div className="paragraph-container">
+                        {item.paperAbstract}
+                      </div>
                     </td>
 
                     <td
@@ -366,6 +367,12 @@ export default function AccordionTable({
                               <p>No chair assigned yet</p>
                             )}
                           </p>
+                          {item.paperStatus == 8 && (
+                            <p>
+                              Presenter:{" "}
+                              {item.registrationDetails.presenterName}
+                            </p>
+                          )}
                         </td>
                       </tr>
                     </>
@@ -426,7 +433,9 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                      <div className = "paragraph-container">{item.paperAbstract}</div> 
+                      <div className="paragraph-container">
+                        {item.paperAbstract}
+                      </div>
                     </td>
 
                     <td
@@ -449,7 +458,7 @@ export default function AccordionTable({
                         conferenceId={item.conferenceId}
                         paperHash={item.paperHash}
                         walletAddress={walletAddress}
-                        paper = {item}
+                        paper={item}
                       />
                     </td>
                   </tr>
@@ -567,7 +576,9 @@ export default function AccordionTable({
                       className="accordion-title align-middle text-center"
                       onClick={() => toggleActive(index)}
                     >
-                      <div className = "paragraph-container">{item.paperAbstract}</div> 
+                      <div className="paragraph-container">
+                        {item.paperAbstract}
+                      </div>
                     </td>
 
                     <td
@@ -599,7 +610,7 @@ export default function AccordionTable({
                           conferenceId={item.conferenceId}
                           paperHash={item.paperHash}
                           walletAddress={walletAddress}
-                          paper = {item}
+                          paper={item}
                         />
                       )}
                     </td>
@@ -1087,6 +1098,12 @@ export default function AccordionTable({
                               <p>No chair assigned yet</p>
                             )}
                           </p>
+                          {item.paperStatus == 8 && (
+                            <p>
+                              Presenter:{" "}
+                              {item.registrationDetails.presenterName}
+                            </p>
+                          )}
                         </td>
                       </tr>
                     </>
