@@ -1,10 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Table,
   Button,
-  UncontrolledCollapse,
-  Card,
-  CardBody,
   Form,
   FormGroup,
   Label,
@@ -13,11 +9,9 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
 } from "reactstrap";
 import { reviewPaper } from "../Common/ReviewerInstructions";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { getPaper } from "../Common/GetPapers";
 import { connectWallet } from "../Common/WalletConnection";
 
 export default function RegistrationModal({
@@ -27,7 +21,6 @@ export default function RegistrationModal({
   walletAddress,
 }) {
   const { user } = useUser();
-  const [review, setReview] = useState(null);
   const [radioSelected, setRadioSelected] = useState(null);
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
@@ -89,15 +82,8 @@ export default function RegistrationModal({
     }
   };
 
-  const getFeedback = async () => {
-    const paps = await getPaper(conferencePDA, conferenceId);
-    const pap = paps.find((element) => element.paperHash == paperHash);
-    setReview(pap.reviewer);
-  };
-
   return (
     <div>
-      {/* <div> */}
       <Button color="primary" type="button" onClick={toggle}>
         Make Payment
       </Button>
@@ -118,7 +104,6 @@ export default function RegistrationModal({
                   name="feedback"
                   placeholder="Enter comments for the paper"
                   type="textarea"
-                  // required
                 />
               </Col>
             </FormGroup>
@@ -185,41 +170,7 @@ export default function RegistrationModal({
             </div>
           </Form>
         </ModalBody>
-        {/* <ModalFooter>
-        {!walletAddress && (
-            <Button color="success" onClick={connectWallet}>
-              Connect wallet to proceed
-            </Button>
-          )}
-          <Button color="primary" type="button" onClick={handleReviewsSubmit}>
-            Submit
-          </Button>{" "}
-          <Button color="secondary" type="button" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter> */}
       </Modal>
-      {/* </div> */}
-      {/* <Button
-        color="primary"
-        id="toggler"
-        style={{
-          marginBottom: "1rem",
-        }}
-      >
-        Review
-      </Button> */}
-      {/* <UncontrolledCollapse toggler="#toggler"> */}
-      {/* <Card>
-          <CardBody> */}
-
-      {/* </CardBody>
-        </Card> */}
-      {/* </UncontrolledCollapse> */}
-      {/* <Button type="button" onClick={getFeedback}>
-        get all feedback
-      </Button>
-      <p>{JSON.stringify(review)}</p> */}
     </div>
   );
 }

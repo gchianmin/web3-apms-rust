@@ -1,7 +1,6 @@
-import React from "react";
 import Header from "../components/Header";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DynamicForm from "../components/DynamicForm";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import {

@@ -37,7 +37,7 @@ const checkIfFileExist = async (
 ) => {
   try {
     const s3Client = new S3Client({});
-    const response = await s3Client.send(
+    await s3Client.send(
       new HeadObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME,
         Key: `${conferencePDA}/${conferenceId}/${hash}/${fileName}`,

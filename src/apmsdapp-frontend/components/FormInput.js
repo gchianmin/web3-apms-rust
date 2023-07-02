@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { RiAddCircleFill, RiDeleteBin6Line } from "react-icons/ri";
 import {
   modifyConference,
-  initializeAccount,
   createConference,
 } from "../Common/AdminInstructions";
 import { useRouter } from "next/router";
@@ -73,7 +72,6 @@ export default function FormInput({
     try {
       // Stop the form from submitting and refreshing the page.
       event.preventDefault();
-      const d = new Date();
       // Get data from the form.
       const data = {
         email: event.target.email.value,

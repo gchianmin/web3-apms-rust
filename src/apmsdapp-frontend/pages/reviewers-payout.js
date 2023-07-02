@@ -1,13 +1,9 @@
-import React from "react";
 import Header from "../components/Header";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   checkIfWalletIsConnected,
-  connectWallet,
 } from "../Common/WalletConnection";
-import AccordionTable from "../components/AccordionTable";
-import { getPaper } from "../Common/GetPapers";
 import { getReviewedPapers } from "../Common/AuthorInstructions";
 import PayoutAT from "../components/PayoutAT";
 

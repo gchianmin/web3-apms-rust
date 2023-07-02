@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { useRouter } from "next/router";
 import FormInput from "./FormInput";
@@ -122,7 +122,6 @@ function Popup({ walletAddress, existingDetails, conferencePDA, tpc }) {
 
                 <Button
                   className="btn btn-block btn-warning  mt-0 btn-alignment"
-                  // onClick={payoutToggle}
                   onClick={() =>
                     sendProps(
                       "/reviewers-payout",

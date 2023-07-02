@@ -1,9 +1,7 @@
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Button,
   Card,
   CardBody,
   CardTitle,
@@ -14,7 +12,6 @@ import {
 import Popup from "../../components/Popup";
 import { getConference } from "../../Common/GetConferences";
 import { checkIfWalletIsConnected } from "../../Common/WalletConnection";
-import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function ViewIndividualConferencePage() {
   const router = useRouter();

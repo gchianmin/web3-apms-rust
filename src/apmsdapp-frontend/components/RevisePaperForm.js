@@ -9,10 +9,9 @@ import {
   Col,
 } from "reactstrap";
 import { useRouter } from "next/router";
-import { revisePaper } from "../Common/AuthorInstructions";
 import ApiCallers from "../Common/ApiCallers";
 import { MAX_FILE_SIZE } from "../utils/const";
-import { deleteRevisedFileIfUnsuccess } from "../Common/AuthorInstructions";
+import { deleteRevisedFileIfUnsuccess, revisePaper } from "../Common/AuthorInstructions";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 const RevisePaperForm = ({ props, prevPaper }) => {

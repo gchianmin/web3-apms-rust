@@ -15,7 +15,6 @@ export const getPaper = async (conferencePDA, conferenceId) => {
     for (let i in data.conferences) {
       if (data.conferences[i].id == conferenceId) {
         return data.conferences[i].paperSubmitted;
-        // break;
       }
     }
   } catch (error) {
@@ -142,9 +141,6 @@ export const getPaperPendingReview = async (role, reviewerEmail) => {
         }));;
 
         if (paper.length > 0) {
-          // paper.pk = conferences[conference].pk;
-          // paper.conferenceId = conferences[conference].id;
-          // paper.conferenceName = conferences[conference].name;
           paperWithReviewer.push(paper);
         }
       }

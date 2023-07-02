@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   Form,
   FormGroup,
   Label,
-  Col,
   Input,
 } from "reactstrap";
 import { makePayment } from "../Common/AuthorInstructions";
@@ -102,20 +100,6 @@ function PaymentExpander({
             className="align-items-center justify-contents-center "
             onSubmit={handlePaymentSubmit}
           >
-            {/* <FormGroup>
-              <Label className="text-monospace" for="feedback" sm={6}>
-                Feedback:
-              </Label>
-              <Col sm={10}>
-                <Input
-                  id="feedback"
-                  name="feedback"
-                  placeholder="Enter comments for the paper"
-                  type="textarea"
-                  // required
-                />
-              </Col>
-            </FormGroup> */}
 
             <FormGroup tag="fieldset">
               <Label for="presenter" sm={6}>
@@ -157,19 +141,6 @@ function PaymentExpander({
             </div>
           </Form>
         </ModalBody>
-        {/* <ModalFooter>
-        {!walletAddress && (
-            <Button color="success" onClick={connectWallet}>
-              Connect wallet to proceed
-            </Button>
-          )}
-          <Button color="primary" type="button" onClick={handlePaymentSubmit}>
-            Pay
-          </Button>{" "}
-          <Button color="secondary" type="button" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter> */}
       </Modal>
     </div>
   );

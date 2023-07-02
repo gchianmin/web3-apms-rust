@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button } from "reactstrap";
 import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
-  RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
+  RiArrowDownSLine
 } from "react-icons/ri";
 import AssignReviewerModal from "./AssignReviewerModal";
 import { useRouter } from "next/router";
@@ -30,7 +26,6 @@ export default function AccordionTable({
   const [activeIndexes, setActiveIndexes] = useState([]);
   const [tpc, setTpc] = useState([]);
 
-  let num = 0;
   function toggleActive(index) {
     if (activeIndexes.includes(index)) {
       setActiveIndexes(activeIndexes.filter((i) => i !== index));

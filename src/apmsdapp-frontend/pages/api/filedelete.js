@@ -40,7 +40,7 @@ export default async (req, res) => {
       Key: `${conferenceListPDA}/${conferenceId}/${paperHash}/${paperName}`,
     });
 
-    const response = await s3Client.send(deleteCommand);
+    await s3Client.send(deleteCommand);
 
     res.status(200).json({ message: "file deleted!" });
   } catch (error) {

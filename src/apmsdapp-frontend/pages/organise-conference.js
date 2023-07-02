@@ -1,6 +1,5 @@
-import React from "react";
 import Header from "../components/Header";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormInput from "../components/FormInput";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import {

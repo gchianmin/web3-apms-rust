@@ -1,5 +1,4 @@
 import * as anchor from "@project-serum/anchor";
-import { Connection } from "@solana/web3.js";
 import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import { IDL, PROGRAM_ID } from "./const";
 

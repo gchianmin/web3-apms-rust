@@ -64,7 +64,7 @@ export default async (req, res) => {
           organiser_email: req.body.organiserEmail,
         }));
 
-        const createMany = await prisma.Reviewer.createMany({
+        await prisma.Reviewer.createMany({
           data: [...reviewerData],
           skipDuplicates: true,
         });
@@ -107,7 +107,7 @@ export default async (req, res) => {
       }
 
       if (newChair.length > 0) {
-        const createMany = await prisma.Reviewer.createMany({
+        await prisma.Reviewer.createMany({
           data: [
             {
               id: Buffer.from(

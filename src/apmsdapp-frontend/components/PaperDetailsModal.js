@@ -1,12 +1,5 @@
 import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
-  RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
-} from "react-icons/ri";
 import Multiselect from "multiselect-react-dropdown";
 import { BN } from "@project-serum/anchor";
 import { assignReviewersandChair } from "../Common/AdminInstructions";

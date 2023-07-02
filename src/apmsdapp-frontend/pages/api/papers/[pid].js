@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 
 export default async (req, res) => {
-  // const prisma = new PrismaClient();
   try {
     const { pid } = req.query;
     const reviewerList = await prisma.Reviewer.findMany({

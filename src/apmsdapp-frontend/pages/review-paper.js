@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { useRouter } from "next/router";
 import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
   RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
 } from "react-icons/ri";
 import {
   Form,
@@ -15,7 +11,6 @@ import {
   Col,
   Input,
   Button,
-  ButtonGroup,
 } from "reactstrap";
 import {
   checkIfWalletIsConnected,
@@ -118,7 +113,6 @@ export default function ReviewPaper() {
     const pap = paps.find(element => element.paperHash == props.paperHash)
     setPaper(pap)
     setReview(pap.reviewer)
-    // return (<p>{JSON.stringify(pap.reviewer)}</p>)
   }
   return (
     <>
@@ -149,7 +143,6 @@ export default function ReviewPaper() {
                 name="feedback"
                 placeholder="Enter comments for the paper"
                 type="textarea"
-                // required
               />
             </Col>
           </FormGroup>
@@ -202,10 +195,6 @@ export default function ReviewPaper() {
         </Form>
         <Button type="button" onClick={getFeedback}>get all feedback</Button>
         <p>{JSON.stringify(review)}</p>
-        {/* <div className="pt-4"> */}
-        {/* {!walletAddress && renderNotConnectedContainer()}
-          {walletAddress && <DynamicForm props={props} />} */}
-        {/* </div> */}
       </div>
     </>
   );

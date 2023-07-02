@@ -1,4 +1,3 @@
-import React from "react";
 import Header from "../components/Header";
 import { IDL, PROGRAM_ID, getProvider } from "../utils/const";
 import { PublicKey } from "@solana/web3.js";
@@ -6,12 +5,11 @@ import {
   Program,
   utils,
 } from "@project-serum/anchor";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CardComponent from "../components/CardComponent";
 import { useRouter } from "next/router";
 import { checkIfWalletIsConnected, connectWallet } from "../Common/WalletConnection";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
-import Loading from "../components/Loading";
 
 function MyConference() {
   const [conferences, setConferences] = useState([]);

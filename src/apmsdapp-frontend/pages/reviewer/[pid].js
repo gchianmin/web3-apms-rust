@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
-import { useEffect, useState, React } from "react";
-import { Table, Button } from "reactstrap";
+import React, { useEffect } from "react";
+import { Table } from "reactstrap";
 import { prisma } from "../../lib/prisma";
 
 export const getServerSideProps = async (context) => {
@@ -64,7 +64,6 @@ export default function ViewReviewerDetails({ reviewerList }) {
             ))}
           </tbody>
         </Table>
-        {/* ); */}
       </div>
     </>
   );

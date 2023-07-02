@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Header from "../../../components/Header";
-import { useEffect, React } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "../../../lib/prisma";
@@ -41,7 +41,6 @@ export default function DeclineInvitationPage({ invitation, paperDetails }) {
         body: JSON.stringify({
           name: paper.reviewer_name,
           reviewerEmail: paper.reviewer_email,
-          organiserEmail: paper.organiser_email,
           conferenceId: paper.conference_id,
           conferencePDA: paper.conference_pda,
           conferenceName: paper.conference_name,

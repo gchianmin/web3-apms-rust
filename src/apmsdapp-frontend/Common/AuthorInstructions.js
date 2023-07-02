@@ -1,6 +1,6 @@
 import { IDL, PROGRAM_ID, getProvider } from "../utils/const";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { Program, BN, utils } from "@project-serum/anchor";
+import { Program, BN } from "@project-serum/anchor";
 import ApiCallers from "./ApiCallers";
 import { getConference } from "./GetConferences";
 
@@ -59,7 +59,7 @@ export const deletePaper = async (
 
     let id = new PublicKey(conferenceId);
 
-    const response = await program.methods
+    await program.methods
       .deletePaper(id, paperHash)
       .accounts({
         conferenceList: conferenceListPDA,
@@ -225,8 +225,6 @@ export const makePayment = async (
     const provider = getProvider();
     const program = new Program(IDL, PROGRAM_ID, provider);
     const id = new PublicKey(conferenceId);
-    // console.log("money from: ", provider.wallet.publicKey.toString());
-    // console.log("paying money to: ", conferencePDA.toString());
     
     const pay = await program.methods
       .makePayment(

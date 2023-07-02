@@ -169,8 +169,6 @@ function AssignReviewerModal({
                 conference.conferenceId
               )
             ).organiserEmail,
-            // acceptancelink: "testaccep",
-            // declinelink: "testdecline"
           }),
           headers: {
             "Content-Type": "application/json",
@@ -233,8 +231,6 @@ function AssignReviewerModal({
             selectionLimit={3}
             emptyRecordMsg="Not found"
             displayValue="tpcName"
-            // selectedValues={acceptedReviewer}
-            // disablePreSelectedValues
           />
           <p className="pt-5">Select a paper chair:</p>
           <Multiselect
@@ -245,8 +241,6 @@ function AssignReviewerModal({
             onSelect={onSelectChair}
             emptyRecordMsg="Not found"
             displayValue="tpcName"
-            // selectedValues={acceptedChair}
-            // disablePreSelectedValues
           />
         </ModalBody>
         <ModalFooter>

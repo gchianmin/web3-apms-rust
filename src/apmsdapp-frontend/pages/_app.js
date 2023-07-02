@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }) {
     <UserProvider>
       <Layout>
         <Component {...pageProps} />
-        <Analytics />
+        {/* <Analytics /> */}
       </Layout>
     </UserProvider>
   );

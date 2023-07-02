@@ -5,7 +5,6 @@ import AccordionTable from "../components/AccordionTable";
 import { useRouter } from "next/router";
 import {
   checkIfWalletIsConnected,
-  connectWallet,
 } from "../Common/WalletConnection";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 

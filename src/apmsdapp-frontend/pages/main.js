@@ -1,6 +1,5 @@
-import React from "react";
 import Header from "../components/Header";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CardComponent from "../components/CardComponent";
 import Link from "next/link";
 import { useUser } from "@auth0/nextjs-auth0/client";

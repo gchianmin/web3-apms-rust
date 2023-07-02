@@ -21,15 +21,6 @@ export default async (req, res) => {
     });
     const organiserEmail = findEmail[0].organiser_email
 
-    // conferencePDA: props.conferencePDA,
-    // conferenceId: props.conferenceId,
-    // conferenceName: props.conferenceName,
-    // prevPaperId: prevPaper.paperId,
-    // paperId: data.entropy,
-    // title: paper.title,
-    // reviewer: prevPaper.reviewer,
-    // chair: prevPaper.paperChair
-
     const reviewerData = req.body.reviewer.map((reviewer) => ({
       id: Buffer.from(
         req.body.paperId + reviewer.tpcEmail + "reviewer"
@@ -48,7 +39,7 @@ export default async (req, res) => {
       organiser_email: organiserEmail,
     }));
 
-    const createMany = await prisma.Reviewer.createMany({
+    await prisma.Reviewer.createMany({
       data: [...reviewerData],
       skipDuplicates: true,
     });
@@ -73,7 +64,7 @@ export default async (req, res) => {
       },
     ]);
 
-    const createChair = await prisma.Reviewer.createMany({
+    await prisma.Reviewer.createMany({
       data: [
         {
           id: Buffer.from(

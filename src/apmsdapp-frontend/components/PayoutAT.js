@@ -1,27 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button } from "reactstrap";
-import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
-  RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
-} from "react-icons/ri";
-import AssignReviewerModal from "./AssignReviewerModal";
-import { useRouter } from "next/router";
 import { connectWallet } from "../Common/WalletConnection";
-import { deletePaper } from "../Common/AuthorInstructions";
-import { getPaperStatus } from "../Common/GetPapers";
 import { getConference } from "../Common/GetConferences";
 import { payoutReviewers } from "../Common/AdminInstructions";
 
 export default function PayoutAT({ props, conference, walletAddress }) {
-  const router = useRouter();
   const [filedata, setFileData] = useState(props);
   const [tpc, setTpc] = useState([]);
 
-
-  // console.log(conference)
   useEffect(() => {
     setFileData(props);
     getTpcList();

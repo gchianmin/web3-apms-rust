@@ -1,29 +1,14 @@
 import { useRouter } from "next/router";
 import Header from "../../components/Header";
-import React from "react";
-import { useEffect, useState } from "react";
-import { Button } from "reactstrap";
+import React, { useEffect, useState } from "react";
 import {
-  RiDeleteBin6Line,
-  RiDownload2Fill,
-  RiInformationLine,
-  RiArrowDownSLine,
-  RiTeamLine,
-} from "react-icons/ri";
-import AssignReviewerModal from "../../components/AssignReviewerModal";
-import {
-  checkIfWalletIsConnected,
-  connectWallet,
+  checkIfWalletIsConnected
 } from "../../Common/WalletConnection";
 import { getPaperStatus, getPaper } from "../../Common/GetPapers";
 import DownloadButton from "../../components/DownloadButton";
-import { deletePaper } from "../../Common/AuthorInstructions";
 import { getConference } from "../../Common/GetConferences";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import Expander from "../../components/Expander";
 
 export default function ViewIndividualPaperPage() {
-  const { user } = useUser();
   const [walletAddress, setWalletAddress] = useState(null);
   const [paper, setPaper] = useState([]);
   const router = useRouter();
@@ -32,26 +17,6 @@ export default function ViewIndividualPaperPage() {
     query: { conferencePDA, conferenceId, conferenceName },
   } = router;
   const conference = { conferencePDA, conferenceId, conferenceName };
-
-  const sendProps = (
-    href,
-    conferencePDA,
-    conferenceId,
-    conferenceName,
-    paperTitle,
-    paperHash
-  ) => {
-    router.push({
-      pathname: href,
-      query: {
-        conferencePDA,
-        conferenceId,
-        conferenceName,
-        paperTitle,
-        paperHash,
-      },
-    });
-  };
 
   const getSpecificPaper = async () => {
     try {
@@ -102,88 +67,6 @@ export default function ViewIndividualPaperPage() {
             </p>
             <p>Paper Status: {getPaperStatus(paper.paperStatus)}</p>
             <p>Date Submitted: {paper.dateSubmitted}</p>
-            {/* <p>Paper Authors:</p>
-            {paper.paperAuthors.map((author) => (
-              <li key={author.authorEmail}>
-                {" "}
-                {author.authorName} - {author.authorEmail} (
-                {author.authorAffiliation})
-              </li>
-            ))}
-            <p className="pt-3">
-              Paper Reviewers:
-              {paper.reviewer.length > 0 ? (
-                paper.reviewer.map((reviewer) => (
-                  <li key={reviewer.tpcEmail}>
-                    {" "}
-                    {reviewer.tpcName} - {reviewer.tpcEmail}{" "}
-                  </li>
-                ))
-              ) : (
-                <p>Not assigned yet</p>
-              )}
-            </p>
-            <p>
-              Paper Chair:
-              {paper.paperChair.tpcName == "" ? (
-                <p>Not assigned yet</p>
-              ) : (
-                <li>
-                  {paper.paperChair.tpcName} - {paper.paperChair.tpcEmail}
-                </li>
-              )}
-            </p> */}
-            {/* <AssignReviewerModal
-              walletAddress={walletAddress}
-              connectWallet={connectWallet}
-              tpc={tpc}
-              conference={conference}
-              paperId={paper.paperHash}
-            /> */}
-            {/* <Button
-              className="btn-danger"
-              type="button"
-              onClick={() =>
-                deletePaper(
-                  conference.conferencePDA,
-                  conference.conferenceId,
-                  paper.paperHash
-                )
-              }
-            >
-              DELETE SUBMISSION
-            </Button>
-            <br /> */}
-            {/* {paper.reviewer.length > 0 &&
-            paper.reviewer.find((element) => element.tpcEmail == user.email) ? (
-              // <Button
-              //   type="button"
-              //   className="btn-primary"
-              //   onClick={() =>
-              //     sendProps(
-              //       "/review-paper",
-              //       conferencePDA,
-              //       conferenceId,
-              //       conference.conferenceName,
-              //       paper.paperTitle,
-              //       paper.paperHash
-              //     )
-              //   }
-              // >
-              //   {" "}
-              //   Review{" "}
-              // </Button>
-              <Expander props={conference} paperHash={paper.paperHash} />
-            ) : (
-              <p></p>
-            )} */}
-            {/* <RiDeleteBin6Line
-              type="button"
-              color="red"
-              size={30}
-              onClick={() => deletePaper(item.paperHash, item.paperName)}
-              className="mr-3"
-            /> */}
           </>
         );
       }
