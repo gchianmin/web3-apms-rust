@@ -23,7 +23,7 @@ export default function NavBar() {
 
   return (
     <div>
-      <Navbar className='nav-color' light expand="md">
+      <Navbar className='nav-color text-dark' light expand="md">
         <Container>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>

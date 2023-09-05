@@ -27,7 +27,7 @@ export default function ViewIndividualConferencePage() {
       if (conferenceDetails) {
         return (
           <>
-            <Card className="my-2">
+            <Card className="my-2 text-dark">
               <CardImg
                 alt="sample image"
                 src="https://picsum.photos/900/180"

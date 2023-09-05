@@ -49,14 +49,14 @@ const renderMainContainer = (props, pk, router) => (
           />
 
           <CardBody>
-            <CardTitle tag="h5">{props.name}</CardTitle>
+            <CardTitle className="text-dark" tag="h5">{props.name}</CardTitle>
             <CardText className="text-sm font-italic text-info">
               Organised By: {props.createdBy}
             </CardText>
             <CardSubtitle className="mb-2 text-secondary" tag="h6">
               {props.date}
             </CardSubtitle>
-            <CardText>{props.description}</CardText>
+            <CardText className="text-dark">{props.description}</CardText>
           </CardBody>
         </Card>
       </a>
